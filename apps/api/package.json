@@ -1,0 +1,30 @@
+{
+  "name": "api",
+  "version": "1.0.0",
+  "private": false,
+  "license": "MIT",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": {
+    "name": "Yash Gourav Kar",
+    "email": "yashgouravkar@gmail.com",
+    "url": "https://github.com/99yash"
+  },
+  "keywords": [
+    "api",
+    "project",
+    "backend",
+    "express"
+  ],
+  "description": "API for the project",
+  "dependencies": {
+    "cookie-parser": "^1.4.7",
+    "express": "^5.1.0",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.3"
+  }
+}
