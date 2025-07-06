@@ -1,5 +1,5 @@
-import express from "express";
-import { env } from "./env";
+import express from 'express';
+import { env } from './env';
 
 async function main() {
   const app = express();
@@ -7,8 +7,8 @@ async function main() {
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
 
-  app.get("/", (req, res) => {
-    res.send("Hello World");
+  app.get('/', (req, res) => {
+    res.send('Hello World');
   });
 
   app.listen(env.API_SERVER_PORT, () => {
