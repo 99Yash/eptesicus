@@ -1,3 +1,4 @@
+import cookie_parser from 'cookie-parser';
 import express from 'express';
 import { env } from './env';
 
@@ -5,6 +6,7 @@ async function main() {
   const app = express();
 
   app.use(express.json());
+  app.use(cookie_parser());
   app.use(express.urlencoded({ extended: true }));
 
   app.get('/', (req, res) => {

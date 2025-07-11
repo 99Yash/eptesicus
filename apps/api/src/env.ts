@@ -1,8 +1,12 @@
-import { z } from "zod";
+import { z } from 'zod';
 
 const envSchema = z.object({
   API_SERVER_PORT: z.string().optional(),
-  NODE_ENV: z.enum(["development", "production", "staging"]).optional(),
+  DATABASE_URL: z.string().url(),
+  DB_USER: z.string(),
+  DB_PASSWORD: z.string(),
+  DB_NAME: z.string(),
+  NODE_ENV: z.enum(['development', 'production', 'staging']).optional(),
 });
 
 function createEnv(env: NodeJS.ProcessEnv) {

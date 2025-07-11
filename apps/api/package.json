@@ -26,9 +26,10 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
-    "@workspace/typescript-config": "workspace:*",
-    "@workspace/eslint-config": "workspace:*",
+    "@types/cookie-parser": "^1.4.9",
     "@types/express": "^5.0.3",
+    "@workspace/eslint-config": "workspace:*",
+    "@workspace/typescript-config": "workspace:*",
     "ts-node": "^10.9.2"
   }
 }
