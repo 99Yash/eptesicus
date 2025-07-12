@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "build": "turbo build",
+    "preinstall": "test -f .env && cp .env apps/web/.env && cp .env apps/api/.env && cp .env packages/db/.env || true",
     "start": "pnpm run dev --filter=api",
     "dev": "turbo dev",
     "lint": "turbo lint",
