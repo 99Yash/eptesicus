@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "ts-node src/index.ts"
+    "dev": "ts-node src/index.ts"
   },
   "author": {
     "name": "Yash Gourav Kar",
@@ -22,6 +22,7 @@
   "description": "API for the project",
   "dependencies": {
     "cookie-parser": "^1.4.7",
+    "dotenv": "^17.2.0",
     "express": "^5.1.0",
     "zod": "^3.24.2"
   },

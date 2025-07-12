@@ -1,5 +1,9 @@
 import cookie_parser from 'cookie-parser';
+import dotenv from 'dotenv';
 import express from 'express';
+
+dotenv.config();
+
 import { env } from './env';
 
 async function main() {
