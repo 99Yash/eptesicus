@@ -2,8 +2,8 @@ import { Geist_Mono, Inter } from 'next/font/google';
 
 import { Toaster } from '@workspace/ui/components/sonner';
 import { Metadata } from 'next';
-import './globals.css';
 
+import '@workspace/ui/globals.css';
 const fontSans = Inter({
   subsets: ['latin'],
   variable: '--font-sans',

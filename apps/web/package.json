@@ -24,7 +24,6 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@workspace/eslint-config": "workspace:^",
-    "@workspace/tailwind-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
     "autoprefixer": "^10.4.21",
     "eslint-config-prettier": "^9.1.0",
