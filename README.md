@@ -1,6 +1,6 @@
-# shadcn/ui monorepo template
+# eptesicus
 
-This template is for creating a monorepo with shadcn/ui.
+A monorepo with shadcn/ui components.
 
 ## Usage
 

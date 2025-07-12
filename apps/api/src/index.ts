@@ -2,7 +2,7 @@ import cookie_parser from 'cookie-parser';
 import dotenv from 'dotenv';
 import express from 'express';
 
-dotenv.config();
+dotenv.config(); // IMPORTANT: loads the environment variables from the .env file, before importing env.ts
 
 import { env } from './env';
 
