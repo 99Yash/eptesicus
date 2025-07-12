@@ -15,10 +15,17 @@ export default {
       },
     },
     extend: {
+      screens: {
+        xs: '480px',
+        xxs: '380px',
+      },
       borderRadius: {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
+      },
+      fontSize: {
+        xxs: ['0.625rem', { lineHeight: '1rem' }],
       },
       keyframes: {
         'accordion-down': {

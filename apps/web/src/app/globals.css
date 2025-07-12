@@ -2,23 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-.animated-border-toast {
-  border: 2px solid transparent; /* Start with a transparent border */
-  animation: neon-border 3s infinite alternate; /* Apply the animation */
-}
-
-@keyframes neon-border {
-  0% {
-    border-color: #00f; /* Initial bright blue */
-  }
-  50% {
-    border-color: #f0f; /* Magenta in the middle */
-  }
-  100% {
-    border-color: #0f0; /* Green at the end */
-  }
-}
-
 @layer base {
   :root {
     --background: 0 0% 100%;
