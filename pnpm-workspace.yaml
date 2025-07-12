@@ -1,3 +1,7 @@
 packages:
-  - "apps/*"
-  - "packages/*"
+  - 'apps/*'
+  - 'packages/*'
+catalog:
+  tailwindcss: ^3.4.17
+  typescript: ^5.7.3
+  zod: ^3.24.2
