@@ -10,7 +10,7 @@ async function main() {
   app.use(express.urlencoded({ extended: true }));
 
   app.get('/', (req, res) => {
-    res.send('Hello World');
+    res.send('API is running');
   });
 
   app.listen(env.API_SERVER_PORT, () => {
