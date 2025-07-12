@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "postcss": "^8.5.4",
-    "tailwindcss": "catalog:",
+    "tailwindcss": "^5.7.3",
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
@@ -22,7 +22,7 @@
     "@types/node": "^22.15.29",
     "eslint": "^9.21.0",
     "prettier": "^3.5.1",
-    "typescript": "catalog:"
+    "typescript": "^5.7.3"
   },
   "keywords": [],
   "author": "",

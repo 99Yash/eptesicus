@@ -4,9 +4,9 @@
   "rsc": true,
   "tsx": true,
   "tailwind": {
-    "config": "",
-    "css": "src/styles/globals.css",
-    "baseColor": "neutral",
+    "config": "../tailwind-config/web.ts",
+    "css": "unused.css",
+    "baseColor": "zinc",
     "cssVariables": true
   },
   "iconLibrary": "lucide",

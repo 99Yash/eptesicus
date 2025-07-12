@@ -1,5 +1,6 @@
 import { Geist_Mono, Inter } from 'next/font/google';
 
+import { Toaster } from '@workspace/ui/components/sonner';
 import { Metadata } from 'next';
 import './globals.css';
 
@@ -28,6 +29,7 @@ export default function RootLayout({
       <body
         className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased`}
       >
+        <Toaster />
         {children}
       </body>
     </html>
