@@ -10,7 +10,7 @@ class CookieService {
   options: CookieOptions = {
     path: '/',
     httpOnly: true,
-    secure: env.NODE_ENV === 'production' ? true : false,
+    secure: env.NODE_ENV !== 'development',
     sameSite: 'lax',
     maxAge: ONE_MONTH,
   };

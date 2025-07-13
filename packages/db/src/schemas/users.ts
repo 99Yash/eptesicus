@@ -1,6 +1,6 @@
 import { relations } from 'drizzle-orm';
 import { index, pgTable, text, varchar } from 'drizzle-orm/pg-core';
-import { lifecycleDates } from './utils';
+import { lifecycle_dates } from './utils';
 
 export const users = pgTable(
   'users',
@@ -11,7 +11,7 @@ export const users = pgTable(
     username: varchar('username', { length: 50 }).notNull().unique(),
     image_url: text('image_url'),
     bio: text('bio'),
-    ...lifecycleDates,
+    ...lifecycle_dates,
   },
   (user) => [
     index('email_idx').on(user.email),
@@ -25,7 +25,7 @@ export const organizations = pgTable('organizations', {
   name: varchar('name', { length: 255 }).notNull(),
   logo_url: text('logo_url'),
   bio: text('bio'),
-  ...lifecycleDates,
+  ...lifecycle_dates,
 });
 
 export const users_to_organizations = pgTable('users_to_organizations', {
@@ -33,7 +33,7 @@ export const users_to_organizations = pgTable('users_to_organizations', {
   organization_id: varchar('organization_id').references(
     () => organizations.id
   ),
-  ...lifecycleDates,
+  ...lifecycle_dates,
 });
 
 export const user_organization_relations = relations(users, ({ many }) => ({
