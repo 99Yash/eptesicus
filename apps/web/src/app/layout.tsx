@@ -1,9 +1,9 @@
-import { Toaster } from '@workspace/ui/components/sonner';
-
 import { Metadata } from 'next';
 import { Geist_Mono, Inter } from 'next/font/google';
 
+import { Toaster } from '@workspace/ui/components/sonner';
 import '@workspace/ui/globals.css';
+import { MainLayout } from '~/components/layouts/main-layout';
 import { siteConfig } from '~/lib/site';
 
 const fontSans = Inter({
@@ -44,8 +44,8 @@ export default function RootLayout({
       <body
         className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased`}
       >
+        <MainLayout>{children}</MainLayout>
         <Toaster />
-        {children}
       </body>
     </html>
   );
