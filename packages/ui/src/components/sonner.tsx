@@ -8,7 +8,9 @@ const Toaster = ({ ...props }: ToasterProps) => {
       theme="dark"
       richColors
       closeButton
-      visibleToasts={2}
+      toastOptions={{
+        duration: 1000,
+      }}
       className="toaster group"
       style={
         {
