@@ -1,5 +1,6 @@
 import { SidebarProvider } from '@workspace/ui/components/sidebar';
 import { cn } from '@workspace/ui/lib/utils';
+import { AppSidebar } from './sidebar/app-sidebar';
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -13,6 +14,7 @@ export function MainLayout({ children, headersNumber = 2 }: MainLayoutProps) {
   // };
   return (
     <SidebarProvider>
+      <AppSidebar />
       <div className="h-svh overflow-hidden lg:p-2 w-full">
         <div className="lg:border lg:rounded-md overflow-hidden flex flex-col items-center justify-start bg-container h-full w-full">
           <div
