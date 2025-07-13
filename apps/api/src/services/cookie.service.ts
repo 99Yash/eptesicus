@@ -19,15 +19,15 @@ class CookieService {
     token: 'token',
   };
 
-  set_token_cookie({ res, token }: { res: Response; token: string }) {
+  setTokenCookie({ res, token }: { res: Response; token: string }) {
     res.cookie(this.cookie_keys.token, token, this.options);
   }
 
-  get_token_cookie({ req }: { req: Request }) {
+  getTokenCookie({ req }: { req: Request }) {
     return req.cookies.token;
   }
 
-  clear_token_cookie({ res }: { res: Response }) {
+  clearTokenCookie({ res }: { res: Response }) {
     res.clearCookie(this.cookie_keys.token, this.options);
   }
 }

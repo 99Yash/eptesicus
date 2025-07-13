@@ -7,6 +7,7 @@ const envSchema = z.object({
   DB_PASSWORD: z.string(),
   DB_NAME: z.string(),
   NODE_ENV: z.enum(['development', 'production', 'staging']).optional(),
+  JWT_SECRET: z.string(),
 });
 
 function createEnv(env: NodeJS.ProcessEnv) {
