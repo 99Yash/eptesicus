@@ -7,6 +7,8 @@ dotenv.config(); // IMPORTANT: loads the environment variables from the .env fil
 
 import { env } from './env';
 
+// NOTE https://github.com/expressjs/express/discussions/5491 - `csurf` package is archived, and has issues.
+
 async function main() {
   const app = express();
 
@@ -16,7 +18,12 @@ async function main() {
     cors({
       origin: ['http://localhost:3000'], // TODO: change to the production URL
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-      credentials: true,
+      credentials: true, // Allow this frontend (origin) to send cookies, authorization headers, or TLS client certificates along with requests.
+      // In the client, you need to do this, else headers won't be included:
+      //
+      // fetch('http://localhost:4000/protected', {
+      //   credentials: 'include', // ✅ tells browser: "send cookies or Authorization headers"
+      // });
     })
   );
 
