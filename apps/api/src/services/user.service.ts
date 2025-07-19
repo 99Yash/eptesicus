@@ -1,14 +1,13 @@
 import { db } from '@workspace/db';
-import { UserInsertType, UserSelectType, users } from '@workspace/db/schemas';
+import { UserInsertType } from '@workspace/db/helpers';
+import { users } from '@workspace/db/schemas';
 import { AppError } from '../lib/error';
 
 class UserService {
-  async createUser(
-    user: Omit<UserInsertType, 'id' | 'createdAt' | 'updatedAt'>
-  ): Promise<UserSelectType> {
-    const { email, name, username, bio, image_url } = user;
+  async createUser(args: UserInsertType) {
+    const { email, name, username, bio, image_url } = args;
 
-    const [newUser] = await db
+    const [user] = await db
       .insert(users)
       .values({
         email,
@@ -19,14 +18,14 @@ class UserService {
       })
       .returning();
 
-    if (!newUser) {
+    if (!user) {
       throw new AppError({
         code: 'INTERNAL_SERVER_ERROR',
         message: 'Failed to create user',
       });
     }
 
-    return newUser;
+    return user;
   }
 }
 

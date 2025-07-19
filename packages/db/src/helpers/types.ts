@@ -8,8 +8,8 @@ export type UserToOrganization = InferSelectModel<
   typeof users_to_organizations
 >;
 
-export type UserInsert = InferInsertModel<typeof users>;
-export type OrganizationInsert = InferInsertModel<typeof organizations>;
+export type UserInsertType = InferInsertModel<typeof users>;
+export type OrganizationInsertType = InferInsertModel<typeof organizations>;
 
 export const userInsertSchema = z.object({
   email: z.string().email(),

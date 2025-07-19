@@ -1,10 +1,10 @@
-import { User, UserInsert } from '@workspace/db/helpers';
+import { User, UserInsertType } from '@workspace/db/helpers';
 import { NextFunction, Request, Response } from 'express';
 import userService from '../services/user.service';
 
 class UserController {
   async createUser(
-    req: Request<object, object, UserInsert>,
+    req: Request<object, object, UserInsertType>,
     res: Response<{ user: User }>,
     next: NextFunction
   ): Promise<void> {
