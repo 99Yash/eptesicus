@@ -1,6 +1,6 @@
 import { User, UserInsertType } from '@workspace/db/helpers';
 import { NextFunction, Request, Response } from 'express';
-import userService from '../services/user.service';
+import { userService } from '../services/user.service';
 
 class UserController {
   async createUser(
@@ -26,4 +26,4 @@ class UserController {
   }
 }
 
-export default new UserController();
+export const userController = new UserController();

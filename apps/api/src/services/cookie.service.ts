@@ -46,4 +46,4 @@ class CookieService {
   }
 }
 
-export const cookie_service = new CookieService();
+export const cookieService = new CookieService();
