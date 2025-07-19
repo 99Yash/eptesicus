@@ -5,4 +5,4 @@ import { validate } from '../middlewares/validate.middleware';
 
 export const userRouter: Router = Router({ mergeParams: true });
 
-userRouter.post('/', validate(userInsertSchema), userController.createUser);
+userRouter.post('/', validate(userInsertSchema), userController.upsertUser);

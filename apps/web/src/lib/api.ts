@@ -1,16 +1,21 @@
-import { env } from 'process';
+import axios from 'axios';
+import { env } from '../env';
+
+const _axios = axios.create({
+  baseURL: `${env.NEXT_PUBLIC_API_URL}`,
+  withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
 
 export class API {
-  static async login(email: string, password: string) {
-    const response = await fetch(`${env.NEXT_PUBLIC_API_URL}/auth/login`, {
-      method: 'POST',
-      body: JSON.stringify({ email, password }),
+  async login(email: string, password: string) {
+    const response = await _axios.post('/auth/login', {
+      email,
+      password,
     });
 
-    if (!response.ok) {
-      throw new Error('Failed to login');
-    }
-
-    return response.json();
+    return response.data;
   }
 }

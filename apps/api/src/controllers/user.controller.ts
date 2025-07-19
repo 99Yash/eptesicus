@@ -3,7 +3,7 @@ import { NextFunction, Request, Response } from 'express';
 import { userService } from '../services/user.service';
 
 class UserController {
-  async createUser(
+  async upsertUser(
     req: Request<object, object, UserInsertType>,
     res: Response<{ user: User }>,
     next: NextFunction
@@ -11,7 +11,7 @@ class UserController {
     try {
       const { email, name, username, bio, image_url } = req.body;
 
-      const user = await userService.createUser({
+      const user = await userService.upsertUser({
         email,
         name,
         username,

@@ -1,11 +1,19 @@
-import { db } from '@workspace/db';
+import { db, eq } from '@workspace/db';
 import { UserInsertType } from '@workspace/db/helpers';
 import { users } from '@workspace/db/schemas';
 import { AppError } from '../lib/error';
 
 class UserService {
-  async createUser(args: UserInsertType) {
+  async upsertUser(args: UserInsertType) {
     const { email, name, username, bio, image_url } = args;
+
+    const existingUser = await db.query.users.findFirst({
+      where: eq(users.email, email),
+    });
+
+    if (existingUser) {
+      return existingUser;
+    }
 
     const [user] = await db
       .insert(users)
