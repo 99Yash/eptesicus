@@ -17,7 +17,7 @@ export function MainLayout({ children, headersNumber = 2 }: MainLayoutProps) {
         <div className="lg:border lg:rounded-md overflow-hidden flex flex-col items-center justify-start bg-container h-full w-full">
           <div
             className={cn(
-              'overflow-auto w-full h-full'
+              'overflow-auto w-full h-full scrollbar-hide'
               // height[headersNumber as keyof typeof height]
             )}
           >
