@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { ZodSchema } from 'zod';
+import { AnyZodObject } from 'zod';
 import { AppError } from '../lib/error';
 
 /*
@@ -8,7 +8,8 @@ import { AppError } from '../lib/error';
  * @returns A middleware function that validates the request body
  */
 export const validate =
-  (schema: ZodSchema) => (req: Request, _res: Response, next: NextFunction) => {
+  (schema: AnyZodObject) =>
+  (req: Request, _res: Response, next: NextFunction) => {
     try {
       const result = schema.safeParse(req.body);
 
@@ -26,8 +27,6 @@ export const validate =
           cause: errors.map((error) => error.message).join(', '),
         });
       }
-
-      req.body = result.data;
 
       next();
     } catch (error) {

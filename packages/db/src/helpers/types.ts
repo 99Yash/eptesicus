@@ -1,4 +1,4 @@
-import { InferInsertModel, InferSelectModel } from 'drizzle-orm';
+import { InferSelectModel } from 'drizzle-orm';
 import { z } from 'zod';
 import { organizations, users, users_to_organizations } from '../schemas/users';
 
@@ -8,9 +8,6 @@ export type UserToOrganization = InferSelectModel<
   typeof users_to_organizations
 >;
 
-export type UserInsertType = InferInsertModel<typeof users>;
-export type OrganizationInsertType = InferInsertModel<typeof organizations>;
-
 export const userInsertSchema = z.object({
   email: z.string().email(),
   name: z.string().min(1),
@@ -18,3 +15,5 @@ export const userInsertSchema = z.object({
   image_url: z.string().optional(),
   bio: z.string().optional(),
 });
+
+export type UserInsertType = z.infer<typeof userInsertSchema>;
