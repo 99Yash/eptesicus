@@ -22,11 +22,13 @@
   ],
   "description": "API for the project",
   "dependencies": {
+    "@workspace/db": "workspace:*",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^17.2.0",
     "express": "^5.1.0",
     "jose": "^6.0.11",
+    "nanoid": "^5.1.5",
     "zod": "^3.25.1"
   },
   "devDependencies": {

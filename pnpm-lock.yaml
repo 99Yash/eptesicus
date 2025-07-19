@@ -26,6 +26,9 @@ importers:
 
   apps/api:
     dependencies:
+      '@workspace/db':
+        specifier: workspace:*
+        version: link:../../packages/db
       cookie-parser:
         specifier: ^1.4.7
         version: 1.4.7
@@ -41,6 +44,9 @@ importers:
       jose:
         specifier: ^6.0.11
         version: 6.0.11
+      nanoid:
+        specifier: ^5.1.5
+        version: 5.1.5
       zod:
         specifier: ^3.25.1
         version: 3.25.1
@@ -66,6 +72,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@t3-oss/env-nextjs':
+        specifier: ^0.13.8
+        version: 0.13.8(typescript@5.7.3)(zod@3.25.1)
       '@workspace/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -135,13 +144,16 @@ importers:
         version: 0.44.2(@types/pg@8.15.4)(postgres@3.4.7)
       drizzle-zod:
         specifier: ^0.8.2
-        version: 0.8.2(drizzle-orm@0.44.2(@types/pg@8.15.4)(postgres@3.4.7))(zod@3.24.2)
+        version: 0.8.2(drizzle-orm@0.44.2(@types/pg@8.15.4)(postgres@3.4.7))(zod@3.25.1)
+      nanoid:
+        specifier: ^5.1.5
+        version: 5.1.5
       postgres:
         specifier: ^3.4.7
         version: 3.4.7
       zod:
-        specifier: ^3.24.2
-        version: 3.24.2
+        specifier: ^3.25.1
+        version: 3.25.1
     devDependencies:
       '@types/node':
         specifier: ^24.0.13
@@ -1741,6 +1753,40 @@ packages:
 
   '@swc/helpers@0.5.15':
     resolution: {integrity: sha512-JQ5TuMi45Owi4/BIMAJBoSQoOJu12oOk/gADqlcUL9JEdHB8vyjUSsxqeNXnmXHjYKMi2WcYtezGEEhqUI/E2g==}
+
+  '@t3-oss/env-core@0.13.8':
+    resolution: {integrity: sha512-L1inmpzLQyYu4+Q1DyrXsGJYCXbtXjC4cICw1uAKv0ppYPQv656lhZPU91Qd1VS6SO/bou1/q5ufVzBGbNsUpw==}
+    peerDependencies:
+      arktype: ^2.1.0
+      typescript: '>=5.0.0'
+      valibot: ^1.0.0-beta.7 || ^1.0.0
+      zod: ^3.24.0 || ^4.0.0-beta.0
+    peerDependenciesMeta:
+      arktype:
+        optional: true
+      typescript:
+        optional: true
+      valibot:
+        optional: true
+      zod:
+        optional: true
+
+  '@t3-oss/env-nextjs@0.13.8':
+    resolution: {integrity: sha512-QmTLnsdQJ8BiQad2W2nvV6oUpH4oMZMqnFEjhVpzU0h3sI9hn8zb8crjWJ1Amq453mGZs6A4v4ihIeBFDOrLeQ==}
+    peerDependencies:
+      arktype: ^2.1.0
+      typescript: '>=5.0.0'
+      valibot: ^1.0.0-beta.7 || ^1.0.0
+      zod: ^3.24.0 || ^4.0.0-beta.0
+    peerDependenciesMeta:
+      arktype:
+        optional: true
+      typescript:
+        optional: true
+      valibot:
+        optional: true
+      zod:
+        optional: true
 
   '@tailwindcss/node@4.1.11':
     resolution: {integrity: sha512-yzhzuGRmv5QyU9qLNg4GTlYI6STedBWRE7NjxP45CsFYYq9taI0zJXZBMqIC/c8fViNLhmrbpSFS57EoxUmD6Q==}
@@ -3521,6 +3567,11 @@ packages:
   nanoid@3.3.11:
     resolution: {integrity: sha512-N8SpfPUnUp1bK+PMYW8qSWdl9U+wwNWI4QKxOYDy9JAro3WMX7p2OeVRF9v+347pnakNevPmiHhNmZ2HbFA76w==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
+    hasBin: true
+
+  nanoid@5.1.5:
+    resolution: {integrity: sha512-Ir/+ZpE9fDsNH0hQ3C68uyThDXzYcim2EqcZ8zn8Chtt1iylPT9xXJB0kPCnqzgcEGikO9RxSrh63MsmVCU7Fw==}
+    engines: {node: ^18 || >=20}
     hasBin: true
 
   natural-compare@1.4.0:
@@ -5857,6 +5908,18 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
+  '@t3-oss/env-core@0.13.8(typescript@5.7.3)(zod@3.25.1)':
+    optionalDependencies:
+      typescript: 5.7.3
+      zod: 3.25.1
+
+  '@t3-oss/env-nextjs@0.13.8(typescript@5.7.3)(zod@3.25.1)':
+    dependencies:
+      '@t3-oss/env-core': 0.13.8(typescript@5.7.3)(zod@3.25.1)
+    optionalDependencies:
+      typescript: 5.7.3
+      zod: 3.25.1
+
   '@tailwindcss/node@4.1.11':
     dependencies:
       '@ampproject/remapping': 2.3.0
@@ -6718,10 +6781,10 @@ snapshots:
       '@types/pg': 8.15.4
       postgres: 3.4.7
 
-  drizzle-zod@0.8.2(drizzle-orm@0.44.2(@types/pg@8.15.4)(postgres@3.4.7))(zod@3.24.2):
+  drizzle-zod@0.8.2(drizzle-orm@0.44.2(@types/pg@8.15.4)(postgres@3.4.7))(zod@3.25.1):
     dependencies:
       drizzle-orm: 0.44.2(@types/pg@8.15.4)(postgres@3.4.7)
-      zod: 3.24.2
+      zod: 3.25.1
 
   dunder-proto@1.0.1:
     dependencies:
@@ -7848,6 +7911,8 @@ snapshots:
       thenify-all: 1.6.0
 
   nanoid@3.3.11: {}
+
+  nanoid@5.1.5: {}
 
   natural-compare@1.4.0: {}
 

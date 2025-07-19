@@ -6,6 +6,7 @@ import express from 'express';
 dotenv.config(); // IMPORTANT: loads the environment variables from the .env file, before importing env.ts
 
 import { env } from './env';
+import { userRouter } from './routers/user.router';
 
 // NOTE https://github.com/expressjs/express/discussions/5491 - `csurf` package is archived, and has issues.
 
@@ -29,6 +30,8 @@ async function main() {
 
   app.use(cookie_parser());
   app.use(express.urlencoded({ extended: true }));
+
+  app.use('/users', userRouter);
 
   app.get('/', (req, res) => {
     res.send('API is running');

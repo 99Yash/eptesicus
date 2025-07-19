@@ -1,11 +1,13 @@
 import { relations } from 'drizzle-orm';
 import { index, pgTable, text, varchar } from 'drizzle-orm/pg-core';
-import { lifecycle_dates } from './utils';
+import { createId, lifecycle_dates } from '../helpers/utils';
 
 export const users = pgTable(
   'users',
   {
-    id: varchar('id').primaryKey(),
+    id: varchar('id')
+      .$defaultFn(() => createId())
+      .primaryKey(),
     email: varchar('email', { length: 255 }).notNull().unique(),
     name: varchar('name', { length: 255 }).notNull(),
     username: varchar('username', { length: 50 }).notNull().unique(),
@@ -21,7 +23,9 @@ export const users = pgTable(
 );
 
 export const organizations = pgTable('organizations', {
-  id: varchar('id').primaryKey(),
+  id: varchar('id')
+    .$defaultFn(() => createId())
+    .primaryKey(),
   name: varchar('name', { length: 255 }).notNull(),
   logo_url: text('logo_url'),
   bio: text('bio'),
