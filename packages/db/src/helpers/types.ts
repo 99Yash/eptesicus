@@ -9,7 +9,7 @@ export type UserToOrganization = InferSelectModel<
 >;
 
 export const userInsertSchema = z.object({
-  email: z.string().email(),
+  email: z.string().email().max(255),
   name: z.string().min(1),
   username: z.string().min(1),
   image_url: z.string().optional(),

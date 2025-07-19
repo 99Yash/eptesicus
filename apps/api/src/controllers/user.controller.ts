@@ -32,6 +32,8 @@ class UserController {
   ): Promise<void> {
     try {
       const user = await userService.getUser(req.query.id);
+
+      res.status(200).json({ user });
     } catch (error) {
       next(error);
     }
