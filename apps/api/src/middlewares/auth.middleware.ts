@@ -25,7 +25,7 @@ export const authenticate: RequestHandler = async (
     if (!token || typeof token !== 'string') {
       throw new AppError({
         code: 'UNAUTHORIZED',
-        message: 'No token provided',
+        message: 'No token provided. Please login again.',
       });
     }
 
@@ -34,9 +34,13 @@ export const authenticate: RequestHandler = async (
     if (res.is_expired) {
       throw new AppError({
         code: 'FORBIDDEN',
-        message: 'Token expired',
+        message: 'Token expired. Please login again.',
       });
     }
+
+    req.body.user = {
+      id: res.uid,
+    };
 
     next();
   } catch (error) {

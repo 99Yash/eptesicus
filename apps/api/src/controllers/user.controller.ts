@@ -24,6 +24,18 @@ class UserController {
       next(error);
     }
   }
+
+  async getCurrentUser(
+    req: Request<object, object, object, { id: string }>,
+    res: Response<{ user: User }>,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const user = await userService.getUser(req.query.id);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export const userController = new UserController();

@@ -35,6 +35,21 @@ class UserService {
 
     return user;
   }
+
+  async getUser(id: string) {
+    const user = await db.query.users.findFirst({
+      where: eq(users.id, id),
+    });
+
+    if (!user) {
+      throw new AppError({
+        code: 'NOT_FOUND',
+        message: 'User not found',
+      });
+    }
+
+    return user;
+  }
 }
 
 export const userService = new UserService();

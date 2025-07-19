@@ -9,13 +9,20 @@ const _axios = axios.create({
   },
 });
 
-export class API {
+class API {
   async login(email: string, password: string) {
-    const response = await _axios.post('/auth/login', {
+    const response = await _axios.post('/users', {
       email,
       password,
     });
 
     return response.data;
   }
+
+  async getCurrentUser() {
+    const response = await _axios.get('/users');
+    return response.data;
+  }
 }
+
+export const api = new API();
