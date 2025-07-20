@@ -31,7 +31,7 @@ class CookieService {
   /*
    * @description Get the token cookie from the request object
    * @param req - The request object
-   * @returns The token cookie
+   * @returns `req.cookies.token`
    */
   getTokenCookie({ req }: { req: Request }) {
     return req.cookies.token;

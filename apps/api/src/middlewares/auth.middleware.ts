@@ -38,10 +38,6 @@ export const authenticate: RequestHandler = async (
       });
     }
 
-    req.body.user = {
-      id: res.uid,
-    };
-
     next();
   } catch (error) {
     next(error);
