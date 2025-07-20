@@ -36,8 +36,9 @@ class UserService {
       });
     }
 
-    // TODO: create email verification code
-    const [email_code] = await db
+    // TODO: create email verification code (only if auth is using email verification?)
+    //  Send a generic toast message to the user that a verification code has been sent to their email, like "Please check your inbox for further instructions"
+    const [verification_code] = await db
       .insert(email_verification_codes)
       .values({
         email,
