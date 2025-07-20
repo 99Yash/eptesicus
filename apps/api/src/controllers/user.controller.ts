@@ -1,5 +1,6 @@
 import { User, UserInsertType } from '@workspace/db/helpers';
 import { NextFunction, Request, Response } from 'express';
+import { AuthenticatedRequest } from '../lib/auth';
 import { generateEncryptedToken } from '../lib/jwt';
 import { cookieService } from '../services/cookie.service';
 import { userService } from '../services/user.service';
@@ -34,12 +35,12 @@ class UserController {
   }
 
   async getCurrentUser(
-    req: Request<object, object, object, { id: string }>,
+    req: AuthenticatedRequest,
     res: Response<{ user: User }>,
     next: NextFunction
   ): Promise<void> {
     try {
-      const user = await userService.getUser(req.query.id);
+      const user = await userService.getUser(req.userId);
 
       res.status(200).json({ user });
     } catch (error) {
