@@ -8,8 +8,6 @@ import { useUser } from '~/hooks/use-user';
 export default function Page() {
   const { data: user } = useUser();
 
-  console.log(user);
-
   return (
     <div className="flex items-center justify-center min-h-svh">
       <div className="flex flex-col items-center justify-center gap-4">

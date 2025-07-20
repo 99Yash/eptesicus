@@ -90,10 +90,11 @@ export function EmailSignIn() {
         />
       </div>
       <Button disabled={loginMutation.isPending}>
-        {loginMutation.isPending && (
+        {loginMutation.isPending ? (
           <Spinner className="mr-2 h-4 w-4 animate-spin" />
+        ) : (
+          'Sign In with Email'
         )}
-        Sign In with Email
       </Button>
     </form>
   );
