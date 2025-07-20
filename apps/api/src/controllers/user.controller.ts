@@ -1,4 +1,4 @@
-import { User, UserInsertType } from '@workspace/db/helpers';
+import { UserInsertType } from '@workspace/db/helpers';
 import { NextFunction, Request, Response } from 'express';
 import { AuthenticatedRequest } from '../lib/auth';
 import { generateEncryptedToken } from '../lib/jwt';
@@ -8,7 +8,7 @@ import { userService } from '../services/user.service';
 class UserController {
   async upsertUser(
     req: Request<object, object, UserInsertType>,
-    res: Response<{ user: User; token: string }>,
+    res: Response<Awaited<ReturnType<typeof userService.upsertUser>>>,
     next: NextFunction
   ): Promise<void> {
     try {
@@ -28,7 +28,7 @@ class UserController {
 
       cookieService.setTokenCookie({ res, token });
 
-      res.status(201).json({ user, token });
+      res.status(201).json(user);
     } catch (error) {
       next(error);
     }
@@ -36,13 +36,13 @@ class UserController {
 
   async getCurrentUser(
     req: AuthenticatedRequest,
-    res: Response<{ user: User }>,
+    res: Response<Awaited<ReturnType<typeof userService.getUser>>>,
     next: NextFunction
   ): Promise<void> {
     try {
       const user = await userService.getUser(req.userId);
 
-      res.status(200).json({ user });
+      res.status(200).json(user);
     } catch (error) {
       next(error);
     }

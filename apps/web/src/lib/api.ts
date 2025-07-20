@@ -33,7 +33,7 @@ class API {
   }
 
   async getCurrentUser() {
-    const response = await _axios.get('/users');
+    const response = await _axios.get<{ user: User }>('/users');
     return response.data;
   }
 }
