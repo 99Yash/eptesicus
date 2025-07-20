@@ -2,7 +2,7 @@ import { EncryptJWT, jwtDecrypt } from 'jose';
 
 import { env } from '../env';
 
-const secret = Buffer.from(env.JWT_SECRET, 'base64'); // ✅ 32 bytes
+const secret = Buffer.from(env.JWT_SECRET, 'base64');
 
 if (secret.length !== 32) {
   throw new Error('Invalid key length: must be 32 bytes');

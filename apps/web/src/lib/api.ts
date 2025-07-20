@@ -1,3 +1,4 @@
+import { type User } from '@workspace/db/helpers';
 import axios from 'axios';
 import { env } from '../env';
 
@@ -19,11 +20,14 @@ class API {
     name: string;
     username: string;
   }) {
-    const response = await _axios.post('/users', {
-      email,
-      name,
-      username,
-    });
+    const response = await _axios.post<{ user: User; token: string }>(
+      '/users',
+      {
+        email,
+        name,
+        username,
+      }
+    );
 
     return response.data;
   }
