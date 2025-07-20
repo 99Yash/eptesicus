@@ -1,14 +1,15 @@
-import { UserInsertType } from '@workspace/db/helpers';
-import { NextFunction, Request, Response } from 'express';
-import { AuthenticatedRequest } from '../lib/auth';
+import { userInsertSchema } from '@workspace/db/helpers';
+import { NextFunction, Response } from 'express';
 import { generateEncryptedToken } from '../lib/jwt';
+import { AuthenticatedRequest } from '../middlewares/auth';
+import { ValidatedRequest } from '../middlewares/validate';
 import { cookieService } from '../services/cookie.service';
 import { userService } from '../services/user.service';
 
 class UserController {
   async upsertUser(
-    req: Request<object, object, UserInsertType>,
-    res: Response<Awaited<ReturnType<typeof userService.upsertUser>>>,
+    req: ValidatedRequest<typeof userInsertSchema>,
+    res: Response,
     next: NextFunction
   ): Promise<void> {
     try {
@@ -36,7 +37,7 @@ class UserController {
 
   async getCurrentUser(
     req: AuthenticatedRequest,
-    res: Response<Awaited<ReturnType<typeof userService.getUser>>>,
+    res: Response,
     next: NextFunction
   ): Promise<void> {
     try {
