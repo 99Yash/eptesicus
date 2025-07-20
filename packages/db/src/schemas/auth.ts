@@ -1,4 +1,10 @@
-import { index, pgTable, timestamp, varchar } from 'drizzle-orm/pg-core';
+import {
+  index,
+  integer,
+  pgTable,
+  timestamp,
+  varchar,
+} from 'drizzle-orm/pg-core';
 import { createId, lifecycle_dates } from '../helpers/utils';
 import { users } from './users';
 
@@ -13,8 +19,12 @@ export const email_verification_codes = pgTable(
       .unique()
       .notNull(),
     user_id: varchar('user_id').references(() => users.id),
-    code: varchar('code', { length: 6 }).notNull(),
-    expires_at: timestamp('expires_at').notNull(),
+    code: integer('code').notNull(),
+    expires_at: timestamp('expires_at')
+      .$defaultFn(() => {
+        return new Date(Date.now() + 60 * 60 * 1000);
+      })
+      .notNull(),
     ...lifecycle_dates,
   },
   (table) => [
