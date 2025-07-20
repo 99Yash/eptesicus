@@ -14,10 +14,10 @@ export function MainLayout({ children, headersNumber = 2 }: MainLayoutProps) {
   return (
     <SidebarProvider>
       <div className="h-svh overflow-hidden lg:p-2 w-full">
-        <div className="lg:border lg:rounded-md overflow-hidden flex flex-col items-center justify-start bg-container h-full w-full">
+        <div className="lg:border lg:rounded-md overflow-hidden flex flex-col items-center justify-start bg-container w-full">
           <div
             className={cn(
-              'overflow-auto w-full h-full scrollbar-hide'
+              'overflow-auto w-full h-full'
               // height[headersNumber as keyof typeof height]
             )}
           >

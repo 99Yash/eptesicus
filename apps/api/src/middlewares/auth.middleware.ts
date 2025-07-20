@@ -20,7 +20,7 @@ export const authenticate: RequestHandler = async (
   next: NextFunction
 ) => {
   try {
-    const token = cookieService.getTokenCookie({ req }); // HttpOnly: true on the cookie ensures JS cannot access it from within your frontend (e.g. no document.cookie access). XSS is not a concern here.
+    const token = cookieService.getTokenCookie({ req }); // HttpOnly: true on the cookie ensures JS cannot access it from within your frontend (e.g. no `document.cookie` access). XSS is not a concern here.
 
     if (!token || typeof token !== 'string') {
       throw new AppError({

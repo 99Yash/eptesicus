@@ -1,5 +1,7 @@
 import { User, UserInsertType } from '@workspace/db/helpers';
 import { NextFunction, Request, Response } from 'express';
+import { generateEncryptedToken } from '../lib/jwt';
+import { cookieService } from '../services/cookie.service';
 import { userService } from '../services/user.service';
 
 class UserController {
@@ -18,6 +20,10 @@ class UserController {
         bio,
         image_url,
       });
+
+      const { token } = await generateEncryptedToken({ uid: user.id });
+
+      cookieService.setTokenCookie({ res, token });
 
       res.status(201).json({ user });
     } catch (error) {
