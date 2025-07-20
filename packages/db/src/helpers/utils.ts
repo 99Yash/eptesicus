@@ -18,3 +18,7 @@ export function createId(
   const id = customAlphabet('0123456789abcdefghijklmnopqrstuvwxyz', length)();
   return prefix ? `${prefix}${separator}${id}` : id;
 }
+
+export function generateRandomCode(length: number = 8) {
+  return customAlphabet('0123456789', length)();
+}

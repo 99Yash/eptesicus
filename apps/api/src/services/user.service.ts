@@ -1,6 +1,6 @@
 import { db, eq } from '@workspace/db';
 import { UserInsertType } from '@workspace/db/helpers';
-import { users } from '@workspace/db/schemas';
+import { email_verification_codes, users } from '@workspace/db/schemas';
 import { AppError } from '../lib/error';
 
 class UserService {
@@ -14,6 +14,9 @@ class UserService {
     if (existingUser) {
       return existingUser;
     }
+
+    // TODO: send email verification code
+    // If user doesn't exist, create user, create email verification code
 
     const [user] = await db
       .insert(users)
@@ -32,6 +35,18 @@ class UserService {
         message: 'Failed to create user',
       });
     }
+
+    // TODO: create email verification code
+    const [email_code] = await db
+      .insert(email_verification_codes)
+      .values({
+        email,
+        user_id: user.id,
+        expires_at: new Date(Date.now() + 60 * 60 * 1000),
+      })
+      .returning();
+
+    // TODO: email verification code to the user's email
 
     return user;
   }

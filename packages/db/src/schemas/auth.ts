@@ -5,7 +5,11 @@ import {
   timestamp,
   varchar,
 } from 'drizzle-orm/pg-core';
-import { createId, lifecycle_dates } from '../helpers/utils';
+import {
+  createId,
+  generateRandomCode,
+  lifecycle_dates,
+} from '../helpers/utils';
 import { users } from './users';
 
 export const email_verification_codes = pgTable(
@@ -19,7 +23,9 @@ export const email_verification_codes = pgTable(
       .unique()
       .notNull(),
     user_id: varchar('user_id').references(() => users.id),
-    code: integer('code').notNull(),
+    code: integer('code')
+      .$defaultFn(() => parseInt(generateRandomCode(8)))
+      .notNull(),
     expires_at: timestamp('expires_at')
       .$defaultFn(() => {
         return new Date(Date.now() + 60 * 60 * 1000);
