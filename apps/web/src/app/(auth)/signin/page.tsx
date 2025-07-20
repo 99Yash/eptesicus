@@ -1,6 +1,17 @@
+'use client';
+
+import { useRouter } from 'next/navigation';
+import { useUser } from '~/hooks/use-user';
 import { EmailSignIn } from './email-signin';
 
 export default function AuthenticationPage() {
+  const router = useRouter();
+  const { data: user } = useUser();
+
+  if (user) {
+    router.push('/');
+  }
+
   return (
     <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
       <div className="flex flex-col space-y-2 text-center">

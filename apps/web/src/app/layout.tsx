@@ -1,10 +1,10 @@
 import { Metadata } from 'next';
 import { Geist_Mono, Inter } from 'next/font/google';
 
-import { Toaster } from '@workspace/ui/components/sonner';
 import '@workspace/ui/globals.css';
 
-import { MainLayout } from '~/components/layouts/main-layout';
+import { MainLayout } from '~/components/main-layout';
+import { Providers } from '~/components/providers';
 import { siteConfig } from '~/lib/site';
 
 const fontSans = Inter({
@@ -45,8 +45,9 @@ export default function RootLayout({
       <body
         className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased`}
       >
-        <MainLayout>{children}</MainLayout>
-        <Toaster />
+        <Providers>
+          <MainLayout>{children}</MainLayout>
+        </Providers>
       </body>
     </html>
   );

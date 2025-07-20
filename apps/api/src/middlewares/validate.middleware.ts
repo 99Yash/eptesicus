@@ -11,6 +11,8 @@ export const validate =
   (schema: AnyZodObject) =>
   (req: Request, _res: Response, next: NextFunction) => {
     try {
+      console.log(`>>>Validating request body for ${req.path}`);
+
       const result = schema.safeParse(req.body);
 
       if (!result.success) {

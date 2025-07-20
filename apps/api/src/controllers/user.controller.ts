@@ -7,7 +7,7 @@ import { userService } from '../services/user.service';
 class UserController {
   async upsertUser(
     req: Request<object, object, UserInsertType>,
-    res: Response<{ user: User }>,
+    res: Response<{ user: User; token: string }>,
     next: NextFunction
   ): Promise<void> {
     try {
@@ -22,11 +22,12 @@ class UserController {
       });
 
       // The token is generated from the user's id AFTER the user is created. This will be used to authenticate the user on subsequent requests.
+      // This has to be done after the user verifies their email address.
       const { token } = await generateEncryptedToken({ uid: user.id });
 
       cookieService.setTokenCookie({ res, token });
 
-      res.status(201).json({ user });
+      res.status(201).json({ user, token });
     } catch (error) {
       next(error);
     }

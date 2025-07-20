@@ -2,7 +2,11 @@ import { EncryptJWT, jwtDecrypt } from 'jose';
 
 import { env } from '../env';
 
-const secret = new TextEncoder().encode(env.JWT_SECRET);
+const secret = Buffer.from(env.JWT_SECRET, 'base64'); // ✅ 32 bytes
+
+if (secret.length !== 32) {
+  throw new Error('Invalid key length: must be 32 bytes');
+}
 
 interface JWTTokenPayload {
   uid: string;
@@ -22,7 +26,7 @@ export async function generateEncryptedToken(payload: SignTokenPayload) {
   const token = await new EncryptJWT({
     uid,
   } satisfies JWTTokenPayload)
-    .setExpirationTime('1m')
+    .setExpirationTime('1h')
     .setProtectedHeader({ alg: 'dir', enc: 'A128CBC-HS256' })
     .encrypt(secret);
 
