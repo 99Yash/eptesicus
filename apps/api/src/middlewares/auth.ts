@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
+import { AppError } from '../lib/error';
+import { verifyToken } from '../lib/jwt';
 import { cookieService } from '../services/cookie.service';
-import { AppError } from './error';
-import { verifyToken } from './jwt';
 
 export interface AuthenticatedRequest extends Request {
   userId: string;
