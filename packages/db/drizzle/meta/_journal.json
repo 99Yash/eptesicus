@@ -15,6 +15,13 @@
       "when": 1752386481267,
       "tag": "0001_wild_rhodey",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1752987812950,
+      "tag": "0002_naive_roxanne_simpson",
+      "breakpoints": true
     }
   ]
 }

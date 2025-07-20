@@ -28,9 +28,7 @@ export function EmailSignIn() {
       toast.error(error.message);
     },
     onSuccess(data, variables, context) {
-      toast.info(
-        `Please check your inbox for further instructions. If you don't see it, check your spam folder. Code: ${data.token}`
-      );
+      toast.info(`Please check your inbox for further instructions.`);
       router.push('/');
     },
   });
@@ -75,7 +73,6 @@ export function EmailSignIn() {
             placeholder="Username"
             type="text"
             autoCapitalize="none"
-            autoComplete="username"
             autoCorrect="off"
             className="bg-background"
             required

@@ -34,7 +34,7 @@ export const email_verification_codes = pgTable(
     ...lifecycle_dates,
   },
   (table) => [
-    index('email_idx').on(table.email),
-    index('user_id_idx').on(table.user_id),
+    index('email_verification_codes_email_idx').on(table.email),
+    index('email_verification_codes_user_id_idx').on(table.user_id),
   ]
 );
