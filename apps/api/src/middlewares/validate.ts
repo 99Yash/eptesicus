@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { AnyZodObject } from 'zod';
+import z, { AnyZodObject } from 'zod';
 import { AppError } from '../lib/error';
 
 type Handler<TReq = any, TRes = any> = (
@@ -7,8 +7,6 @@ type Handler<TReq = any, TRes = any> = (
   res: Response,
   next: NextFunction
 ) => TRes | Promise<TRes>;
-
-import { z } from 'zod';
 
 export type ValidatedRequest<Schema extends z.AnyZodObject> = Request<
   any,
