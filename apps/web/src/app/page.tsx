@@ -19,7 +19,7 @@ export default function Page() {
       toast.loading('Signing out...');
     },
     onSuccess: () => {
-      router.refresh();
+      void router.refresh();
     },
     onError: (error) => {
       toast.error('Failed to sign out');
@@ -33,6 +33,12 @@ export default function Page() {
         {user ? (
           <>
             <p className="text-sm">Hello {user.name}</p>
+            <Link
+              href="/signin"
+              className={cn(buttonVariants({ variant: 'outline', size: 'sm' }))}
+            >
+              Test signin
+            </Link>
             <Button
               variant="outline"
               size="sm"
