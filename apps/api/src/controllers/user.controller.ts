@@ -54,16 +54,12 @@ class UserController {
   async signout(
     _req: AuthenticatedRequest,
     res: Response,
-    next: NextFunction
+    _next: NextFunction
   ): Promise<void> {
-    try {
-      console.log('[UserController] Signing out');
-      cookieService.clearTokenCookie({ res });
-      console.log('[UserController] Token cookie cleared');
-      res.status(204).end();
-    } catch (error) {
-      next(error);
-    }
+    cookieService.clearTokenCookie({ res });
+    console.log('[UserController] Token cookie cleared');
+
+    res.status(204).end();
   }
 }
 

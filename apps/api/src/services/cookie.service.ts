@@ -1,5 +1,4 @@
 import { type CookieOptions, type Request, type Response } from 'express';
-import { env } from '../env';
 
 const ONE_MINUTE = 60;
 const ONE_HOUR = 60 * ONE_MINUTE;
@@ -10,7 +9,7 @@ class CookieService {
   options: CookieOptions = {
     path: '/',
     httpOnly: true,
-    secure: env.NODE_ENV !== 'development',
+    secure: true,
     sameSite: 'lax',
     maxAge: ONE_DAY,
   };

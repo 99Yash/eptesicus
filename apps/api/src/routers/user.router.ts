@@ -4,10 +4,10 @@ import { userController } from '../controllers/user.controller';
 import { authenticate } from '../middlewares/auth';
 import { validate } from '../middlewares/validate';
 
-export const userRouter: Router = Router({ mergeParams: true });
+export const users: Router = Router({ mergeParams: true });
 
-userRouter.post('/', validate(signupSchema, userController.upsertUser));
+users.post('/', validate(signupSchema, userController.upsertUser));
 
-userRouter.get('/', authenticate(userController.getCurrentUser));
+users.get('/', authenticate(userController.getCurrentUser));
 
-userRouter.post('/signout', authenticate(userController.signout));
+users.post('/signout', authenticate(userController.signout));

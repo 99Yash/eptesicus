@@ -2,7 +2,7 @@
 const nextConfig = {
   transpilePackages: ['@workspace/ui'],
   experimental: {
-    browserDebugInfoInTerminal: true,
+    browserDebugInfoInTerminal: process.env.NODE_ENV === 'development',
   },
 };
 

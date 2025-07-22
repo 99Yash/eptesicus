@@ -4,7 +4,7 @@ import { env } from '../env';
 
 const _axios = axios.create({
   baseURL: `${env.NEXT_PUBLIC_API_URL}`,
-  withCredentials: true,
+  withCredentials: true, // Ensures the token cookie is sent and the Set-Cookie header is processed. If baseURL is incorrect (e.g., not matching the backend), the request fails silently.
   headers: {
     'Content-Type': 'application/json',
   },
