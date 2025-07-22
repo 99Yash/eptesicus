@@ -1,7 +1,7 @@
 import { signupSchema } from '@workspace/db/helpers';
 import { Router } from 'express';
 import { userController } from '../controllers/user.controller';
-import { authenticate } from '../middlewares/auth';
+import { authenticate } from '../middlewares/authenticate';
 import { validate } from '../middlewares/validate';
 
 export const users: Router = Router({ mergeParams: true });

@@ -1,7 +1,7 @@
 import { userInsertSchema } from '@workspace/db/helpers';
 import { NextFunction, Response } from 'express';
 import { generateEncryptedToken } from '../lib/jwt';
-import { AuthenticatedRequest } from '../middlewares/auth';
+import { AuthenticatedRequest } from '../middlewares/authenticate';
 import { ValidatedRequest } from '../middlewares/validate';
 import { cookieService } from '../services/cookie.service';
 import { userService } from '../services/user.service';

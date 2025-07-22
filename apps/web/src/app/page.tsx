@@ -1,7 +1,7 @@
 'use client';
 
 import { useMutation } from '@tanstack/react-query';
-import { Button, buttonVariants } from '@workspace/ui/components/button';
+import { buttonVariants } from '@workspace/ui/components/button';
 import { cn } from '@workspace/ui/lib/utils';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -39,16 +39,12 @@ export default function Page() {
             >
               Test signin
             </Link>
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={signoutMutation.isPending}
-              onClick={async () => {
-                await signoutMutation.mutateAsync();
-              }}
+            <Link
+              href="/signout"
+              className={cn(buttonVariants({ variant: 'outline', size: 'sm' }))}
             >
               Sign Out
-            </Button>
+            </Link>
           </>
         ) : (
           <Link

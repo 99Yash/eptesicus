@@ -3,6 +3,7 @@ import { Geist_Mono, Inter } from 'next/font/google';
 
 import '@workspace/ui/globals.css';
 
+import React from 'react';
 import { MainLayout } from '~/components/main-layout';
 import { Providers } from '~/components/providers';
 import { siteConfig } from '~/lib/site';
@@ -41,7 +42,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
       <body
         className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased`}
       >
