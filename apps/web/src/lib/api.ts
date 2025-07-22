@@ -17,8 +17,8 @@ class API {
     username,
   }: {
     email: string;
-    name: string;
-    username: string;
+    name?: string;
+    username?: string;
   }) {
     const response = await _axios.post<{ user: User; token: string }>(
       '/users',
@@ -35,6 +35,11 @@ class API {
   async getCurrentUser() {
     const response = await _axios.get<User>('/users');
     return response.data;
+  }
+
+  async signout() {
+    const response = await _axios.post('/users/signout');
+    return response;
   }
 }
 

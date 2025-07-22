@@ -20,6 +20,7 @@ type Handler<TReq extends Request = Request, TRes = any> = (
  */
 export function withAuth(handler: Handler<AuthenticatedRequest>) {
   return async (req: Request, res: Response, next: NextFunction) => {
+    console.log('[withAuth] Checking for token');
     try {
       const token = cookieService.getTokenCookie({ req }); // HttpOnly: true on the cookie ensures JS cannot access it from within your frontend (e.g. no `document.cookie` access). XSS is not a concern here.
 
@@ -30,6 +31,7 @@ export function withAuth(handler: Handler<AuthenticatedRequest>) {
         });
       }
 
+      console.log('[withAuth] Token found, verifying...');
       const resToken = await verifyToken(token);
 
       if (resToken.is_expired) {
@@ -39,10 +41,12 @@ export function withAuth(handler: Handler<AuthenticatedRequest>) {
         });
       }
 
+      console.log('[withAuth] Token verified, assigning to request');
       const authedReq = Object.assign(req, {
         userId: resToken.user_id,
       }) as AuthenticatedRequest;
 
+      console.log('[withAuth] Calling handler');
       return handler(authedReq, res, next);
     } catch (error) {
       next(error);

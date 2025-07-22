@@ -12,11 +12,6 @@ import { api } from '~/lib/api';
 
 const schema = z.object({
   email: z.string().email().max(255, 'Email must be less than 255 characters'),
-  name: z.string().min(1).max(255, 'Name must be less than 255 characters'),
-  username: z
-    .string()
-    .min(1)
-    .max(255, 'Username must be less than 255 characters'),
 });
 
 export function EmailSignIn() {
@@ -49,35 +44,12 @@ export function EmailSignIn() {
 
     await loginMutation.mutateAsync({
       email: data.email,
-      name: data.name,
-      username: data.username,
     });
   }
 
   return (
     <form className="grid gap-2" onSubmit={handleSubmit}>
       <div className="grid gap-1">
-        <div className="grid gap-1.5 grid-cols-2">
-          <Input
-            name="name"
-            placeholder="Name"
-            type="text"
-            autoCapitalize="none"
-            autoComplete="name"
-            autoCorrect="off"
-            className="bg-background"
-            required
-          />
-          <Input
-            name="username"
-            placeholder="Username"
-            type="text"
-            autoCapitalize="none"
-            autoCorrect="off"
-            className="bg-background"
-            required
-          />
-        </div>
         <Input
           name="email"
           placeholder="name@example.com"

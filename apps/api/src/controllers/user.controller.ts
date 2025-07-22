@@ -13,14 +13,12 @@ class UserController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const { email, name, username, bio, image_url } = req.body;
-
+      const { email, name, username } = req.body;
+      console.log('[UserController] Received payload:', req.body);
       const user = await userService.upsertUser({
         email,
         name,
         username,
-        bio,
-        image_url,
       });
 
       // The token is generated from the user's id AFTER the user is created. This will be used to authenticate the user on subsequent requests.
@@ -44,6 +42,21 @@ class UserController {
       const user = await userService.getUser(req.userId);
 
       res.status(200).json(user);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async signout(
+    _req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      console.log('[UserController] Signing out');
+      cookieService.clearTokenCookie({ res });
+      console.log('[UserController] Token cookie cleared');
+      res.status(204).end();
     } catch (error) {
       next(error);
     }

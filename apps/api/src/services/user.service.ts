@@ -1,11 +1,10 @@
 import { db, eq } from '@workspace/db';
-import { UserInsertType } from '@workspace/db/helpers';
 import { email_verification_codes, users } from '@workspace/db/schemas';
 import { AppError } from '../lib/error';
 
 class UserService {
-  async upsertUser(args: UserInsertType) {
-    const { email, name, username, bio, image_url } = args;
+  async upsertUser(args: { email: string; name?: string; username?: string }) {
+    const { email, name, username } = args;
 
     const existingUser = await db.query.users.findFirst({
       where: eq(users.email, email),
@@ -15,19 +14,26 @@ class UserService {
       return existingUser;
     }
 
+    // Generate name from email or default to 'User'
+    const finalName =
+      name && name.trim().length > 0 ? name : email.split('@')[0] || 'User';
+    // Generate random username
+    const randomUsername =
+      username && username.trim().length > 0
+        ? username
+        : 'user_' + Math.random().toString(36).slice(2, 10);
+
+    const userToInsert = {
+      email,
+      name: finalName,
+      username: randomUsername,
+    };
+    console.log('[UserService] Inserting user:', userToInsert);
+
     // TODO: send email verification code
     // If user doesn't exist, create user, create email verification code
 
-    const [user] = await db
-      .insert(users)
-      .values({
-        email,
-        name,
-        username,
-        bio,
-        image_url,
-      })
-      .returning();
+    const [user] = await db.insert(users).values(userToInsert).returning();
 
     if (!user) {
       throw new AppError({
