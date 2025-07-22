@@ -14,12 +14,13 @@ export type ValidatedRequest<Schema extends z.AnyZodObject> = Request<
   z.infer<Schema>
 >;
 
-export function withValidation<Schema extends AnyZodObject>(
+export function validate<Schema extends AnyZodObject>(
   schema: Schema,
   handler: Handler<Request>
 ) {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
+      console.log('[validate] Validating request body');
       const result = schema.safeParse(req.body);
 
       if (!result.success) {
@@ -35,8 +36,12 @@ export function withValidation<Schema extends AnyZodObject>(
         });
       }
 
+      console.log('[validate] Request body validated');
+
       // Optionally: override req.body with parsed data (fully typed)
       req.body = result.data;
+
+      console.log('[validate] Calling handler');
 
       await handler(req, res, next);
     } catch (error) {
