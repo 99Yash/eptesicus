@@ -25,6 +25,7 @@ class CookieService {
    * @param token - The token to set
    */
   setTokenCookie({ res, token }: { res: Response; token: string }) {
+    console.log('[CookieService] Setting token cookie:', { token });
     res.cookie(this.cookie_keys.token, token, this.options);
   }
 
@@ -42,6 +43,7 @@ class CookieService {
    * @param res - The response object
    */
   clearTokenCookie({ res }: { res: Response }) {
+    console.log('[CookieService] Clearing token cookie');
     res.clearCookie(this.cookie_keys.token, this.options);
   }
 }

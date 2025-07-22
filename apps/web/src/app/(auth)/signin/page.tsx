@@ -7,6 +7,10 @@ import { EmailSignIn } from './email-signin';
 export default function AuthenticationPage() {
   const { data: user } = useUser();
 
+  if (typeof window !== 'undefined') {
+    console.log('[signin/page] user:', user, 'cookies:', document.cookie);
+  }
+
   if (user) {
     redirect('/');
   }

@@ -39,8 +39,12 @@ class UserController {
     next: NextFunction
   ): Promise<void> {
     try {
+      console.log(
+        '[UserController] getCurrentUser called with userId:',
+        req.userId
+      );
       const user = await userService.getUser(req.userId);
-
+      console.log('[UserController] getCurrentUser found user:', user);
       res.status(200).json(user);
     } catch (error) {
       next(error);

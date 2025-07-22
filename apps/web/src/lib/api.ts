@@ -33,8 +33,14 @@ class API {
   }
 
   async getCurrentUser() {
-    const response = await _axios.get<User>('/users');
-    return response.data;
+    try {
+      const response = await _axios.get<User>('/users');
+      console.log('[api.getCurrentUser] response:', response);
+      return response.data;
+    } catch (error) {
+      console.error('[api.getCurrentUser] error:', error);
+      throw error;
+    }
   }
 
   async signout() {
