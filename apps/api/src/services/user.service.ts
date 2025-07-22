@@ -1,9 +1,11 @@
 import { db, eq } from '@workspace/db';
+import { UserInsertType } from '@workspace/db/helpers';
 import { email_verification_codes, users } from '@workspace/db/schemas';
 import { AppError } from '../lib/error';
+import { generateUniqueUsername } from './ai.service';
 
 class UserService {
-  async upsertUser(args: { email: string; name?: string; username?: string }) {
+  async upsertUser(args: UserInsertType) {
     const { email, name, username } = args;
 
     const existingUser = await db.query.users.findFirst({
@@ -14,14 +16,12 @@ class UserService {
       return existingUser;
     }
 
-    // Generate name from email or default to 'User'
     const finalName =
       name && name.trim().length > 0 ? name : email.split('@')[0] || 'User';
-    // Generate random username
-    const randomUsername =
-      username && username.trim().length > 0
-        ? username
-        : 'user_' + Math.random().toString(36).slice(2, 10);
+
+    const randomUsername = username
+      ? username
+      : await generateUniqueUsername(name || email);
 
     const userToInsert = {
       email,

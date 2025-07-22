@@ -11,7 +11,7 @@ export type UserToOrganization = InferSelectModel<
 export const userInsertSchema = z.object({
   email: z.string().email().max(255),
   name: z.string().min(1),
-  username: z.string().min(1),
+  username: z.string().min(1).optional(),
   image_url: z.string().optional(),
   bio: z.string().optional(),
 });
@@ -21,6 +21,7 @@ export type UserInsertType = z.infer<typeof userInsertSchema>;
 export const signupSchema = z.object({
   email: z.string().email().max(255),
   name: z.string().min(1).optional(),
+  username: z.string().min(1).optional(),
 });
 
 export type SignupType = z.infer<typeof signupSchema>;

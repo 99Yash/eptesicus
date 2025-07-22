@@ -7,6 +7,8 @@ const envSchema = z.object({
   DB_PASSWORD: z.string(),
   DB_NAME: z.string(),
   NODE_ENV: z.enum(['development', 'production', 'staging']).optional(),
+  OPENAI_API_KEY: z.string(),
+  GOOGLE_GENERATIVE_AI_API_KEY: z.string(),
   JWT_SECRET: z.string(),
 });
 
