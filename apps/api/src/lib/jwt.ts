@@ -26,7 +26,7 @@ export async function generateEncryptedToken(payload: SignTokenPayload) {
   const token = await new EncryptJWT({
     user_id,
   } satisfies JWTTokenPayload)
-    .setExpirationTime('1h')
+    .setExpirationTime('1d')
     .setProtectedHeader({ alg: 'dir', enc: 'A128CBC-HS256' })
     .encrypt(secret);
 

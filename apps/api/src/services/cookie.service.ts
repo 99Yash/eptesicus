@@ -12,7 +12,7 @@ class CookieService {
     httpOnly: true,
     secure: env.NODE_ENV !== 'development',
     sameSite: 'lax',
-    maxAge: ONE_HOUR,
+    maxAge: ONE_DAY,
   };
 
   cookie_keys = {
