@@ -1,11 +1,10 @@
 'use client';
 
-import { redirect, useRouter } from 'next/navigation';
+import { redirect } from 'next/navigation';
 import { useUser } from '~/hooks/use-user';
 import { EmailSignIn } from './email-signin';
 
 export default function AuthenticationPage() {
-  const router = useRouter();
   const { data: user } = useUser();
 
   if (user) {
