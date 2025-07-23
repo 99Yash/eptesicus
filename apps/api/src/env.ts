@@ -10,6 +10,10 @@ const envSchema = z.object({
   OPENAI_API_KEY: z.string(),
   GOOGLE_GENERATIVE_AI_API_KEY: z.string(),
   JWT_SECRET: z.string(),
+  // Google OAuth
+  GOOGLE_CLIENT_ID: z.string(),
+  GOOGLE_CLIENT_SECRET: z.string(),
+  SESSION_SECRET: z.string(),
 });
 
 function createEnv(env: NodeJS.ProcessEnv) {
