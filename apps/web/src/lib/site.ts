@@ -1,7 +1,7 @@
 export const siteConfig = {
   name: 'Eptesicus',
-  url: 'https://eptesicus.com',
-  ogImage: 'https://eptesicus.com/og.png',
+  url: 'https://eptesicus.ygkr.live',
+  ogImage: 'https://eptesicus.ygkr.live/og.png',
   description:
     'A project collaboration app using Next.js, Shadcn, Tailwind CSS, and Drizzle ORM.',
   links: {
