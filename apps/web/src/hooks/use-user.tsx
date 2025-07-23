@@ -6,6 +6,7 @@ export function useUser() {
     queryFn: api.getCurrentUser,
     queryKey: ['user'],
     retry: 0,
+    staleTime: 0,
   });
   if (typeof window !== 'undefined') {
     // Log user and error state on the client

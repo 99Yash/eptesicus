@@ -1,17 +1,17 @@
 'use client';
 
-import { useMutation } from '@tanstack/react-query';
-import { buttonVariants } from '@workspace/ui/components/button';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { Button, buttonVariants } from '@workspace/ui/components/button';
 import { cn } from '@workspace/ui/lib/utils';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { useUser } from '~/hooks/use-user';
 import { api } from '~/lib/api';
 
 export default function Page() {
   const { data: user } = useUser();
-  const router = useRouter();
+
+  const queryClient = useQueryClient();
 
   const signoutMutation = useMutation({
     mutationFn: api.signout,
@@ -19,9 +19,12 @@ export default function Page() {
       toast.loading('Signing out...');
     },
     onSuccess: () => {
-      void router.refresh();
+      queryClient.setQueryData(['user'], null);
+      toast.dismiss();
+      toast.success('Signed out successfully');
     },
     onError: (error) => {
+      toast.dismiss();
       toast.error('Failed to sign out');
     },
   });
@@ -39,12 +42,14 @@ export default function Page() {
             >
               Test signin
             </Link>
-            <Link
-              href="/signout"
-              className={cn(buttonVariants({ variant: 'outline', size: 'sm' }))}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => signoutMutation.mutate()}
+              disabled={signoutMutation.isPending}
             >
               Sign Out
-            </Link>
+            </Button>
           </>
         ) : (
           <Link
