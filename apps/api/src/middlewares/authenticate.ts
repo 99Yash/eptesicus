@@ -22,7 +22,7 @@ export function authenticate(handler: Handler<AuthenticatedRequest>) {
   return async (req: Request, res: Response, next: NextFunction) => {
     console.log('[authenticate] Checking for token');
     try {
-      const token = cookieService.getTokenCookie({ req }); // HttpOnly: true on the cookie ensures JS cannot access it from within your frontend (e.g. no `document.cookie` access). XSS is not a concern here.
+      const token = cookieService.getTokenCookie({ req }); // HttpOnly: true on the cookie ensures JS cannot access it from within your frontend (e.g. no `document.cookie` access). XSS is not a concern here  .
 
       if (!token || typeof token !== 'string') {
         throw new AppError({
@@ -43,7 +43,7 @@ export function authenticate(handler: Handler<AuthenticatedRequest>) {
 
       console.log('[authenticate] Token verified, assigning to request');
       const authedReq = Object.assign(req, {
-        userId: resToken.user_id,
+        userId: resToken.userId,
       }) as AuthenticatedRequest;
 
       console.log('[authenticate] Calling handler');

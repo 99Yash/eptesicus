@@ -4,6 +4,7 @@ import { useMutation } from '@tanstack/react-query';
 import { Button } from '@workspace/ui/components/button';
 import { Spinner } from '@workspace/ui/components/spinner';
 import { redirect, useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 import { useUser } from '~/hooks/use-user';
 import { api } from '~/lib/api';
 
@@ -17,6 +18,12 @@ export default function SignoutPage() {
 
   const signoutMutation = useMutation({
     mutationFn: api.signout,
+    onMutate: () => {
+      toast.loading('Signing out...');
+    },
+    onError: (error) => {
+      toast.error('Error signing out');
+    },
   });
 
   return (
