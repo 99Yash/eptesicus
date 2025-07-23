@@ -2,6 +2,7 @@ import {
   index,
   integer,
   pgTable,
+  text,
   timestamp,
   varchar,
 } from 'drizzle-orm/pg-core';
@@ -36,5 +37,31 @@ export const email_verification_codes = pgTable(
   (table) => [
     index('email_verification_codes_email_idx').on(table.email),
     index('email_verification_codes_user_id_idx').on(table.user_id),
+  ]
+);
+
+// OAuth federated credentials table
+export const federated_credentials = pgTable(
+  'federated_credentials',
+  {
+    id: varchar('id')
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    user_id: varchar('user_id')
+      .references(() => users.id, { onDelete: 'cascade' })
+      .notNull(),
+    provider: varchar('provider', { length: 50 }).notNull(), // 'google', 'github', etc.
+    subject: text('subject').notNull(), // OAuth provider's user ID
+    access_token: text('access_token'),
+    refresh_token: text('refresh_token'),
+    expires_at: timestamp('expires_at'),
+    ...lifecycle_dates,
+  },
+  (table) => [
+    index('federated_credentials_user_id_idx').on(table.user_id),
+    index('federated_credentials_provider_subject_idx').on(
+      table.provider,
+      table.subject
+    ),
   ]
 );
