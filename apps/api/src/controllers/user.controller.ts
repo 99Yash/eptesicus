@@ -23,7 +23,7 @@ class UserController {
 
       // The token is generated from the user's id AFTER the user is created. This will be used to authenticate the user on subsequent requests.
       // This has to be done after the user verifies their email address.
-      const { token } = await generateEncryptedToken({ user_id: user.id });
+      const { token } = await generateEncryptedToken({ userId: user.id });
 
       cookieService.setTokenCookie({ res, token });
 

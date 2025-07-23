@@ -9,11 +9,11 @@ if (secret.length !== 32) {
 }
 
 interface JWTTokenPayload {
-  user_id: string;
+  userId: string;
 }
 
 interface SignTokenPayload {
-  user_id: JWTTokenPayload['user_id'];
+  userId: JWTTokenPayload['userId'];
 }
 
 type VerifyTokenResult =
@@ -21,10 +21,10 @@ type VerifyTokenResult =
   | { is_expired: true };
 
 export async function generateEncryptedToken(payload: SignTokenPayload) {
-  const { user_id } = payload;
+  const { userId } = payload;
 
   const token = await new EncryptJWT({
-    user_id,
+    userId,
   } satisfies JWTTokenPayload)
     .setExpirationTime('1d')
     .setProtectedHeader({ alg: 'dir', enc: 'A128CBC-HS256' })
@@ -44,7 +44,7 @@ export async function verifyToken(token: string): Promise<VerifyTokenResult> {
   try {
     const payload = (await jwtDecrypt(token, secret))
       .payload as unknown as JWTTokenPayload;
-    return { is_expired: false, user_id: payload.user_id };
+    return { is_expired: false, userId: payload.userId };
   } catch (err) {
     if (
       !!err &&
