@@ -21,7 +21,7 @@ class API {
     username?: string;
   }) {
     const response = await _axios.post<{ user: User; token: string }>(
-      '/users',
+      '/users/signup',
       {
         email,
         name,

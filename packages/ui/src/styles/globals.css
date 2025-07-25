@@ -141,6 +141,7 @@
   --scrollbar-thumb-hover-color: var(--ring);
 
   --animate-caret-blink: caret-blink 1.25s ease-out infinite;
+  --animate-spinner: spinner 1.25s ease-out infinite;
 
   @keyframes caret-blink {
     0%,
@@ -151,6 +152,15 @@
     20%,
     50% {
       opacity: 0;
+    }
+  }
+
+  @keyframes spinner {
+    0% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0.15;
     }
   }
 }

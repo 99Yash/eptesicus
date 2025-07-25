@@ -2,6 +2,7 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button, buttonVariants } from '@workspace/ui/components/button';
+import { Spinner } from '@workspace/ui/components/spinner';
 import { cn } from '@workspace/ui/lib/utils';
 import Link from 'next/link';
 import { toast } from 'sonner';
@@ -48,6 +49,7 @@ export default function Page() {
               onClick={() => signoutMutation.mutate()}
               disabled={signoutMutation.isPending}
             >
+              <Spinner />
               Sign Out
             </Button>
           </>
