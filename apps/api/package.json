@@ -6,7 +6,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "tsx watch src/index.ts"
+    "dev": "ts-node src/index.ts --watch",
+    "start": "ts-node src/index.ts"
   },
   "author": {
     "name": "Yash Gourav Kar",
@@ -32,7 +33,6 @@
     "jose": "^6.0.11",
     "nanoid": "^5.1.5",
     "resend": "^4.7.0",
-    "tsx": "^4.20.3",
     "zod": "catalog:"
   },
   "devDependencies": {
@@ -41,6 +41,7 @@
     "@types/express": "^5.0.3",
     "@workspace/eslint-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
+    "ts-node": "^10.9.2",
     "typescript": "catalog:"
   }
 }

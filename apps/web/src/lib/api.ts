@@ -20,15 +20,23 @@ class API {
     name?: string;
     username?: string;
   }) {
+    const response = await _axios.post<{ message: string }>('/users/signup', {
+      email,
+      name,
+      username,
+    });
+
+    return response.data;
+  }
+
+  async verifyEmail({ email, code }: { email: string; code: string }) {
     const response = await _axios.post<{ user: User; token: string }>(
-      '/users/signup',
+      '/users/verify-email',
       {
         email,
-        name,
-        username,
+        code,
       }
     );
-
     return response.data;
   }
 

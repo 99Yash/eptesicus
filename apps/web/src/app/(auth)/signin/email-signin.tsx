@@ -4,7 +4,6 @@ import { useMutation } from '@tanstack/react-query';
 import { Button } from '@workspace/ui/components/button';
 import { Input } from '@workspace/ui/components/input';
 import { Spinner } from '@workspace/ui/components/spinner';
-import { useRouter } from 'next/navigation';
 import React from 'react';
 import { toast } from 'sonner';
 import z from 'zod';
@@ -14,17 +13,19 @@ const schema = z.object({
   email: z.string().email().max(255, 'Email must be less than 255 characters'),
 });
 
-export function EmailSignIn() {
-  const router = useRouter();
+type EmailSignInProps = {
+  onSuccess: (email: string) => void;
+};
 
+export function EmailSignIn({ onSuccess }: EmailSignInProps) {
   const loginMutation = useMutation({
     mutationFn: api.login,
-    onError(error, variables, context) {
+    onError(error) {
       toast.error(error.message);
     },
-    onSuccess(data, variables, context) {
+    onSuccess(_data, variables) {
+      onSuccess(variables.email);
       toast.info(`Please check your inbox for further instructions.`);
-      router.push('/');
     },
   });
 

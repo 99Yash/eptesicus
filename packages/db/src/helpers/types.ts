@@ -25,3 +25,10 @@ export const signupSchema = z.object({
 });
 
 export type SignupType = z.infer<typeof signupSchema>;
+
+export const verifyEmailSchema = z.object({
+  email: z.string().email().max(255),
+  code: z.string().min(1),
+});
+
+export type VerifyEmailType = z.infer<typeof verifyEmailSchema>;

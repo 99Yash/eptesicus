@@ -1,4 +1,4 @@
-import { userInsertSchema } from '@workspace/db/helpers';
+import { userInsertSchema, verifyEmailSchema } from '@workspace/db/helpers';
 import { NextFunction, Response } from 'express';
 import { generateEncryptedToken } from '../lib/jwt';
 import { AuthenticatedRequest } from '../middlewares/authenticate';
@@ -15,19 +15,37 @@ class UserController {
     try {
       const { email, name, username } = req.body;
       console.log('[UserController] Received payload:', req.body);
-      const user = await userService.upsertUser({
+      await userService.upsertUser({
         email,
         name,
         username,
       });
-
       // The token is generated from the user's id AFTER the user is created. This will be used to authenticate the user on subsequent requests.
       // This has to be done after the user verifies their email address.
+
+      res.status(201).json({
+        message: 'User created successfully',
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async verifyEmail(
+    req: ValidatedRequest<typeof verifyEmailSchema>,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const { email, code } = req.body;
+      await userService.verifyEmail({ email, code });
+
+      const user = await userService.getUserByEmail(email);
+
       const { token } = await generateEncryptedToken({ userId: user.id });
 
       cookieService.setTokenCookie({ res, token });
-
-      res.status(201).json(user);
+      res.status(200).json(user);
     } catch (error) {
       next(error);
     }

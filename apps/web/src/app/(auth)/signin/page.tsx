@@ -1,16 +1,35 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { parseAsStringLiteral, useQueryState } from 'nuqs';
+import React from 'react';
 import { useUser } from '~/hooks/use-user';
 import { EmailSignIn } from './email-signin';
+import { VerifyEmailForm } from './verify-email-form';
 
 export default function AuthenticationPage() {
   const { data: user } = useUser();
   const router = useRouter();
 
+  const [step, setStep] = useQueryState(
+    'step',
+    parseAsStringLiteral(['signin', 'verify'] as const)
+      .withDefault('signin')
+      .withOptions({
+        history: 'replace',
+      })
+  );
+  const [email, setEmail] = React.useState('');
+
   if (user) {
     router.push('/');
   }
+
+  React.useEffect(() => {
+    if (step === 'verify' && !email) {
+      setStep('signin');
+    }
+  }, [step, email, setStep]);
 
   return (
     <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
@@ -23,8 +42,15 @@ export default function AuthenticationPage() {
         </p>
       </div>
       <div className="grid gap-6">
-        <EmailSignIn />
-
+        {step === 'signin' && (
+          <EmailSignIn
+            onSuccess={(email: string) => {
+              setEmail(email);
+              setStep('verify');
+            }}
+          />
+        )}
+        {step === 'verify' && <VerifyEmailForm email={email} />}
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
             <span className="w-full border-t" />

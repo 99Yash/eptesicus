@@ -4,14 +4,30 @@ import { AppError } from './error';
 
 const resend = new Resend(env.RESEND_API_KEY);
 
-export const sendEmail = async (to: string, subject: string, html: string) => {
+export const sendEmail = async ({
+  to,
+  subject,
+  html,
+}: {
+  to: string | string[];
+  subject: string;
+  html: string;
+}) => {
   try {
-    await resend.emails.send({
+    const { data, error } = await resend.emails.send({
       from: 'Eptesicus <yashgouravkar@gmail.com>',
-      to: [to],
+      to: Array.isArray(to) ? to : [to],
       subject: subject,
       html: html,
     });
+
+    if (error) {
+      throw new AppError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message: `Failed to send email to ${to}: Subject: ${subject}`,
+        cause: error,
+      });
+    }
   } catch (error) {
     throw new AppError({
       code: 'INTERNAL_SERVER_ERROR',
