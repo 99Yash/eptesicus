@@ -38,9 +38,7 @@ class UserController {
   ): Promise<void> {
     try {
       const { email, code } = req.body;
-      await userService.verifyEmail({ email, code });
-
-      const user = await userService.getUserByEmail(email);
+      const user = await userService.verifyEmail({ email, code });
 
       const { token } = await generateEncryptedToken({ userId: user.id });
 

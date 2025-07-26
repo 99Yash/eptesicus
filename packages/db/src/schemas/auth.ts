@@ -24,7 +24,6 @@ export const email_verification_codes = pgTable(
       .notNull(),
     user_id: varchar('user_id')
       .references(() => users.id)
-      .unique()
       .notNull(),
     code: integer('code')
       .$defaultFn(() => parseInt(generateRandomCode(8))) // TODO: use 8 as a constant
@@ -41,3 +40,6 @@ export const email_verification_codes = pgTable(
     index('email_verification_codes_user_id_idx').on(table.user_id),
   ]
 );
+
+export type EmailVerificationCode =
+  typeof email_verification_codes.$inferSelect;

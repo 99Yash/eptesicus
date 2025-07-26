@@ -1,6 +1,10 @@
 import { and, db, eq } from '@workspace/db';
 import { UserInsertType, VerifyEmailType } from '@workspace/db/helpers';
-import { email_verification_codes, users } from '@workspace/db/schemas';
+import {
+  email_verification_codes,
+  EmailVerificationCode,
+  users,
+} from '@workspace/db/schemas';
 import { sendEmail } from '../lib/email';
 import { AppError } from '../lib/error';
 import { generateUniqueUsername } from './ai.service';
@@ -13,16 +17,15 @@ class UserService {
       where: eq(users.email, email),
     });
 
-    if (existingUser) {
-      return existingUser; // TODO: There is no way to know if the user is verified here. If the user is not verified, we need to send a verification email if the code isn't present.
-    }
-
     const finalName =
-      name && name.trim().length > 0 ? name : email.split('@')[0] || 'User';
+      existingUser?.name ||
+      (name && name.trim().length > 0 ? name : email.split('@')[0] || 'User');
 
-    const randomUsername = username
-      ? username
-      : await generateUniqueUsername(name || email);
+    const randomUsername =
+      existingUser?.username ||
+      (username && username.trim().length > 0
+        ? username
+        : await generateUniqueUsername(name || email));
 
     const userToInsert = {
       email,
@@ -31,7 +34,9 @@ class UserService {
     };
     console.log('[UserService] Inserting user:', userToInsert);
 
-    const [user] = await db.insert(users).values(userToInsert).returning();
+    const [user] = existingUser
+      ? [existingUser]
+      : await db.insert(users).values(userToInsert).returning();
 
     if (!user) {
       throw new AppError({
@@ -40,16 +45,57 @@ class UserService {
       });
     }
 
-    // TODO: create email verification code (only if auth is using email verification?)
-    //  Send a generic toast message to the user that a verification code has been sent to their email, like "Please check your inbox for further instructions"
-    const [verification_code] = await db
-      .insert(email_verification_codes)
-      .values({
-        email,
-        user_id: user.id,
-        expires_at: new Date(Date.now() + 60 * 60 * 1000),
-      })
-      .returning();
+    // Check if there's an existing verification code and if it's expired
+    const existingVerificationCode =
+      await db.query.email_verification_codes.findFirst({
+        where: eq(email_verification_codes.email, email),
+      });
+
+    let verification_code: EmailVerificationCode | null = null;
+
+    if (
+      existingVerificationCode &&
+      existingVerificationCode.expires_at > new Date()
+    ) {
+      // Use existing valid code
+      console.log(
+        '[UserService] Using existing valid verification code for:',
+        email
+      );
+      verification_code = existingVerificationCode;
+    } else {
+      // Create new verification code (either user doesn't exist or code is expired)
+      if (existingVerificationCode) {
+        console.log(
+          '[UserService] Deleting expired verification code for:',
+          email
+        );
+        // Delete expired code
+        await db
+          .delete(email_verification_codes)
+          .where(eq(email_verification_codes.email, email));
+      }
+
+      console.log('[UserService] Creating new verification code for:', email);
+      // Create new verification code
+      const [newCode] = await db
+        .insert(email_verification_codes)
+        .values({
+          email,
+          user_id: user.id,
+          expires_at: new Date(Date.now() + 60 * 60 * 1000), // 1 hour
+        })
+        .returning();
+
+      if (!newCode) {
+        throw new AppError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to create email verification code',
+        });
+      }
+
+      verification_code = newCode;
+    }
 
     if (!verification_code) {
       throw new AppError({
@@ -88,6 +134,7 @@ class UserService {
 
   async verifyEmail(args: VerifyEmailType) {
     const { email, code } = args;
+    console.log('[UserService] Verifying email:', email, 'with code:', code);
 
     const verification_code = await db.query.email_verification_codes.findFirst(
       {
@@ -99,6 +146,7 @@ class UserService {
     );
 
     if (!verification_code) {
+      console.log('[UserService] Invalid verification code for:', email);
       throw new AppError({
         code: 'NOT_FOUND',
         message: 'Invalid verification code',
@@ -106,11 +154,21 @@ class UserService {
     }
 
     if (verification_code.expires_at < new Date()) {
+      console.log('[UserService] Expired verification code for:', email);
       throw new AppError({
         code: 'BAD_REQUEST',
         message: 'Verification code expired',
       });
     }
+
+    console.log('[UserService] Verification successful for:', email);
+    // Delete the verification code after successful verification
+    await db
+      .delete(email_verification_codes)
+      .where(eq(email_verification_codes.email, email));
+
+    // Return the user for token generation
+    return await this.getUserByEmail(email);
   }
 
   async getUserByEmail(email: string) {
