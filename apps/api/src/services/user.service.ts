@@ -14,7 +14,7 @@ class UserService {
     });
 
     if (existingUser) {
-      return existingUser;
+      return existingUser; // TODO: There is no way to know if the user is verified here. If the user is not verified, we need to send a verification email if the code isn't present.
     }
 
     const finalName =
@@ -61,9 +61,9 @@ class UserService {
     //TODO: create a separate emails package for writing emails
     await sendEmail({
       to: [email],
-      subject: `Welcome to Eptesicus, ${name}!`,
+      subject: `Welcome to Eptesicus, ${finalName}!`,
       html: `
-        <h1>Welcome to Eptesicus, ${name}!</h1>
+        <h1>Welcome to Eptesicus, ${finalName}!</h1>
         <p>Your verification code is: ${verification_code.code}</p>
       `,
     });

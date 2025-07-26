@@ -13,7 +13,7 @@ import z from 'zod';
 import { api } from '~/lib/api';
 
 const verifyEmailSchema = z.object({
-  code: z.string().min(1, 'Code is required'),
+  code: z.string().min(8, 'Code must be 8 digits'),
 });
 
 type VerifyEmailFormProps = {
@@ -22,6 +22,8 @@ type VerifyEmailFormProps = {
 
 export function VerifyEmailForm({ email }: VerifyEmailFormProps) {
   const router = useRouter();
+  const id = React.useId();
+  const [otpValue, setOtpValue] = React.useState('');
 
   const verifyMutation = useMutation({
     mutationFn: api.verifyEmail,
@@ -36,10 +38,9 @@ export function VerifyEmailForm({ email }: VerifyEmailFormProps) {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    const { success, data, error } = verifyEmailSchema.safeParse(
-      Object.fromEntries(formData)
-    );
+    const { success, data, error } = verifyEmailSchema.safeParse({
+      code: otpValue,
+    });
     if (!success) {
       toast.error(error.message);
       return;
@@ -53,11 +54,18 @@ export function VerifyEmailForm({ email }: VerifyEmailFormProps) {
   return (
     <form className="grid gap-2" onSubmit={handleSubmit}>
       <div className="grid gap-1.5 place-content-center">
-        <InputOTP maxLength={8} autoFocus className="bg-background">
+        <InputOTP
+          maxLength={8}
+          autoFocus
+          className="bg-background"
+          value={otpValue}
+          onChange={setOtpValue}
+          // pattern={REGEX_ONLY_DIGITS}
+        >
           <InputOTPGroup>
             {/* TODO: use 8 as a constant */}
             {Array.from({ length: 8 }).map((_, index) => (
-              <InputOTPSlot key={index} index={index} />
+              <InputOTPSlot key={`${id}-${index}`} index={index} />
             ))}
           </InputOTPGroup>
         </InputOTP>

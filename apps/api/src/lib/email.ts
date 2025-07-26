@@ -4,7 +4,7 @@ import { AppError } from './error';
 
 const resend = new Resend(env.RESEND_API_KEY);
 
-export const sendEmail = async ({
+export async function sendEmail({
   to,
   subject,
   html,
@@ -12,10 +12,10 @@ export const sendEmail = async ({
   to: string | string[];
   subject: string;
   html: string;
-}) => {
+}) {
   try {
     const { data, error } = await resend.emails.send({
-      from: 'Eptesicus <yashgouravkar@gmail.com>',
+      from: 'Eptesicus <onboarding@resend.dev>',
       to: Array.isArray(to) ? to : [to],
       subject: subject,
       html: html,
@@ -35,4 +35,4 @@ export const sendEmail = async ({
       cause: error,
     });
   }
-};
+}

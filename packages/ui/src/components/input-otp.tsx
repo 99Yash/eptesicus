@@ -86,7 +86,7 @@ export function InputOTPSlot({
       <motion.div
         data-slot="input-otp-slot"
         className={cn(
-          'group relative flex h-10 w-9 items-center justify-center rounded-[10px] border border-border bg-main-muted font-medium text-base text-primary-foreground',
+          'group relative flex h-10 w-9 items-center justify-center rounded-[10px] border border-border bg-main-muted font-medium text-base text-foreground',
           'aria-invalid:border-red-500 data-[active=true]:aria-invalid:border-red-500 data-[active=true]:aria-invalid:ring-2 data-[active=true]:aria-invalid:ring-red-500',
           className
         )}
