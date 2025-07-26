@@ -20,5 +20,5 @@ export function createId(
 }
 
 export function generateRandomCode(length: number = 8) {
-  return customAlphabet('0123456789', length)();
+  return customAlphabet('123456789', length)();
 }

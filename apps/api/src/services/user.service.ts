@@ -107,11 +107,10 @@ class UserService {
     //TODO: create a separate emails package for writing emails
     await sendEmail({
       to: [email],
-      subject: `Welcome to Eptesicus, ${finalName}!`,
+      subject: `Welcome to Eptesicus!`,
       // If verification code starts with 0, it will be displayed as a string
       html: `
-        <h1>Welcome to Eptesicus, ${finalName}!</h1>
-        <p>Your verification code is: ${String(verification_code.code)}</p> 
+        <p>Your verification code is: <b>${String(verification_code.code)}</b></p> 
       `,
     });
 
