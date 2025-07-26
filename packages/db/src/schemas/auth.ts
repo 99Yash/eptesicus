@@ -22,7 +22,10 @@ export const email_verification_codes = pgTable(
       .references(() => users.email)
       .unique()
       .notNull(),
-    user_id: varchar('user_id').references(() => users.id),
+    user_id: varchar('user_id')
+      .references(() => users.id)
+      .unique()
+      .notNull(),
     code: integer('code')
       .$defaultFn(() => parseInt(generateRandomCode(8))) // TODO: use 8 as a constant
       .notNull(),

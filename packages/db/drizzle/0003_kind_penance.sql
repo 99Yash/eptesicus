@@ -1,0 +1,2 @@
+ALTER TABLE "email_verification_codes" ALTER COLUMN "user_id" SET NOT NULL;--> statement-breakpoint
+ALTER TABLE "email_verification_codes" ADD CONSTRAINT "email_verification_codes_user_id_unique" UNIQUE("user_id");
