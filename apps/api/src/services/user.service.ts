@@ -13,6 +13,8 @@ class UserService {
   async upsertUser(args: UserInsertType) {
     const { email, name, username } = args;
 
+    //TODO: send verification code on every signup only if 2FA is enabled
+
     const existingUser = await db.query.users.findFirst({
       where: eq(users.email, email),
     });
@@ -46,26 +48,22 @@ class UserService {
     }
 
     // Check if there's an existing verification code and if it's expired
-    const existingVerificationCode =
-      await db.query.email_verification_codes.findFirst({
-        where: eq(email_verification_codes.email, email),
-      });
+    const existing_code = await db.query.email_verification_codes.findFirst({
+      where: eq(email_verification_codes.email, email),
+    });
 
     let verification_code: EmailVerificationCode | null = null;
 
-    if (
-      existingVerificationCode &&
-      existingVerificationCode.expires_at > new Date()
-    ) {
+    if (existing_code && existing_code.expires_at > new Date()) {
       // Use existing valid code
       console.log(
         '[UserService] Using existing valid verification code for:',
         email
       );
-      verification_code = existingVerificationCode;
+      verification_code = existing_code;
     } else {
       // Create new verification code (either user doesn't exist or code is expired)
-      if (existingVerificationCode) {
+      if (existing_code) {
         console.log(
           '[UserService] Deleting expired verification code for:',
           email
