@@ -8,6 +8,7 @@ import React from 'react';
 import { toast } from 'sonner';
 import z from 'zod';
 import { api } from '~/lib/api';
+import { getErrorMessage } from '~/lib/utils';
 
 const schema = z.object({
   email: z.string().email().max(255, 'Email must be less than 255 characters'),
@@ -21,7 +22,7 @@ export function EmailSignIn({ onSuccess }: EmailSignInProps) {
   const loginMutation = useMutation({
     mutationFn: api.login,
     onError(error) {
-      toast.error(error.message);
+      toast.error(getErrorMessage(error));
     },
     onSuccess(_data, variables) {
       onSuccess(variables.email);

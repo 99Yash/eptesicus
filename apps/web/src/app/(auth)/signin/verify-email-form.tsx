@@ -11,6 +11,7 @@ import React from 'react';
 import { toast } from 'sonner';
 import z from 'zod';
 import { api } from '~/lib/api';
+import { getErrorMessage } from '~/lib/utils';
 
 const verifyEmailSchema = z.object({
   code: z.string().min(8, 'Code must be 8 digits'),
@@ -28,7 +29,7 @@ export function VerifyEmailForm({ email }: VerifyEmailFormProps) {
   const verifyMutation = useMutation({
     mutationFn: api.verifyEmail,
     onError(error) {
-      toast.error(error.message);
+      toast.error(getErrorMessage(error));
     },
     onSuccess() {
       toast.success('Email verified');
