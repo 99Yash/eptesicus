@@ -11,6 +11,7 @@ const envSchema = z.object({
   GOOGLE_GENERATIVE_AI_API_KEY: z.string(),
   JWT_SECRET: z.string(),
   RESEND_API_KEY: z.string(),
+  REDIS_URL: z.string().url(),
 });
 
 function createEnv(env: NodeJS.ProcessEnv) {
