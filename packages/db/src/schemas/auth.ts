@@ -24,7 +24,7 @@ export const email_verification_codes = pgTable(
       .notNull(),
     user_id: varchar('user_id').references(() => users.id),
     code: integer('code')
-      .$defaultFn(() => parseInt(generateRandomCode(8)))
+      .$defaultFn(() => parseInt(generateRandomCode(8))) // TODO: use 8 as a constant
       .notNull(),
     expires_at: timestamp('expires_at')
       .$defaultFn(() => {

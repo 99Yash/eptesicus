@@ -31,9 +31,6 @@ class UserService {
     };
     console.log('[UserService] Inserting user:', userToInsert);
 
-    // TODO: send email verification code
-    // If user doesn't exist, create user, create email verification code
-
     const [user] = await db.insert(users).values(userToInsert).returning();
 
     if (!user) {

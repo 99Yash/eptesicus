@@ -52,9 +52,10 @@ export function VerifyEmailForm({ email }: VerifyEmailFormProps) {
 
   return (
     <form className="grid gap-2" onSubmit={handleSubmit}>
-      <div className="grid gap-1">
+      <div className="grid gap-1.5 place-content-center">
         <InputOTP maxLength={8} autoFocus className="bg-background">
           <InputOTPGroup>
+            {/* TODO: use 8 as a constant */}
             {Array.from({ length: 8 }).map((_, index) => (
               <InputOTPSlot key={index} index={index} />
             ))}
