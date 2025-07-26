@@ -24,7 +24,7 @@ type VerifyEmailFormProps = {
 export function VerifyEmailForm({ email }: VerifyEmailFormProps) {
   const router = useRouter();
   const id = React.useId();
-  const [otpValue, setOtpValue] = React.useState('');
+  const [code, setCode] = React.useState('');
 
   const verifyMutation = useMutation({
     mutationFn: api.verifyEmail,
@@ -40,7 +40,7 @@ export function VerifyEmailForm({ email }: VerifyEmailFormProps) {
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const { success, data, error } = verifyEmailSchema.safeParse({
-      code: otpValue,
+      code,
     });
     if (!success) {
       toast.error(error.message);
@@ -59,8 +59,8 @@ export function VerifyEmailForm({ email }: VerifyEmailFormProps) {
           maxLength={8}
           autoFocus
           className="bg-background"
-          value={otpValue}
-          onChange={setOtpValue}
+          value={code}
+          onChange={setCode}
           // pattern={REGEX_ONLY_DIGITS}
         >
           <InputOTPGroup>
