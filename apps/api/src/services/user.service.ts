@@ -102,7 +102,7 @@ class UserService {
       });
     }
 
-    //TODO: create a separate emails package for writing emails
+    //TODO: create a separate emails package for writing emails, put rate limiting here, and send emails in a queue
     await sendEmail({
       to: [email],
       subject: `Welcome to Eptesicus!`,
