@@ -108,9 +108,10 @@ class UserService {
     await sendEmail({
       to: [email],
       subject: `Welcome to Eptesicus, ${finalName}!`,
+      // If verification code starts with 0, it will be displayed as a string
       html: `
         <h1>Welcome to Eptesicus, ${finalName}!</h1>
-        <p>Your verification code is: ${verification_code.code}</p>
+        <p>Your verification code is: ${String(verification_code.code)}</p> 
       `,
     });
 
