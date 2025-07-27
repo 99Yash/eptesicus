@@ -66,7 +66,9 @@ export default function AuthenticationPage() {
               }}
             />
             {lastAuthMethod === 'email' && (
-              <p className="text-xs text-muted-foreground">Last used</p>
+              <p className="text-xs italic text-muted-foreground text-center">
+                Last used
+              </p>
             )}
           </div>
         )}
