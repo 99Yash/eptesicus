@@ -1,16 +1,13 @@
+import { signupSchema, verifyEmailSchema } from '@workspace/db/helpers';
 import { Router } from 'express';
 import passport from 'passport';
+import { authController } from '../controllers/auth.controller';
+import { env } from '../env';
 import { generateEncryptedToken } from '../lib/jwt';
-import { cookieService } from '../services/cookie.service';
-
-// Middlewares & validation
-import { signupSchema, verifyEmailSchema } from '@workspace/db/helpers';
 import { limiter } from '../lib/rate-limit';
 import { authenticate } from '../middlewares/authenticate';
 import { validate } from '../middlewares/validate';
-
-import { authController } from '../controllers/auth.controller';
-import { env } from '../env';
+import { cookieService } from '../services/cookie.service';
 
 export const auth: Router = Router({ mergeParams: true });
 
