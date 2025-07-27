@@ -1,6 +1,7 @@
 'use client';
 
 import { useMutation } from '@tanstack/react-query';
+import { AuthOptionsType } from '@workspace/db/helpers';
 import { Button } from '@workspace/ui/components/button';
 import { Input } from '@workspace/ui/components/input';
 import { Spinner } from '@workspace/ui/components/spinner';
@@ -8,7 +9,7 @@ import React from 'react';
 import { toast } from 'sonner';
 import z from 'zod';
 import { api } from '~/lib/api';
-import { getErrorMessage } from '~/lib/utils';
+import { getErrorMessage, setLocalStorageItem } from '~/lib/utils';
 
 const schema = z.object({
   email: z.string().email().max(255, 'Email must be less than 255 characters'),
@@ -27,7 +28,7 @@ export function EmailSignIn({ onSuccess }: EmailSignInProps) {
     onSuccess(_data, variables) {
       // Persist last used auth method
       if (typeof window !== 'undefined') {
-        localStorage.setItem('lastAuthMethod', 'email');
+        setLocalStorageItem<AuthOptionsType>('lastAuthMethod', 'EMAIL');
       }
       onSuccess(variables.email);
       toast.info(`Please check your inbox for further instructions.`);

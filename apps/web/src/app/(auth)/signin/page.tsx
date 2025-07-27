@@ -1,5 +1,6 @@
 'use client';
 
+import { authOptionsSchema, AuthOptionsType } from '@workspace/db/helpers';
 import { Button } from '@workspace/ui/components/button';
 import { Google } from '@workspace/ui/icons';
 import { useRouter } from 'next/navigation';
@@ -7,6 +8,7 @@ import { parseAsStringLiteral, useQueryState } from 'nuqs';
 import React from 'react';
 import { env } from '~/env';
 import { useUser } from '~/hooks/use-user';
+import { getLocalStorageItem, setLocalStorageItem } from '~/lib/utils';
 import { EmailSignIn } from './email-signin';
 import { VerifyEmailForm } from './verify-email-form';
 
@@ -24,13 +26,16 @@ export default function AuthenticationPage() {
   );
   const [email, setEmail] = React.useState('');
 
-  const [lastAuthMethod, setLastAuthMethod] = React.useState<string | null>(
-    null
-  );
+  const [lastAuthMethod, setLastAuthMethod] =
+    React.useState<AuthOptionsType | null>(null);
 
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
-      setLastAuthMethod(localStorage.getItem('lastAuthMethod'));
+      const lastAuthMethod = getLocalStorageItem(
+        'lastAuthMethod',
+        authOptionsSchema
+      );
+      setLastAuthMethod(lastAuthMethod ?? null);
     }
   }, []);
 
@@ -65,7 +70,7 @@ export default function AuthenticationPage() {
                 setStep('verify');
               }}
             />
-            {lastAuthMethod === 'email' && (
+            {lastAuthMethod === 'EMAIL' && (
               <p className="text-xs italic text-muted-foreground text-center">
                 Last used
               </p>
@@ -93,7 +98,10 @@ export default function AuthenticationPage() {
                 onClick={() => {
                   // Redirect to backend OAuth endpoint. The backend will handle Google authentication and redirect back.
                   if (typeof window !== 'undefined') {
-                    localStorage.setItem('lastAuthMethod', 'google');
+                    setLocalStorageItem<AuthOptionsType>(
+                      'lastAuthMethod',
+                      'GOOGLE'
+                    );
                   }
                   window.location.href = `${env.NEXT_PUBLIC_API_URL}/auth/google`;
                 }}
@@ -101,7 +109,7 @@ export default function AuthenticationPage() {
                 <Google className="size-5" />
                 <span className="text-sm">Continue with Google</span>
               </Button>
-              {lastAuthMethod === 'google' && (
+              {lastAuthMethod === 'GOOGLE' && (
                 <p className="text-xs text-muted-foreground text-center">
                   Last used
                 </p>

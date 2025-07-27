@@ -8,13 +8,17 @@ export type UserToOrganization = InferSelectModel<
   typeof users_to_organizations
 >;
 
+export const authOptionsSchema = z.enum(['EMAIL', 'GOOGLE']);
+
+export type AuthOptionsType = z.infer<typeof authOptionsSchema>;
+
 export const userInsertSchema = z.object({
   email: z.string().email().max(255),
   name: z.string().min(1),
   username: z.string().min(1).optional(),
   image_url: z.string().optional(),
   bio: z.string().optional(),
-  auth_provider: z.enum(['EMAIL', 'GOOGLE']).optional(),
+  auth_provider: authOptionsSchema.optional(),
 });
 
 export type UserInsertType = z.infer<typeof userInsertSchema>;
@@ -25,7 +29,7 @@ export const signupSchema = z.object({
   username: z.string().min(1).optional(),
   image_url: z.string().optional(),
   bio: z.string().optional(),
-  auth_provider: z.enum(['EMAIL', 'GOOGLE']).optional(),
+  auth_provider: authOptionsSchema.optional(),
 });
 
 export type SignupType = z.infer<typeof signupSchema>;
