@@ -15,7 +15,7 @@ class UserController {
     try {
       const { email, name, username } = req.body;
       console.log('[UserController] Received payload:', req.body);
-      await userService.signup({
+      await userService.upsertUser({
         email,
         name,
         username,
@@ -77,6 +77,27 @@ class UserController {
     console.log('[UserController] Token cookie cleared');
 
     res.status(204).end();
+  }
+
+  async checkUsernameAvailability(
+    req: ValidatedRequest<never>,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const { username } = req.params;
+      console.log('[UserController] Checking username availability:', username);
+
+      const result = await userService.checkUsernameAvailability(username);
+
+      res.status(200).json(result);
+    } catch (error) {
+      console.error(
+        '[UserController] Error checking username availability:',
+        error
+      );
+      next(error);
+    }
   }
 }
 

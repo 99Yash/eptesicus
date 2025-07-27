@@ -1,5 +1,7 @@
 'use client';
 
+import { Button } from '@workspace/ui/components/button';
+import { Google } from '@workspace/ui/icons';
 import { useRouter } from 'next/navigation';
 import { parseAsStringLiteral, useQueryState } from 'nuqs';
 import React from 'react';
@@ -66,6 +68,11 @@ export default function AuthenticationPage() {
             </div>
           </div>
         )}
+
+        <Button variant="outline" className="w-full">
+          <Google className="size-5" />
+          <span className="text-sm">Continue with Google</span>
+        </Button>
       </div>
     </div>
   );

@@ -12,6 +12,8 @@ const envSchema = z.object({
   JWT_SECRET: z.string(),
   RESEND_API_KEY: z.string(),
   REDIS_URL: z.string().url(),
+  GOOGLE_CLIENT_ID: z.string(),
+  GOOGLE_CLIENT_SECRET: z.string(),
 });
 
 function createEnv(env: NodeJS.ProcessEnv) {

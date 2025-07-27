@@ -17,3 +17,8 @@ users.post(
 users.get('/', authenticate(userController.getCurrentUser));
 
 users.post('/signout', authenticate(userController.signout));
+
+users.get(
+  '/check-username/:username',
+  userController.checkUsernameAvailability
+);

@@ -10,7 +10,7 @@ import { AppError } from '../lib/error';
 import { generateUniqueUsername } from './ai.service';
 
 class UserService {
-  async signup(args: UserInsertType) {
+  async upsertUser(args: UserInsertType) {
     const { email, name, username } = args;
 
     //TODO: send verification code on every signup only if 2FA is enabled
@@ -23,16 +23,68 @@ class UserService {
       existingUser?.name ||
       (name && name.trim().length > 0 ? name : email.split('@')[0] || 'User');
 
-    const randomUsername =
-      existingUser?.username ||
-      (username && username.trim().length > 0
-        ? username
-        : await generateUniqueUsername(name || email));
+    let finalUsername: string;
+
+    if (existingUser) {
+      // For existing users, keep their current username
+      finalUsername = existingUser.username;
+    } else {
+      // For new users, handle username generation/validation
+      if (username && username.trim().length > 0) {
+        // User provided a username, check if it's available
+        console.log(
+          '[UserService] Checking provided username uniqueness:',
+          username
+        );
+        const existingUsernameUser = await db.query.users.findFirst({
+          where: eq(users.username, username.trim()),
+        });
+
+        if (existingUsernameUser) {
+          console.log(
+            '[UserService] Provided username already exists:',
+            username,
+            'for user:',
+            existingUsernameUser.email
+          );
+          throw new AppError({
+            code: 'BAD_REQUEST',
+            message: 'Username already taken',
+          });
+        }
+        finalUsername = username.trim();
+      } else {
+        // Generate unique username using AI service
+        console.log(
+          '[UserService] Generating unique username for:',
+          name || email
+        );
+        finalUsername = await generateUniqueUsername(name || email);
+
+        // Double-check the generated username is still available (race condition protection)
+        const existingUsernameUser = await db.query.users.findFirst({
+          where: eq(users.username, finalUsername),
+        });
+
+        if (existingUsernameUser) {
+          console.log(
+            '[UserService] Generated username became unavailable:',
+            finalUsername,
+            'for user:',
+            existingUsernameUser.email
+          );
+          throw new AppError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: 'Failed to generate unique username. Please try again.',
+          });
+        }
+      }
+    }
 
     const userToInsert = {
       email,
       name: finalName,
-      username: randomUsername,
+      username: finalUsername,
     };
     console.log('[UserService] Inserting user:', userToInsert);
 
@@ -197,6 +249,67 @@ class UserService {
     }
 
     return user;
+  }
+
+  async checkUsernameAvailability(username: string) {
+    if (!username || username.trim().length === 0) {
+      return { available: false, message: 'Username cannot be empty' };
+    }
+
+    const trimmedUsername = username.trim();
+
+    // Basic validation
+    if (trimmedUsername.length < 3) {
+      return {
+        available: false,
+        message: 'Username must be at least 3 characters long',
+      };
+    }
+
+    if (trimmedUsername.length > 50) {
+      return {
+        available: false,
+        message: 'Username must be less than 50 characters',
+      };
+    }
+
+    // Check for invalid characters
+    if (!/^[a-z0-9_-]+$/.test(trimmedUsername)) {
+      return {
+        available: false,
+        message:
+          'Username can only contain lowercase letters, numbers, underscores, and hyphens',
+      };
+    }
+
+    // Check if username is reserved
+    const reservedUsernames = [
+      'settings',
+      'signout',
+      'messages',
+      'notifications',
+      'profile',
+      'home',
+      'search',
+      'explore',
+      'admin',
+      'root',
+      'system',
+    ];
+    if (reservedUsernames.includes(trimmedUsername.toLowerCase())) {
+      return { available: false, message: 'This username is reserved' };
+    }
+
+    // Check database for existing username
+    const existingUser = await db.query.users.findFirst({
+      where: eq(users.username, trimmedUsername),
+    });
+
+    if (existingUser) {
+      return { available: false, message: 'Username already taken' };
+    }
+
+    return { available: true, message: 'Username is available' };
   }
 }
 
