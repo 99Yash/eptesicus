@@ -1,10 +1,7 @@
-import {
-  signupSchema,
-  userSchema,
-  verifyEmailSchema,
-} from '@workspace/db/helpers';
+import { signupSchema, verifyEmailSchema } from '@workspace/db/helpers';
 import { Router } from 'express';
 import passport from 'passport';
+import z from 'zod';
 import { authController } from '../controllers/auth.controller';
 import { env } from '../env';
 import { generateEncryptedToken } from '../lib/jwt';
@@ -48,7 +45,13 @@ auth.get(
   async (req, res) => {
     const user = req.user;
 
-    const { success, data } = userSchema.safeParse(user);
+    console.log('[auth.router] Google OAuth callback for user:', user);
+
+    const { success, data } = z
+      .object({
+        id: z.string(),
+      })
+      .safeParse(user);
 
     if (!success) {
       return res.redirect(
