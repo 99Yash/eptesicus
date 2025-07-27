@@ -44,22 +44,11 @@ class UserService {
     } else {
       // For new users, handle username generation/validation
       if (username && username.trim().length > 0) {
-        // User provided a username, check if it's available
-        console.log(
-          '[UserService] Checking provided username uniqueness:',
-          username
-        );
         const existingUsernameUser = await db.query.users.findFirst({
           where: eq(users.username, username.trim()),
         });
 
         if (existingUsernameUser) {
-          console.log(
-            '[UserService] Provided username already exists:',
-            username,
-            'for user:',
-            existingUsernameUser.email
-          );
           throw new AppError({
             code: 'BAD_REQUEST',
             message: 'Username already taken',
@@ -67,11 +56,7 @@ class UserService {
         }
         finalUsername = username.trim();
       } else {
-        // Generate unique username using AI service
-        console.log(
-          '[UserService] Generating unique username for:',
-          name || email
-        );
+        // Generate unique username using AI
         finalUsername = await generateUniqueUsername(name || email);
 
         // Double-check the generated username is still available (race condition protection)
@@ -80,15 +65,9 @@ class UserService {
         });
 
         if (existingUsernameUser) {
-          console.log(
-            '[UserService] Generated username became unavailable:',
-            finalUsername,
-            'for user:',
-            existingUsernameUser.email
-          );
           throw new AppError({
             code: 'INTERNAL_SERVER_ERROR',
-            message: 'Failed to generate unique username. Please try again.',
+            message: 'Failed to generate username. Please try again.',
           });
         }
       }
@@ -101,7 +80,7 @@ class UserService {
     ) {
       throw new AppError({
         code: 'BAD_REQUEST',
-        message: 'User already exists with a different sign-in method',
+        message: 'Email already exists with a different sign-in method',
       });
     }
 
