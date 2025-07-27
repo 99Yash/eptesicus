@@ -71,7 +71,11 @@ export function VerifyEmailForm({ email }: VerifyEmailFormProps) {
           </InputOTPGroup>
         </InputOTP>
       </div>
-      <Button disabled={verifyMutation.isPending}>
+      <Button
+        disabled={verifyMutation.isPending}
+        type="submit"
+        className="bg-background"
+      >
         {verifyMutation.isPending ? (
           <Spinner className="mr-2" />
         ) : (

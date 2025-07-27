@@ -63,7 +63,11 @@ export function EmailSignIn({ onSuccess }: EmailSignInProps) {
           required
         />
       </div>
-      <Button disabled={loginMutation.isPending}>
+      <Button
+        disabled={loginMutation.isPending}
+        type="submit"
+        className="bg-background"
+      >
         {loginMutation.isPending ? (
           <Spinner className="mr-2" />
         ) : (

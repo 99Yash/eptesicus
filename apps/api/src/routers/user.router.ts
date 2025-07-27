@@ -7,11 +7,7 @@ import { validate } from '../middlewares/validate';
 
 export const users: Router = Router({ mergeParams: true });
 
-users.post(
-  '/signup',
-  limiter,
-  validate(signupSchema, userController.upsertUser)
-);
+users.post('/signup', limiter, validate(signupSchema, userController.signup));
 
 users.post(
   '/verify-email',

@@ -7,7 +7,7 @@ import { cookieService } from '../services/cookie.service';
 import { userService } from '../services/user.service';
 
 class UserController {
-  async upsertUser(
+  async signup(
     req: ValidatedRequest<typeof userInsertSchema>,
     res: Response,
     next: NextFunction
@@ -15,7 +15,7 @@ class UserController {
     try {
       const { email, name, username } = req.body;
       console.log('[UserController] Received payload:', req.body);
-      await userService.upsertUser({
+      await userService.signup({
         email,
         name,
         username,
@@ -27,6 +27,7 @@ class UserController {
         message: 'User created successfully',
       });
     } catch (error) {
+      console.error('[UserController] Error in signup:', error);
       next(error);
     }
   }

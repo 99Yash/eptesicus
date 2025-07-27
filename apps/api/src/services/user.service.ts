@@ -10,7 +10,7 @@ import { AppError } from '../lib/error';
 import { generateUniqueUsername } from './ai.service';
 
 class UserService {
-  async upsertUser(args: UserInsertType) {
+  async signup(args: UserInsertType) {
     const { email, name, username } = args;
 
     //TODO: send verification code on every signup only if 2FA is enabled
