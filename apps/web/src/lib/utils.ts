@@ -1,3 +1,4 @@
+import { AxiosError } from 'axios';
 import z from 'zod';
 
 export const unknownError = 'Something went wrong. Please try again.';
@@ -6,6 +7,8 @@ export function getErrorMessage(err: unknown) {
     return err;
   } else if (err instanceof z.ZodError) {
     return err.errors.map((e) => e.message).join(', ') ?? unknownError;
+  } else if (err instanceof AxiosError) {
+    return err.response?.data.message ?? unknownError;
   } else if (err instanceof Error) {
     return err.message;
   } else {
