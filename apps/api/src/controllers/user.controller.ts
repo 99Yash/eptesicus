@@ -19,6 +19,7 @@ class UserController {
         email,
         name,
         username,
+        sendVerificationEmail: true,
       });
       // The token is generated from the user's id AFTER the user is created. This will be used to authenticate the user on subsequent requests.
       // This has to be done after the user verifies their email address.

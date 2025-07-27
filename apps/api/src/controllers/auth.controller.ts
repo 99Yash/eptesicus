@@ -42,12 +42,11 @@ class AuthController {
         username,
         image_url,
         bio,
+        sendVerificationEmail: false,
       });
 
       const status = existingUser ? 200 : 201;
-      const message = existingUser
-        ? 'User already exists – verification code resent.'
-        : 'User created successfully';
+      const message = existingUser ? 'User already exists' : 'User created';
 
       res.status(status).json({ message });
     } catch (error) {
