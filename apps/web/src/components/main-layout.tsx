@@ -1,5 +1,4 @@
 import { SidebarProvider } from '@workspace/ui/components/sidebar';
-import { cn } from '@workspace/ui/lib/utils';
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -13,16 +12,9 @@ export function MainLayout({ children, headersNumber = 2 }: MainLayoutProps) {
   // };
   return (
     <SidebarProvider>
-      <div className="h-svh overflow-hidden lg:p-2 w-full">
-        <div className="lg:border lg:rounded-md overflow-hidden flex flex-col items-center justify-start bg-container w-full">
-          <div
-            className={cn(
-              'overflow-auto w-full h-full'
-              // height[headersNumber as keyof typeof height]
-            )}
-          >
-            {children}
-          </div>
+      <div className="min-h-svh lg:p-2 w-full flex flex-col">
+        <div className="lg:border lg:rounded-md flex flex-col items-center justify-start bg-background w-full h-full">
+          <div className="overflow-auto w-full h-full">{children}</div>
         </div>
       </div>
     </SidebarProvider>

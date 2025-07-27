@@ -5,8 +5,8 @@ import { siteConfig } from '~/lib/site';
 export default function AuthLayout(props: { children: React.ReactNode }) {
   return (
     <>
-      <div className="relative grid min-h-screen grid-cols-1 overflow-hidden md:grid-cols-3 lg:grid-cols-2">
-        <div className="relative">
+      <div className="relative grid min-h-full grid-cols-1 md:grid-cols-3 lg:grid-cols-2">
+        <div className="relative overflow-hidden lg:rounded-tl-md lg:rounded-bl-md">
           <div
             className="absolute inset-0 bg-cover"
             style={{
@@ -24,7 +24,7 @@ export default function AuthLayout(props: { children: React.ReactNode }) {
           </Link>
         </div>
 
-        <div className="container absolute top-1/2 col-span-1 flex -translate-y-1/2 items-center md:static md:top-0 md:col-span-2 md:flex md:translate-y-0 lg:col-span-1">
+        <div className="container flex items-center justify-center md:static md:col-span-2 lg:col-span-1 min-h-full py-4">
           {props.children}
         </div>
       </div>
