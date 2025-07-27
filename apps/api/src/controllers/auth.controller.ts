@@ -19,8 +19,8 @@ class AuthController {
     next: NextFunction
   ) {
     try {
-      const { email, name, username } = req.body;
-      console.log('[AuthController] signup received:', req.body);
+      const { email, name, username, image_url, bio } = req.body;
+      console.log('[AuthController] login received:', req.body);
 
       // Check if the email is already registered (regardless of method)
       let existingUser = null;
@@ -40,6 +40,8 @@ class AuthController {
         email,
         name: name ?? '',
         username,
+        image_url,
+        bio,
       });
 
       const status = existingUser ? 200 : 201;

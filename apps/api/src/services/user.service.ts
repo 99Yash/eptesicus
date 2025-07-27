@@ -11,7 +11,14 @@ import { generateUniqueUsername } from './ai.service';
 
 class UserService {
   async upsertUser(args: UserInsertType & { sendVerificationEmail?: boolean }) {
-    const { email, name, username, sendVerificationEmail = true } = args;
+    const {
+      email,
+      name,
+      username,
+      image_url,
+      bio,
+      sendVerificationEmail = true,
+    } = args;
 
     //TODO: send verification code on every signup only if 2FA is enabled
 
@@ -85,6 +92,8 @@ class UserService {
       email,
       name: finalName,
       username: finalUsername,
+      image_url,
+      bio,
     };
     console.log('[UserService] Inserting user:', userToInsert);
 

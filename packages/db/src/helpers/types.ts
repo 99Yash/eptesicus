@@ -22,6 +22,8 @@ export const signupSchema = z.object({
   email: z.string().email().max(255),
   name: z.string().min(1).optional(),
   username: z.string().min(1).optional(),
+  image_url: z.string().optional(),
+  bio: z.string().optional(),
 });
 
 export type SignupType = z.infer<typeof signupSchema>;
