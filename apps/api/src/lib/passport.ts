@@ -9,7 +9,7 @@ passport.use(
     {
       clientID: env.GOOGLE_CLIENT_ID,
       clientSecret: env.GOOGLE_CLIENT_SECRET,
-      callbackURL: '/api/auth/google/callback',
+      callbackURL: '/auth/google/callback',
       scope: ['email', 'profile'],
     },
     async (accessToken, refreshToken, profile, done) => {
@@ -22,12 +22,20 @@ passport.use(
         });
       }
 
+      const usernameFromProfile =
+        // Some Google accounts expose a username field in the profile json, but most do not.
+        // Fallback to the local-part of the email (before the @) when username is absent.
+        (profile as any).username ?? profile.emails[0].value.split('@')[0];
+
       const user = await userService.upsertUser({
         email: profile.emails[0].value,
         name: profile.displayName,
-        username: profile.username,
+        username: usernameFromProfile,
         image_url: profile.photos?.[0]?.value,
       });
+
+      // Complete the Passport flow. We don’t use sessions, so the user is just attached to req.user
+      return done(null, user);
     }
   )
 );

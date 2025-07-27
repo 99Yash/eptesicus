@@ -20,7 +20,7 @@ class API {
     name?: string;
     username?: string;
   }) {
-    const response = await _axios.post<{ message: string }>('/users/signup', {
+    const response = await _axios.post<{ message: string }>('/auth/signup', {
       email,
       name,
       username,
@@ -31,7 +31,7 @@ class API {
 
   async verifyEmail({ email, code }: { email: string; code: string }) {
     const response = await _axios.post<{ user: User; token: string }>(
-      '/users/verify-email',
+      '/auth/verify-email',
       {
         email,
         code,
@@ -52,7 +52,7 @@ class API {
   }
 
   async signout() {
-    const response = await _axios.post('/users/signout');
+    const response = await _axios.post('/auth/signout');
     return response;
   }
 

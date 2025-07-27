@@ -5,6 +5,7 @@ import { Google } from '@workspace/ui/icons';
 import { useRouter } from 'next/navigation';
 import { parseAsStringLiteral, useQueryState } from 'nuqs';
 import React from 'react';
+import { env } from '~/env';
 import { useUser } from '~/hooks/use-user';
 import { EmailSignIn } from './email-signin';
 import { VerifyEmailForm } from './verify-email-form';
@@ -69,7 +70,14 @@ export default function AuthenticationPage() {
           </div>
         )}
 
-        <Button variant="outline" className="w-full">
+        <Button
+          variant="outline"
+          className="w-full"
+          onClick={() => {
+            // Redirect to backend OAuth endpoint. The backend will handle Google authentication and redirect back.
+            window.location.href = `${env.NEXT_PUBLIC_API_URL}/auth/google`;
+          }}
+        >
           <Google className="size-5" />
           <span className="text-sm">Continue with Google</span>
         </Button>

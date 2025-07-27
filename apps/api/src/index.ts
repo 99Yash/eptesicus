@@ -3,7 +3,15 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
 
-dotenv.config(); // IMPORTANT: loads the environment variables from the .env file, before importing env.ts
+// Load environment variables as early as possible
+dotenv.config();
+
+import passport from 'passport';
+
+// Passport configuration (depends on env variables)
+import './lib/passport';
+
+import { auth as authRouter } from './routers/auth.router';
 
 import { env } from './env';
 import { users as userRouter } from './routers/user.router';
@@ -27,7 +35,11 @@ async function main() {
   app.use(cookie_parser());
   app.use(express.urlencoded({ extended: true }));
 
+  // Initialize Passport (we do not use sessions, but initialization is required)
+  app.use(passport.initialize());
+
   app.use('/users', userRouter);
+  app.use('/auth', authRouter);
 
   app.get('/', (_req, res) => {
     res.send('API is running');
