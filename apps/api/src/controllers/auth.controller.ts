@@ -40,9 +40,7 @@ class AuthController {
         email,
         name: name ?? '',
         username,
-        image_url,
-        bio,
-        sendVerificationEmail: false,
+        auth_provider: 'EMAIL',
       });
 
       const status = existingUser ? 200 : 201;

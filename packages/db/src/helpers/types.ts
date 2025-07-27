@@ -14,6 +14,7 @@ export const userInsertSchema = z.object({
   username: z.string().min(1).optional(),
   image_url: z.string().optional(),
   bio: z.string().optional(),
+  auth_provider: z.enum(['EMAIL', 'GOOGLE']).optional(),
 });
 
 export type UserInsertType = z.infer<typeof userInsertSchema>;
@@ -24,6 +25,7 @@ export const signupSchema = z.object({
   username: z.string().min(1).optional(),
   image_url: z.string().optional(),
   bio: z.string().optional(),
+  auth_provider: z.enum(['EMAIL', 'GOOGLE']).optional(),
 });
 
 export type SignupType = z.infer<typeof signupSchema>;

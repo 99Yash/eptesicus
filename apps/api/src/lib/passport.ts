@@ -33,6 +33,7 @@ passport.use(
         username,
         image_url: profile.photos?.[0]?.value,
         sendVerificationEmail: false,
+        auth_provider: 'GOOGLE',
       });
 
       // Complete the Passport flow. We don’t use sessions, so the user is just attached to req.user

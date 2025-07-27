@@ -10,9 +10,21 @@ import { AppError } from '../lib/error';
 import { generateUniqueUsername } from './ai.service';
 
 class UserService {
-  async upsertUser(args: UserInsertType & { sendVerificationEmail: boolean }) {
-    const { email, name, username, image_url, bio, sendVerificationEmail } =
-      args;
+  async upsertUser(
+    args: UserInsertType & {
+      sendVerificationEmail?: boolean;
+      auth_provider?: 'EMAIL' | 'GOOGLE';
+    }
+  ) {
+    const {
+      email,
+      name,
+      username,
+      image_url,
+      bio,
+      sendVerificationEmail = true,
+      auth_provider = 'EMAIL',
+    } = args;
 
     //TODO: send verification code on every signup only if 2FA is enabled
 
@@ -82,12 +94,24 @@ class UserService {
       }
     }
 
+    if (
+      existingUser &&
+      existingUser.auth_provider &&
+      existingUser.auth_provider !== auth_provider
+    ) {
+      throw new AppError({
+        code: 'BAD_REQUEST',
+        message: 'User already exists with a different sign-in method',
+      });
+    }
+
     const userToInsert = {
       email,
       name: finalName,
       username: finalUsername,
       image_url,
       bio,
+      auth_provider,
     };
     console.log('[UserService] Inserting user:', userToInsert);
 

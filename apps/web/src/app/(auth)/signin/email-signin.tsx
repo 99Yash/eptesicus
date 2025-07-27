@@ -25,6 +25,10 @@ export function EmailSignIn({ onSuccess }: EmailSignInProps) {
       toast.error(getErrorMessage(error));
     },
     onSuccess(_data, variables) {
+      // Persist last used auth method
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('lastAuthMethod', 'email');
+      }
       onSuccess(variables.email);
       toast.info(`Please check your inbox for further instructions.`);
     },

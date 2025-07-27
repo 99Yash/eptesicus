@@ -29,6 +29,20 @@
       "when": 1753497526164,
       "tag": "0003_kind_penance",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1753598895964,
+      "tag": "0004_familiar_sunspot",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1753599088265,
+      "tag": "0005_greedy_captain_universe",
+      "breakpoints": true
     }
   ]
 }

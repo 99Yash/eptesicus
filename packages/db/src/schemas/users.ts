@@ -1,6 +1,8 @@
 import { relations } from 'drizzle-orm';
-import { index, pgTable, text, varchar } from 'drizzle-orm/pg-core';
+import { index, pgEnum, pgTable, text, varchar } from 'drizzle-orm/pg-core';
 import { createId, lifecycle_dates } from '../helpers/utils';
+
+export const auth_providers = pgEnum('auth_providers', ['EMAIL', 'GOOGLE']);
 
 export const users = pgTable(
   'users',
@@ -13,6 +15,7 @@ export const users = pgTable(
     username: varchar('username', { length: 50 }).notNull().unique(),
     image_url: text('image_url'),
     bio: text('bio'),
+    auth_provider: auth_providers('auth_provider').notNull(),
     ...lifecycle_dates,
   },
   (user) => [

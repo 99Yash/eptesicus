@@ -24,6 +24,16 @@ export default function AuthenticationPage() {
   );
   const [email, setEmail] = React.useState('');
 
+  const [lastAuthMethod, setLastAuthMethod] = React.useState<string | null>(
+    null
+  );
+
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setLastAuthMethod(localStorage.getItem('lastAuthMethod'));
+    }
+  }, []);
+
   if (user) {
     router.push('/');
   }
@@ -48,12 +58,17 @@ export default function AuthenticationPage() {
       </div>
       <div className="grid gap-6">
         {step === 'signin' && (
-          <EmailSignIn
-            onSuccess={(email: string) => {
-              setEmail(email);
-              setStep('verify');
-            }}
-          />
+          <div className="space-y-1">
+            <EmailSignIn
+              onSuccess={(email: string) => {
+                setEmail(email);
+                setStep('verify');
+              }}
+            />
+            {lastAuthMethod === 'email' && (
+              <p className="text-xs text-muted-foreground">Last used</p>
+            )}
+          </div>
         )}
         {step === 'verify' && <VerifyEmailForm email={email} />}
 
@@ -69,17 +84,27 @@ export default function AuthenticationPage() {
                 </span>
               </div>
             </div>
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={() => {
-                // Redirect to backend OAuth endpoint. The backend will handle Google authentication and redirect back.
-                window.location.href = `${env.NEXT_PUBLIC_API_URL}/auth/google`;
-              }}
-            >
-              <Google className="size-5" />
-              <span className="text-sm">Continue with Google</span>
-            </Button>
+            <div className="space-y-1">
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={() => {
+                  // Redirect to backend OAuth endpoint. The backend will handle Google authentication and redirect back.
+                  if (typeof window !== 'undefined') {
+                    localStorage.setItem('lastAuthMethod', 'google');
+                  }
+                  window.location.href = `${env.NEXT_PUBLIC_API_URL}/auth/google`;
+                }}
+              >
+                <Google className="size-5" />
+                <span className="text-sm">Continue with Google</span>
+              </Button>
+              {lastAuthMethod === 'google' && (
+                <p className="text-xs text-muted-foreground text-center">
+                  Last used
+                </p>
+              )}
+            </div>
           </>
         )}
       </div>
