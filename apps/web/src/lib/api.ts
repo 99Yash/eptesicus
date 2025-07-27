@@ -55,6 +55,14 @@ class API {
     const response = await _axios.post('/users/signout');
     return response;
   }
+
+  async checkUsernameAvailability(username: string) {
+    const response = await _axios.get<{
+      available: boolean;
+      message: string;
+    }>(`/users/check-username/${username}`);
+    return response.data;
+  }
 }
 
 export const api = new API();
