@@ -13,31 +13,36 @@ passport.use(
       scope: ['email', 'profile'],
     },
     async (accessToken, refreshToken, profile, done) => {
-      console.log(profile);
+      try {
+        console.log(profile);
 
-      if (!profile.emails || !profile.emails[0]?.value) {
-        throw new AppError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'No email found',
+        if (!profile.emails || !profile.emails[0]?.value) {
+          throw new AppError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: 'No email found',
+          });
+        }
+
+        const username =
+          // Some Google accounts expose a username field in the profile json, but most do not.
+          // Fallback to the local-part of the email (before the @) when username is absent.
+          profile.username ?? profile.emails[0].value.split('@')[0];
+
+        const user = await userService.upsertUser({
+          email: profile.emails[0].value,
+          name: profile.displayName,
+          username,
+          image_url: profile.photos?.[0]?.value,
+          sendVerificationEmail: false,
+          auth_provider: 'GOOGLE',
         });
+
+        // Complete the Passport flow. We don’t use sessions, so the user is just attached to req.user
+        return done(null, user);
+      } catch (error) {
+        // Forward any errors (e.g., email exists with different provider) to Passport
+        return done(error as Error, undefined);
       }
-
-      const username =
-        // Some Google accounts expose a username field in the profile json, but most do not.
-        // Fallback to the local-part of the email (before the @) when username is absent.
-        profile.username ?? profile.emails[0].value.split('@')[0];
-
-      const user = await userService.upsertUser({
-        email: profile.emails[0].value,
-        name: profile.displayName,
-        username,
-        image_url: profile.photos?.[0]?.value,
-        sendVerificationEmail: false,
-        auth_provider: 'GOOGLE',
-      });
-
-      // Complete the Passport flow. We don’t use sessions, so the user is just attached to req.user
-      return done(null, user);
     }
   )
 );

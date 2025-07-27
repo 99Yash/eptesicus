@@ -4,6 +4,7 @@ import passport from 'passport';
 import z from 'zod';
 import { authController } from '../controllers/auth.controller';
 import { env } from '../env';
+import { AppError } from '../lib/error';
 import { generateEncryptedToken } from '../lib/jwt';
 import { limiter } from '../lib/rate-limit';
 import { authenticate } from '../middlewares/authenticate';
@@ -35,15 +36,24 @@ auth.get(
 );
 
 // 2. Google OAuth callback
-// On success, Passport will attach the User object returned from the strategy to req.user.
-auth.get(
-  '/google/callback',
-  passport.authenticate('google', {
-    session: false,
-    failureRedirect: `${env.WEB_APP_URL ?? 'http://localhost:3000'}/signin?error=google`,
-  }),
-  async (req, res) => {
-    const user = req.user;
+// On success, Passport will attach the User object returned from the strategy to `user` in the callback.
+auth.get('/google/callback', (req, res, next) => {
+  passport.authenticate('google', { session: false }, async (err, user) => {
+    if (err) {
+      console.error('[auth.router] Google OAuth error:', err);
+
+      if (err instanceof AppError) {
+        // Pass specific error codes back to the frontend for granular handling.
+        return res.redirect(
+          `${env.WEB_APP_URL ?? 'http://localhost:3000'}/signin?error=${err.code}`
+        );
+      }
+
+      // Fallback for non-AppError instances
+      return res.redirect(
+        `${env.WEB_APP_URL ?? 'http://localhost:3000'}/signin?error=GOOGLE_OAUTH`
+      );
+    }
 
     console.log('[auth.router] Google OAuth callback for user:', user);
 
@@ -54,6 +64,7 @@ auth.get(
       .safeParse(user);
 
     if (!success) {
+      // If we can’t parse the user, treat as failure and redirect with an error.
       return res.redirect(
         `${env.WEB_APP_URL ?? 'http://localhost:3000'}/signin?error=google`
       );
@@ -75,5 +86,5 @@ auth.get(
 
     // Redirect the user back to the frontend. Feel free to change the path as needed.
     return res.redirect(env.WEB_APP_URL ?? 'http://localhost:3000');
-  }
-);
+  })(req, res, next);
+});
