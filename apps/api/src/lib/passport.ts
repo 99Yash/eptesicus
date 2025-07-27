@@ -22,16 +22,17 @@ passport.use(
         });
       }
 
-      const usernameFromProfile =
+      const username =
         // Some Google accounts expose a username field in the profile json, but most do not.
         // Fallback to the local-part of the email (before the @) when username is absent.
-        (profile as any).username ?? profile.emails[0].value.split('@')[0];
+        profile.username ?? profile.emails[0].value.split('@')[0];
 
       const user = await userService.upsertUser({
         email: profile.emails[0].value,
         name: profile.displayName,
-        username: usernameFromProfile,
+        username,
         image_url: profile.photos?.[0]?.value,
+        sendVerificationEmail: false,
       });
 
       // Complete the Passport flow. We don’t use sessions, so the user is just attached to req.user

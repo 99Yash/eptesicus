@@ -58,29 +58,30 @@ export default function AuthenticationPage() {
         {step === 'verify' && <VerifyEmailForm email={email} />}
 
         {step === 'signin' && (
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
+          <>
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">
+                  Or continue with
+                </span>
+              </div>
             </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">
-                Or continue with
-              </span>
-            </div>
-          </div>
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => {
+                // Redirect to backend OAuth endpoint. The backend will handle Google authentication and redirect back.
+                window.location.href = `${env.NEXT_PUBLIC_API_URL}/auth/google`;
+              }}
+            >
+              <Google className="size-5" />
+              <span className="text-sm">Continue with Google</span>
+            </Button>
+          </>
         )}
-
-        <Button
-          variant="outline"
-          className="w-full"
-          onClick={() => {
-            // Redirect to backend OAuth endpoint. The backend will handle Google authentication and redirect back.
-            window.location.href = `${env.NEXT_PUBLIC_API_URL}/auth/google`;
-          }}
-        >
-          <Google className="size-5" />
-          <span className="text-sm">Continue with Google</span>
-        </Button>
       </div>
     </div>
   );

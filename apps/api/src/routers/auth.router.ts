@@ -10,6 +10,7 @@ import { authenticate } from '../middlewares/authenticate';
 import { validate } from '../middlewares/validate';
 
 import { authController } from '../controllers/auth.controller';
+import { env } from '../env';
 
 export const auth: Router = Router({ mergeParams: true });
 
@@ -41,15 +42,13 @@ auth.get(
   '/google/callback',
   passport.authenticate('google', {
     session: false,
-    failureRedirect: `${process.env.WEB_APP_URL ?? 'http://localhost:3000'}/signin?error=google`,
+    failureRedirect: `${env.WEB_APP_URL}/signin?error=google`,
   }),
   async (req, res) => {
     const user = req.user as { id: string } | undefined;
 
     if (!user) {
-      return res.redirect(
-        `${process.env.WEB_APP_URL ?? 'http://localhost:3000'}/signin?error=google`
-      );
+      return res.redirect(`${env.WEB_APP_URL}/signin?error=google`);
     }
 
     console.log('[auth.router] Google OAuth successful for user:', user.id);
@@ -65,6 +64,6 @@ auth.get(
     console.log('[auth.router] Token cookie set');
 
     // Redirect the user back to the frontend. Feel free to change the path as needed.
-    return res.redirect(process.env.WEB_APP_URL ?? 'http://localhost:3000');
+    return res.redirect(env.WEB_APP_URL);
   }
 );

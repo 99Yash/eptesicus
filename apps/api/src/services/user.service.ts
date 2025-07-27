@@ -10,8 +10,8 @@ import { AppError } from '../lib/error';
 import { generateUniqueUsername } from './ai.service';
 
 class UserService {
-  async upsertUser(args: UserInsertType) {
-    const { email, name, username } = args;
+  async upsertUser(args: UserInsertType & { sendVerificationEmail?: boolean }) {
+    const { email, name, username, sendVerificationEmail = true } = args;
 
     //TODO: send verification code on every signup only if 2FA is enabled
 
@@ -97,6 +97,11 @@ class UserService {
         code: 'INTERNAL_SERVER_ERROR',
         message: 'Failed to create user',
       });
+    }
+
+    // Skip email verification flow when not required (e.g., social login)
+    if (!sendVerificationEmail) {
+      return user;
     }
 
     // Check if there's an existing verification code and if it's expired

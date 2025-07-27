@@ -14,6 +14,7 @@ const envSchema = z.object({
   REDIS_URL: z.string().url(),
   GOOGLE_CLIENT_ID: z.string(),
   GOOGLE_CLIENT_SECRET: z.string(),
+  WEB_APP_URL: z.string().url(),
 });
 
 function createEnv(env: NodeJS.ProcessEnv) {
