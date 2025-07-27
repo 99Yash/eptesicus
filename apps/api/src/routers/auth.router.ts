@@ -13,7 +13,7 @@ export const auth: Router = Router({ mergeParams: true });
 
 // ---------- Email / code based auth ----------
 
-auth.post('/signup', limiter, validate(signupSchema, authController.signup));
+auth.post('/login', limiter, validate(signupSchema, authController.login));
 
 auth.post(
   '/verify-email',

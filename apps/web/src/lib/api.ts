@@ -20,7 +20,7 @@ class API {
     name?: string;
     username?: string;
   }) {
-    const response = await _axios.post<{ message: string }>('/auth/signup', {
+    const response = await _axios.post<{ message: string }>('/auth/login', {
       email,
       name,
       username,

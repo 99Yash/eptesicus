@@ -13,7 +13,7 @@ class AuthController {
    * – If the email already exists, we treat this as a resend and return 200.
    * – Otherwise we create the user and return 201.
    */
-  async signup(
+  async login(
     req: ValidatedRequest<typeof signupSchema>,
     res: Response,
     next: NextFunction
