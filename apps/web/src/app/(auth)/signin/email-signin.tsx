@@ -1,7 +1,7 @@
 'use client';
 
 import { useMutation } from '@tanstack/react-query';
-import { AuthOptionsType } from '@workspace/db/helpers';
+import { authOptionsSchema, AuthOptionsType } from '@workspace/db/helpers';
 import { Button } from '@workspace/ui/components/button';
 import { Input } from '@workspace/ui/components/input';
 import { Spinner } from '@workspace/ui/components/spinner';
@@ -9,7 +9,11 @@ import React from 'react';
 import { toast } from 'sonner';
 import z from 'zod';
 import { api } from '~/lib/api';
-import { getErrorMessage, setLocalStorageItem } from '~/lib/utils';
+import {
+  getErrorMessage,
+  getLocalStorageItem,
+  setLocalStorageItem,
+} from '~/lib/utils';
 
 const schema = z.object({
   email: z.string().email().max(255, 'Email must be less than 255 characters'),
@@ -20,6 +24,19 @@ type EmailSignInProps = {
 };
 
 export function EmailSignIn({ onSuccess }: EmailSignInProps) {
+  const [lastAuthMethod, setLastAuthMethod] =
+    React.useState<AuthOptionsType | null>(null);
+
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const lastAuthMethod = getLocalStorageItem<AuthOptionsType>(
+        'lastAuthMethod',
+        authOptionsSchema
+      );
+      setLastAuthMethod(lastAuthMethod ?? null);
+    }
+  }, []);
+
   const loginMutation = useMutation({
     mutationFn: api.login,
     onError(error) {
@@ -68,11 +85,20 @@ export function EmailSignIn({ onSuccess }: EmailSignInProps) {
           required
         />
       </div>
-      <Button disabled={loginMutation.isPending} type="submit">
+      <Button
+        disabled={loginMutation.isPending}
+        type="submit"
+        className="relative"
+      >
         {loginMutation.isPending ? (
           <Spinner className="mr-2 bg-background" />
         ) : (
           'Sign In with Email'
+        )}
+        {lastAuthMethod === 'EMAIL' && (
+          <p className="text-xs absolute right-4 text-muted-foreground text-center">
+            Last used
+          </p>
         )}
       </Button>
     </form>

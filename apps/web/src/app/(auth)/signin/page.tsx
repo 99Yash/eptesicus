@@ -70,11 +70,6 @@ export default function AuthenticationPage() {
                 setStep('verify');
               }}
             />
-            {lastAuthMethod === 'EMAIL' && (
-              <p className="text-xs italic text-muted-foreground text-center">
-                Last used
-              </p>
-            )}
           </div>
         )}
         {step === 'verify' && <VerifyEmailForm email={email} />}
@@ -87,14 +82,14 @@ export default function AuthenticationPage() {
               </div>
               <div className="relative flex justify-center text-xs uppercase">
                 <span className="bg-background px-2 text-muted-foreground">
-                  Or continue with
+                  or
                 </span>
               </div>
             </div>
             <div className="space-y-1">
               <Button
                 variant="outline"
-                className="w-full"
+                className="w-full relative"
                 onClick={() => {
                   // Redirect to backend OAuth endpoint. The backend will handle Google authentication and redirect back.
                   if (typeof window !== 'undefined') {
@@ -108,12 +103,12 @@ export default function AuthenticationPage() {
               >
                 <Google className="size-5" />
                 <span className="text-sm">Continue with Google</span>
+                {lastAuthMethod === 'GOOGLE' && (
+                  <p className="text-xs absolute right-4 text-muted-foreground text-center">
+                    Last used
+                  </p>
+                )}
               </Button>
-              {lastAuthMethod === 'GOOGLE' && (
-                <p className="text-xs text-muted-foreground text-center">
-                  Last used
-                </p>
-              )}
             </div>
           </>
         )}
