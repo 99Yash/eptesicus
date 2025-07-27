@@ -32,3 +32,9 @@ export const verifyEmailSchema = z.object({
 });
 
 export type VerifyEmailType = z.infer<typeof verifyEmailSchema>;
+
+export const userSchema = z.object({
+  id: z.string(),
+});
+
+export type UserType = z.infer<typeof userSchema>;

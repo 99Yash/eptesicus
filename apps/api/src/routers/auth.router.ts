@@ -1,4 +1,8 @@
-import { signupSchema, verifyEmailSchema } from '@workspace/db/helpers';
+import {
+  signupSchema,
+  userSchema,
+  verifyEmailSchema,
+} from '@workspace/db/helpers';
 import { Router } from 'express';
 import passport from 'passport';
 import { authController } from '../controllers/auth.controller';
@@ -42,15 +46,19 @@ auth.get(
     failureRedirect: `${env.WEB_APP_URL}/signin?error=google`,
   }),
   async (req, res) => {
-    const user = req.user as { id: string } | undefined;
+    const user = req.user;
 
-    if (!user) {
+    const { success, data } = userSchema.safeParse(user);
+
+    if (!success) {
       return res.redirect(`${env.WEB_APP_URL}/signin?error=google`);
     }
 
-    console.log('[auth.router] Google OAuth successful for user:', user.id);
+    console.log('[auth.router] Google OAuth successful for user:', data.id);
 
-    const { token } = await generateEncryptedToken({ userId: user.id });
+    const { token } = await generateEncryptedToken({
+      userId: data.id,
+    });
     console.log(
       '[auth.router] Generated token:',
       token.substring(0, 15),
