@@ -6,14 +6,13 @@ import express from 'express';
 // Load environment variables as early as possible
 dotenv.config();
 
+// Passport configuration (depends on env variables)
 import passport from 'passport';
 
-// Passport configuration (depends on env variables)
+import { env } from './env';
 import './lib/passport';
 
 import { auth as authRouter } from './routers/auth.router';
-
-import { env } from './env';
 import { users as userRouter } from './routers/user.router';
 
 // NOTE https://github.com/expressjs/express/discussions/5491 - `csurf` package is archived, and has issues.

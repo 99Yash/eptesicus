@@ -8,6 +8,7 @@ import { parseAsStringLiteral, useQueryState } from 'nuqs';
 import React from 'react';
 import { env } from '~/env';
 import { useUser } from '~/hooks/use-user';
+import { LOCAL_STORAGE_KEYS } from '~/lib/constants';
 import { getLocalStorageItem, setLocalStorageItem } from '~/lib/utils';
 import { EmailSignIn } from './email-signin';
 import { VerifyEmailForm } from './verify-email-form';
@@ -32,7 +33,7 @@ export default function AuthenticationPage() {
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
       const lastAuthMethod = getLocalStorageItem(
-        'lastAuthMethod',
+        LOCAL_STORAGE_KEYS.LAST_AUTH_METHOD,
         authOptionsSchema
       );
       setLastAuthMethod(lastAuthMethod ?? null);
@@ -94,7 +95,7 @@ export default function AuthenticationPage() {
                   // Redirect to backend OAuth endpoint. The backend will handle Google authentication and redirect back.
                   if (typeof window !== 'undefined') {
                     setLocalStorageItem<AuthOptionsType>(
-                      'lastAuthMethod',
+                      LOCAL_STORAGE_KEYS.LAST_AUTH_METHOD,
                       'GOOGLE'
                     );
                   }

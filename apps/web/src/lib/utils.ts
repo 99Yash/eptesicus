@@ -1,5 +1,6 @@
 import { AxiosError } from 'axios';
 import z from 'zod';
+import { LOCAL_STORAGE_KEYS } from './constants';
 
 export const unknownError = 'Something went wrong. Please try again.';
 export function getErrorMessage(err: unknown) {
@@ -23,7 +24,10 @@ export function getErrorMessage(err: unknown) {
  * @param key The key to store the value under.
  * @param value The value to store. Can be any JSON-serializable type.
  */
-export function setLocalStorageItem<T>(key: string, value: T): void {
+export function setLocalStorageItem<T>(
+  key: (typeof LOCAL_STORAGE_KEYS)[keyof typeof LOCAL_STORAGE_KEYS],
+  value: T
+): void {
   try {
     const serializedValue = JSON.stringify(value);
     localStorage.setItem(key, serializedValue);
@@ -42,7 +46,7 @@ export function setLocalStorageItem<T>(key: string, value: T): void {
  * @returns The validated value, the default value, or undefined if not found/invalid and no default is provided.
  */
 export function getLocalStorageItem<T>(
-  key: string,
+  key: (typeof LOCAL_STORAGE_KEYS)[keyof typeof LOCAL_STORAGE_KEYS],
   schema: z.ZodType<T>, // Accept a Zod schema
   defaultValue?: T
 ): T | undefined {
@@ -82,7 +86,9 @@ export function getLocalStorageItem<T>(
  *
  * @param key The key of the item to remove.
  */
-export function removeLocalStorageItem(key: string): void {
+export function removeLocalStorageItem(
+  key: (typeof LOCAL_STORAGE_KEYS)[keyof typeof LOCAL_STORAGE_KEYS]
+): void {
   try {
     localStorage.removeItem(key);
   } catch (error) {

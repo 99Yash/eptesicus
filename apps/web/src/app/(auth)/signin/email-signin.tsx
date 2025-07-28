@@ -9,6 +9,7 @@ import React from 'react';
 import { toast } from 'sonner';
 import z from 'zod';
 import { api } from '~/lib/api';
+import { LOCAL_STORAGE_KEYS } from '~/lib/constants';
 import {
   getErrorMessage,
   getLocalStorageItem,
@@ -30,7 +31,7 @@ export function EmailSignIn({ onSuccess }: EmailSignInProps) {
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
       const lastAuthMethod = getLocalStorageItem<AuthOptionsType>(
-        'lastAuthMethod',
+        LOCAL_STORAGE_KEYS.LAST_AUTH_METHOD,
         authOptionsSchema
       );
       setLastAuthMethod(lastAuthMethod ?? null);
@@ -45,7 +46,10 @@ export function EmailSignIn({ onSuccess }: EmailSignInProps) {
     onSuccess(_data, variables) {
       // Persist last used auth method
       if (typeof window !== 'undefined') {
-        setLocalStorageItem<AuthOptionsType>('lastAuthMethod', 'EMAIL');
+        setLocalStorageItem<AuthOptionsType>(
+          LOCAL_STORAGE_KEYS.LAST_AUTH_METHOD,
+          'EMAIL'
+        );
       }
       onSuccess(variables.email);
       toast.info(`Please check your inbox for further instructions.`);
