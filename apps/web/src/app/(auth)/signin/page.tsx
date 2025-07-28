@@ -3,7 +3,7 @@
 import { authOptionsSchema, AuthOptionsType } from '@workspace/db/helpers';
 import { Button } from '@workspace/ui/components/button';
 import { Google } from '@workspace/ui/icons';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { parseAsStringLiteral, useQueryState } from 'nuqs';
 import React from 'react';
 import { env } from '~/env';
@@ -15,7 +15,6 @@ import { VerifyEmailForm } from './verify-email-form';
 export default function AuthenticationPage() {
   const { data: user } = useUser();
   const router = useRouter();
-  const searchParams = useSearchParams();
 
   const [step, setStep] = useQueryState(
     'step',

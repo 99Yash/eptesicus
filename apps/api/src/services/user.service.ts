@@ -79,7 +79,7 @@ class UserService {
       existingUser.auth_provider !== auth_provider
     ) {
       throw new AppError({
-        code: 'METHOD_NOT_SUPPORTED',
+        code: 'CONFLICT',
         message: 'Email already exists with a different sign-in method',
       });
     }
