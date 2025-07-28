@@ -1,6 +1,6 @@
 'use client';
 
-import { authOptionsSchema, AuthOptionsType } from '@workspace/db/helpers';
+import { AuthOptionsType } from '@workspace/db/helpers';
 import { Button } from '@workspace/ui/components/button';
 import { Google } from '@workspace/ui/icons';
 import { useRouter } from 'next/navigation';
@@ -8,7 +8,6 @@ import { parseAsStringLiteral, useQueryState } from 'nuqs';
 import React from 'react';
 import { env } from '~/env';
 import { useUser } from '~/hooks/use-user';
-import { LOCAL_STORAGE_KEYS } from '~/lib/constants';
 import { getLocalStorageItem, setLocalStorageItem } from '~/lib/utils';
 import { EmailSignIn } from './email-signin';
 import { VerifyEmailForm } from './verify-email-form';
@@ -32,10 +31,7 @@ export default function AuthenticationPage() {
 
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
-      const lastAuthMethod = getLocalStorageItem(
-        LOCAL_STORAGE_KEYS.LAST_AUTH_METHOD,
-        authOptionsSchema
-      );
+      const lastAuthMethod = getLocalStorageItem('LAST_AUTH_METHOD');
       setLastAuthMethod(lastAuthMethod ?? null);
     }
   }, []);
@@ -94,10 +90,7 @@ export default function AuthenticationPage() {
                 onClick={() => {
                   // Redirect to backend OAuth endpoint. The backend will handle Google authentication and redirect back.
                   if (typeof window !== 'undefined') {
-                    setLocalStorageItem<AuthOptionsType>(
-                      LOCAL_STORAGE_KEYS.LAST_AUTH_METHOD,
-                      'GOOGLE'
-                    );
+                    setLocalStorageItem('LAST_AUTH_METHOD', 'GOOGLE');
                   }
                   window.location.href = `${env.NEXT_PUBLIC_API_URL}/auth/google`;
                 }}

@@ -1,7 +1,7 @@
 'use client';
 
 import { useMutation } from '@tanstack/react-query';
-import { authOptionsSchema, AuthOptionsType } from '@workspace/db/helpers';
+import { AuthOptionsType } from '@workspace/db/helpers';
 import { Button } from '@workspace/ui/components/button';
 import { Input } from '@workspace/ui/components/input';
 import { Spinner } from '@workspace/ui/components/spinner';
@@ -9,7 +9,6 @@ import React from 'react';
 import { toast } from 'sonner';
 import z from 'zod';
 import { api } from '~/lib/api';
-import { LOCAL_STORAGE_KEYS } from '~/lib/constants';
 import {
   getErrorMessage,
   getLocalStorageItem,
@@ -30,10 +29,7 @@ export function EmailSignIn({ onSuccess }: EmailSignInProps) {
 
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
-      const lastAuthMethod = getLocalStorageItem<AuthOptionsType>(
-        LOCAL_STORAGE_KEYS.LAST_AUTH_METHOD,
-        authOptionsSchema
-      );
+      const lastAuthMethod = getLocalStorageItem('LAST_AUTH_METHOD');
       setLastAuthMethod(lastAuthMethod ?? null);
     }
   }, []);
@@ -46,10 +42,7 @@ export function EmailSignIn({ onSuccess }: EmailSignInProps) {
     onSuccess(_data, variables) {
       // Persist last used auth method
       if (typeof window !== 'undefined') {
-        setLocalStorageItem<AuthOptionsType>(
-          LOCAL_STORAGE_KEYS.LAST_AUTH_METHOD,
-          'EMAIL'
-        );
+        setLocalStorageItem('LAST_AUTH_METHOD', 'EMAIL');
       }
       onSuccess(variables.email);
       toast.info(`Please check your inbox for further instructions.`);
