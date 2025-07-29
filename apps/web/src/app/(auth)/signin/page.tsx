@@ -59,20 +59,19 @@ export default function AuthenticationPage() {
         </p>
       </div>
       <div className="grid gap-6">
-        {step === 'signin' && (
-          <div className="space-y-1">
-            <EmailSignIn
-              onSuccess={(email: string) => {
-                setEmail(email);
-                setStep('verify');
-              }}
-            />
-          </div>
-        )}
         {step === 'verify' && <VerifyEmailForm email={email} />}
 
         {step === 'signin' && (
           <>
+            <div className="space-y-1">
+              <EmailSignIn
+                onSuccess={(email: string) => {
+                  setEmail(email);
+                  setStep('verify');
+                }}
+              />
+            </div>
+
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
                 <span className="w-full border-t" />
@@ -106,6 +105,8 @@ export default function AuthenticationPage() {
             </div>
           </>
         )}
+
+        {step === 'verify' && <VerifyEmailForm email={email} />}
       </div>
     </div>
   );
