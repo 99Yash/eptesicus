@@ -31,16 +31,16 @@ const OAuthButton: React.FC<OAuthButtonProps> = ({ providerId, className }) => {
 
   const provider = getProviderById(providerId);
 
-  if (!provider || !provider.enabled) {
-    return null;
-  }
-
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
       const lastAuthMethod = getLocalStorageItem('LAST_AUTH_METHOD');
       setLastAuthMethod(lastAuthMethod ?? null);
     }
   }, []);
+
+  if (!provider || !provider.enabled) {
+    return null;
+  }
 
   const oauthMutation = useMutation({
     mutationFn: () => oauthPopup(provider),

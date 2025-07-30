@@ -1,6 +1,25 @@
 import { env } from '~/env';
 import { OAUTH_POPUP_DIMENSIONS, OAuthProvider } from './oauth-providers';
 
+/**
+ * Validates that an origin exactly matches the expected API URL
+ * This prevents subdomain attacks and ensures proper security
+ */
+function validateOrigin(origin: string, expectedApiUrl: string): boolean {
+  try {
+    // Parse both URLs to extract their origins
+    const originUrl = new URL(origin);
+    const expectedUrl = new URL(expectedApiUrl);
+
+    // Compare the complete origin (protocol + hostname + port)
+    return originUrl.origin === expectedUrl.origin;
+  } catch (error) {
+    // If URL parsing fails, the origin is invalid
+    console.warn('[oauth-popup] Invalid origin format:', origin);
+    return false;
+  }
+}
+
 export async function oauthPopup(provider: OAuthProvider): Promise<void> {
   if (typeof window === 'undefined') {
     throw new Error(
@@ -34,8 +53,12 @@ export async function oauthPopup(provider: OAuthProvider): Promise<void> {
     }, 500);
 
     function handleMessage(event: MessageEvent) {
-      // Ensure the message is coming from our API origin
-      if (!event.origin.startsWith(env.NEXT_PUBLIC_API_URL)) {
+      // Secure origin validation - exact match to prevent subdomain attacks
+      if (!validateOrigin(event.origin, env.NEXT_PUBLIC_API_URL)) {
+        console.warn(
+          '[oauth-popup] Rejected message from unauthorized origin:',
+          event.origin
+        );
         return;
       }
 
