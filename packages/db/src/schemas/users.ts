@@ -2,7 +2,11 @@ import { relations } from 'drizzle-orm';
 import { index, pgEnum, pgTable, text, varchar } from 'drizzle-orm/pg-core';
 import { createId, lifecycle_dates } from '../helpers/utils';
 
-export const auth_providers = pgEnum('auth_providers', ['EMAIL', 'GOOGLE']);
+export const auth_providers = pgEnum('auth_providers', [
+  'EMAIL',
+  'GOOGLE',
+  'GITHUB',
+]);
 
 export const users = pgTable(
   'users',

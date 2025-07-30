@@ -106,3 +106,87 @@ auth.get('/google/callback', (req, res, next) => {
     return res.status(200).send(buildHtml({ ok: true }));
   })(req, res, next);
 });
+
+auth.get(
+  '/github',
+  passport.authenticate('github', {
+    session: false,
+    scope: ['user:email'],
+  })
+);
+
+// 2. GitHub OAuth callback
+auth.get('/github/callback', (req, res, next) => {
+  const buildHtml = (payload: Record<string, unknown>) => {
+    return `<!DOCTYPE html>
+    <html><head><title>GitHub OAuth</title></head><body>
+    <script>
+      (function () {
+        const payload = ${JSON.stringify({ type: 'github-oauth', ...payload })};
+        if (window.opener) {
+          window.opener.postMessage(payload, '${env.WEB_APP_URL ?? 'http://localhost:3000'}');
+          window.close();
+        } else {
+          // Fallback for users who opened in same tab
+          window.location.href = '${env.WEB_APP_URL ?? 'http://localhost:3000'}';
+        }
+      })();
+    </script></body></html>`;
+  };
+
+  passport.authenticate(
+    'github',
+    { session: false },
+    async (err: any, user: any) => {
+      if (err) {
+        console.error('[auth.router] GitHub OAuth error:', err);
+
+        if (err instanceof AppError) {
+          return res
+            .status(200)
+            .send(buildHtml({ error: err.code, message: err.message }));
+        }
+
+        return res
+          .status(200)
+          .send(
+            buildHtml({ error: 'GITHUB_OAUTH', message: 'GitHub OAuth failed' })
+          );
+      }
+
+      console.log('[auth.router] GitHub OAuth callback for user:', user);
+
+      const { success, data } = z
+        .object({
+          id: z.string(),
+        })
+        .safeParse(user);
+
+      if (!success) {
+        return res
+          .status(200)
+          .send(
+            buildHtml({ error: 'GITHUB_OAUTH', message: 'GitHub OAuth failed' })
+          );
+      }
+
+      console.log('[auth.router] GitHub OAuth successful for user:', data.id);
+
+      const { token } = await generateEncryptedToken({
+        userId: data.id,
+      });
+
+      console.log(
+        '[auth.router] Generated token:',
+        token.substring(0, 15),
+        '...'
+      );
+
+      cookieService.setTokenCookie({ res, token });
+      console.log('[auth.router] Token cookie set');
+
+      // Send success payload via postMessage HTML
+      return res.status(200).send(buildHtml({ ok: true }));
+    }
+  )(req, res, next);
+});

@@ -13,7 +13,7 @@ class UserService {
   async upsertUser(
     args: UserInsertType & {
       sendVerificationEmail?: boolean;
-      auth_provider?: 'EMAIL' | 'GOOGLE';
+      auth_provider?: 'EMAIL' | 'GOOGLE' | 'GITHUB';
     }
   ) {
     const {
