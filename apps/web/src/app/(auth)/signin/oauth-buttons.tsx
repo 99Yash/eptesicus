@@ -52,7 +52,6 @@ const OAuthButton: React.FC<OAuthButtonProps> = ({ providerId, className }) => {
         'LAST_AUTH_METHOD',
         provider.id.toUpperCase() as AuthOptionsType
       );
-      toast.success(`Signed in with ${provider.name}`);
       router.push('/');
     },
   });
