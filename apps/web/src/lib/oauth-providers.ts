@@ -1,3 +1,4 @@
+import { AuthOptionsType } from '@workspace/db/helpers';
 import { GitHub, Google } from '@workspace/ui/icons';
 import { env } from '~/env';
 
@@ -7,23 +8,23 @@ export interface OAuthProvider {
   authUrl: string;
   icon?: React.ComponentType<{ className?: string }>;
   enabled: boolean;
-  popupDimensions?: {
-    width: number;
-    height: number;
-  };
 }
 
-export const OAUTH_PROVIDERS: Record<string, OAuthProvider> = {
+export const OAUTH_POPUP_DIMENSIONS = {
+  width: 500,
+  height: 600,
+} as const;
+
+export const OAUTH_PROVIDERS: Record<
+  Lowercase<Exclude<AuthOptionsType, 'EMAIL'>>,
+  OAuthProvider
+> = {
   google: {
     id: 'google',
     name: 'Google',
     authUrl: `${env.NEXT_PUBLIC_API_URL}/auth/google`,
     icon: Google,
     enabled: true,
-    popupDimensions: {
-      width: 500,
-      height: 600,
-    },
   },
   github: {
     id: 'github',
@@ -31,10 +32,6 @@ export const OAUTH_PROVIDERS: Record<string, OAuthProvider> = {
     authUrl: `${env.NEXT_PUBLIC_API_URL}/auth/github`,
     icon: GitHub,
     enabled: true,
-    popupDimensions: {
-      width: 500,
-      height: 600,
-    },
   },
 } as const;
 

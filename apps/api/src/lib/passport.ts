@@ -1,6 +1,9 @@
-import passport from 'passport';
+import passport, { Profile } from 'passport';
 import { Strategy as GitHubStrategy } from 'passport-github2';
-import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
+import {
+  Strategy as GoogleStrategy,
+  VerifyCallback,
+} from 'passport-google-oauth20';
 import { env } from '../env';
 import { userService } from '../services/user.service';
 import { AppError } from './error';
@@ -58,7 +61,12 @@ passport.use(
       callbackURL: '/auth/github/callback',
       scope: ['user:email'],
     },
-    async (accessToken, refreshToken, profile, done) => {
+    async (
+      accessToken: string,
+      refreshToken: string,
+      profile: Profile,
+      done: VerifyCallback
+    ) => {
       try {
         console.log('[passport] GitHub profile:', profile);
 
@@ -76,7 +84,7 @@ passport.use(
 
         const user = await userService.upsertUser({
           email,
-          name: profile.displayName || username,
+          name: profile.displayName ?? username,
           username,
           image_url: profile.photos?.[0]?.value,
           sendVerificationEmail: false,

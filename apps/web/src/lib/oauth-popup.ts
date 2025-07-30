@@ -1,5 +1,5 @@
 import { env } from '~/env';
-import { OAuthProvider } from './oauth-providers';
+import { OAUTH_POPUP_DIMENSIONS, OAuthProvider } from './oauth-providers';
 
 export async function oauthPopup(provider: OAuthProvider): Promise<void> {
   if (typeof window === 'undefined') {
@@ -9,8 +9,8 @@ export async function oauthPopup(provider: OAuthProvider): Promise<void> {
   }
 
   return new Promise((resolve, reject) => {
-    // Use provider-specific dimensions or defaults
-    const { width = 500, height = 600 } = provider.popupDimensions || {};
+    // Use fixed popup dimensions
+    const { width, height } = OAUTH_POPUP_DIMENSIONS;
     const top = window.screenY + (window.outerHeight - height) / 2;
     const left = window.screenX + (window.outerWidth - width) / 2;
 
