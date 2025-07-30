@@ -1,6 +1,6 @@
 import { type CookieOptions, type Request, type Response } from 'express';
 
-const ONE_MINUTE = 60;
+const ONE_MINUTE = 60 * 1000;
 const ONE_HOUR = 60 * ONE_MINUTE;
 const ONE_DAY = 24 * ONE_HOUR;
 const ONE_MONTH = 30 * ONE_DAY;
