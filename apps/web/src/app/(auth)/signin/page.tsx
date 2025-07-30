@@ -40,7 +40,7 @@ export default function AuthenticationPage() {
         </h1>
         <p className="text-sm text-muted-foreground">
           {step === 'signin'
-            ? 'Enter your email below to create your account'
+            ? 'Select an authentication method to continue'
             : 'Enter the code sent to your email below to verify your email'}
         </p>
       </div>
