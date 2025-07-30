@@ -90,13 +90,31 @@ export function getLocalStorageItem<K extends LocalStorageKey>(
     const schema = LOCAL_STORAGE_SCHEMAS[key]; // Retrieve schema based on the key
 
     if (serializedValue === null) {
-      // If the item doesn't exist, try to get a default from the schema itself,
-      // then fallback to the provided `defaultValue`.
-      // This allows Zod's .default() to provide a fallback even if localStorage is empty.
-      const defaultSchemaValue = schema.safeParse(undefined).success
-        ? schema.parse(undefined) // This will trigger Zod's default if present
-        : undefined;
-      return defaultValue ?? defaultSchemaValue;
+      // Validate the provided default value against the schema
+      if (defaultValue !== undefined) {
+        const defaultValidation = schema.safeParse(defaultValue);
+
+        if (defaultValidation.success) {
+          return defaultValidation.data;
+        } else {
+          console.error(
+            `[LocalStorageError] Provided default value for key "${key}" does not conform to schema.`,
+            `Default value:`,
+            defaultValue,
+            `Schema errors:`,
+            defaultValidation.error.errors
+          );
+          // Don't return invalid default value - let it fall through to schema default
+        }
+      }
+
+      // Try to get schema default if no valid provided default
+      try {
+        const schemaDefault = schema.parse(undefined);
+        return schemaDefault;
+      } catch (schemaError) {
+        return undefined;
+      }
     }
 
     const parsedValue: unknown = JSON.parse(serializedValue);
@@ -110,17 +128,37 @@ export function getLocalStorageItem<K extends LocalStorageKey>(
       // Log the validation error for debugging purposes
       console.warn(
         `[LocalStorageValidation] Stored data for key "${key}" is invalid. ` +
-          `Returning default value (if provided) or schema default.`,
+          `Attempting to use default value.`,
         `Stored value:`,
         parsedValue,
         `Errors:`,
         validationResult.error.errors
       );
-      // If validation fails, attempt to get schema default, then provided default
-      const defaultSchemaValue = schema.safeParse(undefined).success
-        ? schema.parse(undefined)
-        : undefined;
-      return defaultValue ?? defaultSchemaValue;
+
+      // If validation fails, validate and use provided default, then schema default
+      if (defaultValue !== undefined) {
+        const defaultValidation = schema.safeParse(defaultValue);
+
+        if (defaultValidation.success) {
+          return defaultValidation.data;
+        } else {
+          console.error(
+            `[LocalStorageError] Provided default value for key "${key}" does not conform to schema after stored value validation failed.`,
+            `Default value:`,
+            defaultValue,
+            `Schema errors:`,
+            defaultValidation.error.errors
+          );
+        }
+      }
+
+      // Try schema default as last resort
+      try {
+        const schemaDefault = schema.parse(undefined);
+        return schemaDefault;
+      } catch (schemaError) {
+        return undefined;
+      }
     }
   } catch (error) {
     // This catch block handles JSON.parse errors or other unexpected issues
@@ -128,7 +166,26 @@ export function getLocalStorageItem<K extends LocalStorageKey>(
       `[LocalStorageError] Failed to get or parse item for key "${key}":`,
       error
     );
-    return defaultValue; // Return default on parsing or other errors
+
+    // Even on error, validate the default value if provided
+    if (defaultValue !== undefined) {
+      const schema = LOCAL_STORAGE_SCHEMAS[key];
+      const defaultValidation = schema.safeParse(defaultValue);
+
+      if (defaultValidation.success) {
+        return defaultValidation.data;
+      } else {
+        console.error(
+          `[LocalStorageError] Provided default value for key "${key}" does not conform to schema after error.`,
+          `Default value:`,
+          defaultValue,
+          `Schema errors:`,
+          defaultValidation.error.errors
+        );
+      }
+    }
+
+    return undefined;
   }
 }
 

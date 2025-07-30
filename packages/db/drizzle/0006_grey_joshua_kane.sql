@@ -1,0 +1,1 @@
+ALTER TYPE "public"."auth_providers" ADD VALUE 'GITHUB';

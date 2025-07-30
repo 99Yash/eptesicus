@@ -1,5 +1,7 @@
 import { userInsertSchema, verifyEmailSchema } from '@workspace/db/helpers';
 import { NextFunction, Response } from 'express';
+import z from 'zod';
+import { AppError } from '../lib/error';
 import { generateEncryptedToken } from '../lib/jwt';
 import { AuthenticatedRequest } from '../middlewares/authenticate';
 import { ValidatedRequest } from '../middlewares/validate';
@@ -87,6 +89,15 @@ class UserController {
   ): Promise<void> {
     try {
       const { username } = req.params;
+      const parsedUsername = z.string().safeParse(username);
+
+      if (!parsedUsername.success) {
+        throw new AppError({
+          code: 'BAD_REQUEST',
+          message: 'Invalid username',
+        });
+      }
+
       console.log('[UserController] Checking username availability:', username);
 
       const result = await userService.checkUsernameAvailability(username);

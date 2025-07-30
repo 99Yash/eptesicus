@@ -8,7 +8,7 @@ export type UserToOrganization = InferSelectModel<
   typeof users_to_organizations
 >;
 
-export const authOptionsSchema = z.enum(['EMAIL', 'GOOGLE']);
+export const authOptionsSchema = z.enum(['EMAIL', 'GOOGLE', 'GITHUB']);
 
 export type AuthOptionsType = z.infer<typeof authOptionsSchema>;
 
