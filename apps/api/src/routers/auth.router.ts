@@ -38,21 +38,38 @@ auth.get(
 // 2. Google OAuth callback
 // On success, Passport will attach the User object returned from the strategy to `user` in the callback.
 auth.get('/google/callback', (req, res, next) => {
+  const buildHtml = (payload: Record<string, unknown>) => {
+    return `<!DOCTYPE html>
+    <html><head><title>Google OAuth</title></head><body>
+    <script>
+      (function () {
+        const payload = ${JSON.stringify({ type: 'google-oauth', ...payload })};
+        if (window.opener) {
+          window.opener.postMessage(payload, '${env.WEB_APP_URL ?? 'http://localhost:3000'}');
+          window.close();
+        } else {
+          // Fallback for users who opened in same tab
+          window.location.href = '${env.WEB_APP_URL ?? 'http://localhost:3000'}';
+        }
+      })();
+    </script></body></html>`;
+  };
+
   passport.authenticate('google', { session: false }, async (err, user) => {
     if (err) {
       console.error('[auth.router] Google OAuth error:', err);
 
       if (err instanceof AppError) {
-        // Pass specific error codes back to the frontend for granular handling.
-        return res.redirect(
-          `${env.WEB_APP_URL ?? 'http://localhost:3000'}/signin?error=${err.code}`
-        );
+        return res
+          .status(200)
+          .send(buildHtml({ error: err.code, message: err.message }));
       }
 
-      // Fallback for non-AppError instances
-      return res.redirect(
-        `${env.WEB_APP_URL ?? 'http://localhost:3000'}/signin?error=GOOGLE_OAUTH`
-      );
+      return res
+        .status(200)
+        .send(
+          buildHtml({ error: 'GOOGLE_OAUTH', message: 'Google OAuth failed' })
+        );
     }
 
     console.log('[auth.router] Google OAuth callback for user:', user);
@@ -64,10 +81,11 @@ auth.get('/google/callback', (req, res, next) => {
       .safeParse(user);
 
     if (!success) {
-      // If we can’t parse the user, treat as failure and redirect with an error.
-      return res.redirect(
-        `${env.WEB_APP_URL ?? 'http://localhost:3000'}/signin?error=google`
-      );
+      return res
+        .status(200)
+        .send(
+          buildHtml({ error: 'GOOGLE_OAUTH', message: 'Google OAuth failed' })
+        );
     }
 
     console.log('[auth.router] Google OAuth successful for user:', data.id);
@@ -84,7 +102,7 @@ auth.get('/google/callback', (req, res, next) => {
     cookieService.setTokenCookie({ res, token });
     console.log('[auth.router] Token cookie set');
 
-    // Redirect the user back to the frontend. Feel free to change the path as needed.
-    return res.redirect(env.WEB_APP_URL ?? 'http://localhost:3000');
+    // Send success payload via postMessage HTML
+    return res.status(200).send(buildHtml({ ok: true }));
   })(req, res, next);
 });

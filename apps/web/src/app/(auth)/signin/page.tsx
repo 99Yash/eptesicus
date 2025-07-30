@@ -1,20 +1,28 @@
 'use client';
 
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AuthOptionsType } from '@workspace/db/helpers';
 import { Button } from '@workspace/ui/components/button';
+import { Spinner } from '@workspace/ui/components/spinner';
 import { Google } from '@workspace/ui/icons';
 import { useRouter } from 'next/navigation';
 import { parseAsStringLiteral, useQueryState } from 'nuqs';
 import React from 'react';
-import { env } from '~/env';
+import { toast } from 'sonner';
 import { useUser } from '~/hooks/use-user';
-import { getLocalStorageItem, setLocalStorageItem } from '~/lib/utils';
+import { googleAuthPopup } from '~/lib/google-auth';
+import {
+  getErrorMessage,
+  getLocalStorageItem,
+  setLocalStorageItem,
+} from '~/lib/utils';
 import { EmailSignIn } from './email-signin';
 import { VerifyEmailForm } from './verify-email-form';
 
 export default function AuthenticationPage() {
   const { data: user } = useUser();
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const [step, setStep] = useQueryState(
     'step',
@@ -35,6 +43,20 @@ export default function AuthenticationPage() {
       setLastAuthMethod(lastAuthMethod ?? null);
     }
   }, []);
+
+  // Google OAuth mutation
+  const googleMutation = useMutation({
+    mutationFn: googleAuthPopup,
+    onError(error) {
+      toast.error(getErrorMessage(error));
+    },
+    async onSuccess() {
+      // Invalidate user query so useUser fetches fresh data
+      await queryClient.invalidateQueries();
+      toast.success('Signed in with Google');
+      router.push('/');
+    },
+  });
 
   if (user) {
     router.push('/');
@@ -87,19 +109,26 @@ export default function AuthenticationPage() {
                 variant="outline"
                 className="w-full relative"
                 onClick={() => {
-                  // Redirect to backend OAuth endpoint. The backend will handle Google authentication and redirect back.
                   if (typeof window !== 'undefined') {
                     setLocalStorageItem('LAST_AUTH_METHOD', 'GOOGLE');
                   }
-                  window.location.href = `${env.NEXT_PUBLIC_API_URL}/auth/google`;
+                  googleMutation.mutate();
                 }}
               >
                 <Google className="size-5" />
-                <span className="text-sm">Continue with Google</span>
-                {lastAuthMethod === 'GOOGLE' && (
-                  <p className="text-xs absolute right-4 text-muted-foreground text-center">
-                    Last used
-                  </p>
+                <span className="text-sm">
+                  {googleMutation.isPending
+                    ? 'Signing in…'
+                    : 'Continue with Google'}
+                </span>
+                {googleMutation.isPending ? (
+                  <Spinner className="mr-2 bg-background" />
+                ) : (
+                  lastAuthMethod === 'GOOGLE' && (
+                    <p className="text-xs absolute right-4 text-muted-foreground text-center">
+                      Last used
+                    </p>
+                  )
                 )}
               </Button>
             </div>
