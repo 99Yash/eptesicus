@@ -1,6 +1,6 @@
 'use client';
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { AuthOptionsType } from '@workspace/db/helpers';
 import { Button } from '@workspace/ui/components/button';
 import { Spinner } from '@workspace/ui/components/spinner';
@@ -22,7 +22,6 @@ import { VerifyEmailForm } from './verify-email-form';
 export default function AuthenticationPage() {
   const { data: user } = useUser();
   const router = useRouter();
-  const queryClient = useQueryClient();
 
   const [step, setStep] = useQueryState(
     'step',
@@ -51,8 +50,7 @@ export default function AuthenticationPage() {
       toast.error(getErrorMessage(error));
     },
     async onSuccess() {
-      // Invalidate user query so useUser fetches fresh data
-      await queryClient.invalidateQueries();
+      setLocalStorageItem('LAST_AUTH_METHOD', 'GOOGLE');
       toast.success('Signed in with Google');
       router.push('/');
     },
@@ -108,11 +106,8 @@ export default function AuthenticationPage() {
               <Button
                 variant="outline"
                 className="w-full relative"
-                onClick={() => {
-                  if (typeof window !== 'undefined') {
-                    setLocalStorageItem('LAST_AUTH_METHOD', 'GOOGLE');
-                  }
-                  googleMutation.mutate();
+                onClick={async () => {
+                  await googleMutation.mutateAsync();
                 }}
               >
                 <Google className="size-5" />

@@ -8,6 +8,7 @@ dotenv.config();
 
 // Passport configuration (depends on env variables)
 import passport from 'passport';
+import { errorHandler } from './middlewares/error-handler';
 
 import { env } from './env';
 import './lib/passport';
@@ -43,6 +44,9 @@ async function main() {
   app.get('/', (_req, res) => {
     res.send('API is running');
   });
+
+  // ----- Global Error Handler -----
+  app.use(errorHandler);
 
   app.listen(env.API_SERVER_PORT, () => {
     console.log(`Server is running on port ${env.API_SERVER_PORT}`);
