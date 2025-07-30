@@ -19,18 +19,18 @@ export const OAUTH_PROVIDERS: Record<
   Lowercase<Exclude<AuthOptionsType, 'EMAIL'>>,
   OAuthProvider
 > = {
-  google: {
-    id: 'google',
-    name: 'Google',
-    authUrl: `${env.NEXT_PUBLIC_API_URL}/auth/google`,
-    icon: Google,
-    enabled: true,
-  },
   github: {
     id: 'github',
     name: 'GitHub',
     authUrl: `${env.NEXT_PUBLIC_API_URL}/auth/github`,
     icon: GitHub,
+    enabled: true,
+  },
+  google: {
+    id: 'google',
+    name: 'Google',
+    authUrl: `${env.NEXT_PUBLIC_API_URL}/auth/google`,
+    icon: Google,
     enabled: true,
   },
 } as const;
