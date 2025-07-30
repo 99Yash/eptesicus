@@ -41,6 +41,8 @@ class AuthController {
         name: name ?? '',
         username,
         auth_provider: 'EMAIL',
+        image_url,
+        bio,
       });
 
       const status = existingUser ? 200 : 201;
