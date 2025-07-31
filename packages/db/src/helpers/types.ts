@@ -1,5 +1,6 @@
 import { InferSelectModel } from 'drizzle-orm';
 import { z } from 'zod';
+import { issues } from '../schemas';
 import { organizations, users, users_to_organizations } from '../schemas/users';
 
 export type User = InferSelectModel<typeof users>;
@@ -7,6 +8,7 @@ export type Organization = InferSelectModel<typeof organizations>;
 export type UserToOrganization = InferSelectModel<
   typeof users_to_organizations
 >;
+export type Issue = InferSelectModel<typeof issues>;
 
 export const authOptionsSchema = z.enum(['EMAIL', 'GOOGLE', 'GITHUB']);
 
