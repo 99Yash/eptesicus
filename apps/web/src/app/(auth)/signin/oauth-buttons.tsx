@@ -9,8 +9,8 @@ import React from 'react';
 import { toast } from 'sonner';
 import { oauthPopup } from '~/lib/oauth-popup';
 import {
-  getEnabledProviders,
   getProviderById,
+  OAUTH_PROVIDERS,
   OAuthProviderId,
 } from '~/lib/oauth-providers';
 import {
@@ -38,7 +38,7 @@ const OAuthButton: React.FC<OAuthButtonProps> = ({ providerId, className }) => {
     }
   }, []);
 
-  if (!provider || !provider.enabled) {
+  if (!provider) {
     return null;
   }
 
@@ -94,12 +94,9 @@ const OAuthButton: React.FC<OAuthButtonProps> = ({ providerId, className }) => {
 export const OAuthButtons: React.FC<{ className?: string }> = ({
   className,
 }) => {
-  // Show all enabled providers
-  const enabledProviders = getEnabledProviders();
-
   return (
     <div className={`space-y-1 ${className || ''}`}>
-      {enabledProviders.map((provider) => (
+      {Object.values(OAUTH_PROVIDERS).map((provider) => (
         <OAuthButton
           key={provider.id}
           providerId={provider.id as OAuthProviderId}
