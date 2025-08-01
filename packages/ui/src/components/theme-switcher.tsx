@@ -1,8 +1,8 @@
 'use client';
 
-import { useControllableState } from '@radix-ui/react-use-controllable-state';
 import { Monitor, Moon, Sun } from 'lucide-react';
 import { motion } from 'motion/react';
+import { useTheme } from 'next-themes';
 import { useCallback, useEffect, useState } from 'react';
 import { cn } from '../lib/utils';
 
@@ -23,6 +23,7 @@ const themes = [
     label: 'Dark theme',
   },
 ];
+
 export type ThemeSwitcherProps = {
   value?: 'light' | 'dark' | 'system';
   onChange?: (theme: 'light' | 'dark' | 'system') => void;
@@ -36,25 +37,32 @@ export const ThemeSwitcher = ({
   defaultValue = 'system',
   className,
 }: ThemeSwitcherProps) => {
-  const [theme, setTheme] = useControllableState({
-    defaultProp: defaultValue,
-    prop: value,
-    onChange,
-  });
+  const { theme, setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+
+  // Use the theme from next-themes if no controlled value is provided
+  const currentTheme = value || theme || defaultValue;
+
   const handleThemeClick = useCallback(
     (themeKey: 'light' | 'dark' | 'system') => {
-      setTheme(themeKey);
+      if (onChange) {
+        onChange(themeKey);
+      } else {
+        setTheme(themeKey);
+      }
     },
-    [setTheme]
+    [setTheme, onChange]
   );
+
   // Prevent hydration mismatch
   useEffect(() => {
     setMounted(true);
   }, []);
+
   if (!mounted) {
     return null;
   }
+
   return (
     <div
       className={cn(
@@ -63,7 +71,7 @@ export const ThemeSwitcher = ({
       )}
     >
       {themes.map(({ key, icon: Icon, label }) => {
-        const isActive = theme === key;
+        const isActive = currentTheme === key;
         return (
           <button
             aria-label={label}
