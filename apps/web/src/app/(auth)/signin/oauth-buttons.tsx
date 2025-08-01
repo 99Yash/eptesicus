@@ -21,7 +21,7 @@ import {
 
 interface OAuthButtonProps {
   providerId: OAuthProviderId;
-  className?: string;
+  className?: React.ComponentProps<typeof Button>['className'];
 }
 
 const OAuthButton: React.FC<OAuthButtonProps> = ({ providerId, className }) => {
@@ -67,7 +67,7 @@ const OAuthButton: React.FC<OAuthButtonProps> = ({ providerId, className }) => {
   return (
     <Button
       variant="outline"
-      className={`w-full relative ${className || ''}`}
+      className={`w-full relative ${className}`}
       onClick={async () => {
         await oauthMutation.mutateAsync();
       }}
@@ -91,11 +91,11 @@ const OAuthButton: React.FC<OAuthButtonProps> = ({ providerId, className }) => {
   );
 };
 
-export const OAuthButtons: React.FC<{ className?: string }> = ({
-  className,
-}) => {
+export const OAuthButtons: React.FC<{
+  className?: React.ComponentProps<typeof Button>['className'];
+}> = ({ className }) => {
   return (
-    <div className={`space-y-1 ${className || ''}`}>
+    <div className={`space-y-1 ${className}`}>
       {Object.values(OAUTH_PROVIDERS).map((provider) => (
         <OAuthButton
           key={provider.id}
