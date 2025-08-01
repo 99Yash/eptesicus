@@ -148,8 +148,8 @@ export function CreateOrganizationDialog({
                       <FormControl>
                         <Input
                           autoFocus
+                          variant="transparent"
                           placeholder="Organization name"
-                          className="text-lg font-medium border-0 p-0 focus-visible:ring-0 focus-visible:ring-offset-0"
                           disabled={createOrgMutation.isPending}
                           onKeyDown={handleNameKeyDown}
                           ref={(el) => {
@@ -174,7 +174,7 @@ export function CreateOrganizationDialog({
                       <FormControl>
                         <Textarea
                           placeholder="Bio (optional)"
-                          className="min-h-[80px] border-0 p-0 focus-visible:ring-0 focus-visible:ring-offset-0 resize-none"
+                          variant="transparent"
                           disabled={createOrgMutation.isPending}
                           onKeyDown={handleBioKeyDown}
                           ref={(el) => {
