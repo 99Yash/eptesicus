@@ -2,15 +2,9 @@ import { useQuery } from '@tanstack/react-query';
 import { api } from '../lib/api';
 
 export function useUser() {
-  const query = useQuery({
-    queryFn: api.getCurrentUser,
+  return useQuery({
     queryKey: ['user'],
-    retry: 0,
-    staleTime: 0,
+    queryFn: api.getCurrentUser,
+    retry: false,
   });
-  if (typeof window !== 'undefined') {
-    // Log user and error state on the client
-    console.log('[useUser] user:', query.data, 'error:', query.error);
-  }
-  return query;
 }

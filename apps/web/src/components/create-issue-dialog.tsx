@@ -7,6 +7,8 @@ import { Label } from '@workspace/ui/components/label';
 import { Switch } from '@workspace/ui/components/switch';
 import { Textarea } from '@workspace/ui/components/textarea';
 import { useState } from 'react';
+import { useCreateIssue } from '~/hooks/use-issues';
+import { useUser } from '~/hooks/use-user';
 import { Modal } from './modal';
 
 interface CreateIssueDialogProps {
@@ -18,16 +20,54 @@ export function CreateIssueDialog({
   showModal,
   setShowModal,
 }: CreateIssueDialogProps) {
+  const { data: user } = useUser();
+
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [createMore, setCreateMore] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // TODO: Implement issue creation logic
-    console.log('Creating issue:', { title, description });
-    setShowModal(false);
+  const createIssueMutation = useCreateIssue();
 
+  if (!user) {
+    return null;
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!title.trim()) {
+      return;
+    }
+
+    console.log('[CreateIssueDialog] Submitting issue:', {
+      title: title.trim(),
+      description: description.trim() || undefined,
+      organization_id: 'default',
+    });
+
+    try {
+      await createIssueMutation.mutateAsync({
+        title: title.trim(),
+        description: description.trim() || undefined,
+        organization_id: 'default', // TODO: Get from user context or organization selector
+        user_id: user.id,
+      });
+
+      console.log('[CreateIssueDialog] Issue created successfully');
+      setShowModal(false);
+
+      if (!createMore) {
+        setTitle('');
+        setDescription('');
+      }
+    } catch (error) {
+      // Error is handled by the mutation hook
+      console.error('[CreateIssueDialog] Failed to create issue:', error);
+    }
+  };
+
+  const handleClose = () => {
+    setShowModal(false);
     if (!createMore) {
       setTitle('');
       setDescription('');
@@ -35,7 +75,7 @@ export function CreateIssueDialog({
   };
 
   return (
-    <Modal showModal={showModal} setShowModal={setShowModal}>
+    <Modal showModal={showModal} setShowModal={handleClose}>
       <div className="w-full max-w-[600px] mx-auto p-6 space-y-4">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -60,12 +100,14 @@ export function CreateIssueDialog({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               className="text-lg font-medium border-0 p-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+              disabled={createIssueMutation.isPending}
             />
             <Textarea
               placeholder="Add description..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               className="min-h-[100px] border-0 p-0 focus-visible:ring-0 focus-visible:ring-offset-0 resize-none"
+              disabled={createIssueMutation.isPending}
             />
           </div>
 
@@ -76,6 +118,7 @@ export function CreateIssueDialog({
               variant="outline"
               size="sm"
               className="flex items-center gap-2"
+              disabled={createIssueMutation.isPending}
             >
               <div
                 className="h-4 w-4 border-2 border-dashed rounded"
@@ -88,6 +131,7 @@ export function CreateIssueDialog({
               variant="outline"
               size="sm"
               className="flex items-center gap-2"
+              disabled={createIssueMutation.isPending}
             >
               <div className="h-4 w-4 flex items-center justify-center">
                 <div
@@ -102,6 +146,7 @@ export function CreateIssueDialog({
               variant="outline"
               size="sm"
               className="flex items-center gap-2"
+              disabled={createIssueMutation.isPending}
             >
               <div
                 className="h-4 w-4 rounded-full"
@@ -114,6 +159,7 @@ export function CreateIssueDialog({
               variant="outline"
               size="sm"
               className="flex items-center gap-2"
+              disabled={createIssueMutation.isPending}
             >
               <div
                 className="h-4 w-4 border rounded-sm relative"
@@ -130,6 +176,7 @@ export function CreateIssueDialog({
               variant="outline"
               size="sm"
               className="flex items-center gap-2"
+              disabled={createIssueMutation.isPending}
             >
               <div className="h-4 w-4 flex items-center justify-center">
                 <div
@@ -155,6 +202,7 @@ export function CreateIssueDialog({
               variant="ghost"
               size="sm"
               className="flex items-center gap-2"
+              disabled={createIssueMutation.isPending}
             >
               <div
                 className="h-4 w-4 border-b-2 border-l-2 transform rotate-45"
@@ -168,6 +216,7 @@ export function CreateIssueDialog({
                   id="create-more"
                   checked={createMore}
                   onCheckedChange={setCreateMore}
+                  disabled={createIssueMutation.isPending}
                 />
                 <Label htmlFor="create-more" className="text-sm">
                   Create more
@@ -180,8 +229,9 @@ export function CreateIssueDialog({
                   color: 'var(--color-primary-foreground)',
                 }}
                 className="hover:opacity-90"
+                disabled={createIssueMutation.isPending || !title.trim()}
               >
-                Create issue
+                {createIssueMutation.isPending ? 'Creating...' : 'Create issue'}
               </Button>
             </div>
           </div>

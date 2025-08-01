@@ -29,6 +29,8 @@ export function validate<Schema extends z.ZodTypeAny>(
           message: issue.message,
         }));
 
+        console.log('[validate] Errors:', errors);
+
         throw new AppError({
           code: 'BAD_REQUEST',
           message: 'Invalid request body',

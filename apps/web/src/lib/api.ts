@@ -1,6 +1,14 @@
-import { type User } from '@workspace/db/helpers';
+import {
+  type Issue,
+  type IssueUpdateType,
+  type User,
+} from '@workspace/db/helpers';
+import { IssueInsertType } from '@workspace/db/schemas';
 import axios from 'axios';
 import { env } from '../env';
+
+// Frontend-specific type that excludes user_id (handled by backend)
+export type CreateIssueData = Omit<IssueInsertType, 'user_id'>;
 
 const _axios = axios.create({
   baseURL: `${env.NEXT_PUBLIC_API_URL}`,
@@ -62,6 +70,41 @@ class API {
       message: string;
     }>(`/users/check-username/${username}`);
     return response.data;
+  }
+
+  // Issue-related methods
+  async createIssue(data: CreateIssueData) {
+    console.log('[api.createIssue] Sending request:', data);
+    const response = await _axios.post<Issue>('/issues', data);
+    console.log('[api.createIssue] Response:', response.data);
+    return response.data;
+  }
+
+  async getIssue(id: string) {
+    console.log('[api.getIssue] Fetching issue:', id);
+    const response = await _axios.get<Issue>(`/issues/${id}`);
+    console.log('[api.getIssue] Response:', response.data);
+    return response.data;
+  }
+
+  async listIssues(params?: { organization_id?: string }) {
+    console.log('[api.listIssues] Fetching issues with params:', params);
+    const response = await _axios.get<Issue[]>('/issues', { params });
+    console.log('[api.listIssues] Response:', response.data);
+    return response.data;
+  }
+
+  async updateIssue(id: string, data: IssueUpdateType) {
+    console.log('[api.updateIssue] Updating issue:', id, data);
+    const response = await _axios.put<Issue>(`/issues/${id}`, data);
+    console.log('[api.updateIssue] Response:', response.data);
+    return response.data;
+  }
+
+  async deleteIssue(id: string) {
+    console.log('[api.deleteIssue] Deleting issue:', id);
+    await _axios.delete(`/issues/${id}`);
+    console.log('[api.deleteIssue] Issue deleted successfully');
   }
 }
 
