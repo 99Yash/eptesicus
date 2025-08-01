@@ -7,8 +7,8 @@ import { cn } from '@workspace/ui/lib/utils';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { CreateIssueDialog } from '~/components/create-issue-dialog';
-import { IssueList } from '~/components/issue-list';
+import { CreateIssueDialog } from '~/components/issues/create-issue-dialog';
+import { IssueList } from '~/components/issues/issue-list';
 import { useUser } from '~/hooks/use-user';
 import { api } from '~/lib/api';
 
