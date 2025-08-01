@@ -1,5 +1,9 @@
 import { and, db, eq } from '@workspace/db';
-import { IssueInsertType, IssueUpdateType } from '@workspace/db/helpers';
+import {
+  issueInsertSchema,
+  IssueUpdateType,
+  WithUser,
+} from '@workspace/db/helpers';
 import { issues } from '@workspace/db/schemas';
 import { AppError } from '../lib/error';
 
@@ -7,7 +11,7 @@ class IssueService {
   /*
    * Create a new issue. `user_id` is picked from the authenticated request layer.
    */
-  async createIssue(args: IssueInsertType & { user_id: string }) {
+  async createIssue(args: WithUser<typeof issueInsertSchema>) {
     const {
       title,
       description,

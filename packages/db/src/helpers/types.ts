@@ -1,6 +1,6 @@
 import { InferSelectModel } from 'drizzle-orm';
 import { z } from 'zod/v4';
-import { issues } from '../schemas';
+import { issueInsertSchema, issues, issueUpdateSchema } from '../schemas';
 import { organizations, users, users_to_organizations } from '../schemas/users';
 
 export type User = InferSelectModel<typeof users>;
@@ -43,8 +43,102 @@ export const verifyEmailSchema = z.object({
 
 export type VerifyEmailType = z.infer<typeof verifyEmailSchema>;
 
-// -------------------- Issues --------------------
-import { issueInsertSchema, issueUpdateSchema } from '../schemas/issues';
+// -------------------- Schema Helpers --------------------
+
+/**
+ * Helper to add user_id to any schema
+ */
+export function withUser<T extends z.ZodObject<any>>(schema: T) {
+  return z.object({
+    ...schema.shape,
+    user_id: z.string().min(1),
+  }) as z.ZodObject<
+    {
+      user_id: z.ZodString;
+    } & T['shape']
+  >;
+}
+
+/**
+ * Helper to add organization_id to any schema
+ */
+export function withOrganization<T extends z.ZodObject<any>>(schema: T) {
+  return z.object({
+    ...schema.shape,
+    organization_id: z.string().min(1),
+  }) as z.ZodObject<
+    {
+      organization_id: z.ZodString;
+    } & T['shape']
+  >;
+}
+
+/**
+ * Helper to add both user_id and organization_id to any schema
+ */
+export function withUserAndOrganization<T extends z.ZodObject<any>>(schema: T) {
+  return z.object({
+    ...schema.shape,
+    user_id: z.string().min(1),
+    organization_id: z.string().min(1),
+  }) as z.ZodObject<
+    {
+      user_id: z.ZodString;
+      organization_id: z.ZodString;
+    } & T['shape']
+  >;
+}
+
+/**
+ * Helper to add optional user_id to any schema
+ */
+export function withOptionalUser<T extends z.ZodObject<any>>(schema: T) {
+  return z.object({
+    ...schema.shape,
+    user_id: z.string().min(1).optional(),
+  }) as z.ZodObject<
+    {
+      user_id: z.ZodOptional<z.ZodString>;
+    } & T['shape']
+  >;
+}
+
+/**
+ * Helper to add optional organization_id to any schema
+ */
+export function withOptionalOrganization<T extends z.ZodObject<any>>(
+  schema: T
+) {
+  return z.object({
+    ...schema.shape,
+    organization_id: z.string().min(1).optional(),
+  }) as z.ZodObject<
+    {
+      organization_id: z.ZodOptional<z.ZodString>;
+    } & T['shape']
+  >;
+}
+
+// Type helpers for the schema helpers
+export type WithUser<T extends z.ZodObject<any>> = z.infer<
+  ReturnType<typeof withUser<T>>
+>;
+
+export type WithOrganization<T extends z.ZodObject<any>> = z.infer<
+  ReturnType<typeof withOrganization<T>>
+>;
+
+export type WithUserAndOrganization<T extends z.ZodObject<any>> = z.infer<
+  ReturnType<typeof withUserAndOrganization<T>>
+>;
+
+export type WithOptionalUser<T extends z.ZodObject<any>> = z.infer<
+  ReturnType<typeof withOptionalUser<T>>
+>;
+
+export type WithOptionalOrganization<T extends z.ZodObject<any>> = z.infer<
+  ReturnType<typeof withOptionalOrganization<T>>
+>;
 
 export { issueInsertSchema, issueUpdateSchema };
 
