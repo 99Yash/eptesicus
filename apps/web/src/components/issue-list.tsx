@@ -9,6 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@workspace/ui/components/card';
+import { Kbd } from '@workspace/ui/components/kbd';
 import { useIssues } from '~/hooks/use-issues';
 
 function IssueCard({ issue }: { issue: Issue }) {
@@ -83,9 +84,11 @@ export function IssueList() {
   if (!issues || issues.length === 0) {
     return (
       <div className="text-center py-8">
-        <p className="text-muted-foreground">No issues found</p>
-        <p className="text-sm text-muted-foreground mt-1">
-          Press 'C' to create your first issue
+        <p className="text-muted-foreground tracking-tight font-medium text-sm">
+          No issues found
+        </p>
+        <p className="text-muted-foreground mt-1 text-xs">
+          Press <Kbd>C</Kbd> to create your first issue
         </p>
       </div>
     );
