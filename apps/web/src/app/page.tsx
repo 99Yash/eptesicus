@@ -2,6 +2,7 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button, buttonVariants } from '@workspace/ui/components/button';
+import { Kbd } from '@workspace/ui/components/kbd';
 import { cn } from '@workspace/ui/lib/utils';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -68,7 +69,7 @@ export default function Page() {
               <h1 className="text-2xl font-bold">Eptesicus</h1>
               {user && (
                 <p className="text-sm text-muted-foreground">
-                  Hello {user.name} • Press 'C' to create a new issue
+                  Hello {user.name} • Press <Kbd>C</Kbd> to create a new issue
                 </p>
               )}
             </div>
