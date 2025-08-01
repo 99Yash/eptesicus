@@ -33,8 +33,10 @@ export const issues = pgTable('issues', {
     .notNull(),
   organization_id: varchar('organization_id'),
   assignee_id: varchar('assignee_id').references(() => users.id), // TODO: has to be in the same organization
-  todo_status: issue_statuses('todo_status'),
-  todo_priority: issue_priorities('todo_priority'),
+  todo_status: issue_statuses('todo_status').$defaultFn(() => 'todo'),
+  todo_priority: issue_priorities('todo_priority').$defaultFn(
+    () => 'no_priority'
+  ),
   ...lifecycle_dates,
 });
 
