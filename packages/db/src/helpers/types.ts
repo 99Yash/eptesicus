@@ -144,3 +144,9 @@ export { issueInsertSchema, issueUpdateSchema };
 
 export type IssueInsertType = z.infer<typeof issueInsertSchema>;
 export type IssueUpdateType = z.infer<typeof issueUpdateSchema>;
+
+// Schema used by external clients (e.g. frontend) where `user_id` is injected
+// server-side from the authenticated token. Keeps a single source of truth for
+// validation & types across FE ↔️ BE.
+export const issueCreateSchema = issueInsertSchema.omit({ user_id: true });
+export type IssueCreateType = z.infer<typeof issueCreateSchema>;

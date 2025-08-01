@@ -1,6 +1,6 @@
 import {
-  issueInsertSchema,
-  IssueInsertType,
+  issueCreateSchema,
+  IssueCreateType,
   issueUpdateSchema,
   IssueUpdateType,
 } from '@workspace/db/helpers';
@@ -13,12 +13,12 @@ import { issueService } from '../services/issue.service';
 class IssueController {
   /* Create a new issue */
   async createIssue(
-    req: AuthenticatedRequest & ValidatedRequest<typeof issueInsertSchema>,
+    req: AuthenticatedRequest & ValidatedRequest<typeof issueCreateSchema>,
     res: Response,
     next: NextFunction
   ) {
     try {
-      const body = req.body as IssueInsertType;
+      const body = req.body as IssueCreateType;
 
       const issue = await issueService.createIssue({
         ...body,

@@ -1,4 +1,4 @@
-import { issueInsertSchema, issueUpdateSchema } from '@workspace/db/helpers';
+import { issueCreateSchema, issueUpdateSchema } from '@workspace/db/helpers';
 import { Router } from 'express';
 import { issueController } from '../controllers/issue.controller';
 import { authenticate } from '../middlewares/authenticate';
@@ -9,7 +9,7 @@ export const issues: Router = Router({ mergeParams: true });
 // Create
 issues.post(
   '/',
-  validate(issueInsertSchema, authenticate(issueController.createIssue))
+  validate(issueCreateSchema, authenticate(issueController.createIssue))
 );
 
 // List

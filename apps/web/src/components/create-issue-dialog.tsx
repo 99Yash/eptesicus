@@ -50,7 +50,6 @@ export function CreateIssueDialog({
         title: title.trim(),
         description: description.trim() || undefined,
         organization_id: 'default', // TODO: Get from user context or organization selector
-        user_id: user.id,
       });
 
       console.log('[CreateIssueDialog] Issue created successfully');

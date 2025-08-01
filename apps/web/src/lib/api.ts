@@ -1,14 +1,14 @@
 import {
   type Issue,
+  type IssueCreateType,
   type IssueUpdateType,
   type User,
 } from '@workspace/db/helpers';
-import { IssueInsertType } from '@workspace/db/schemas';
 import axios from 'axios';
 import { env } from '../env';
 
 // Frontend-specific type that excludes user_id (handled by backend)
-export type CreateIssueData = Omit<IssueInsertType, 'user_id'>;
+export type CreateIssueData = IssueCreateType;
 
 const _axios = axios.create({
   baseURL: `${env.NEXT_PUBLIC_API_URL}`,
