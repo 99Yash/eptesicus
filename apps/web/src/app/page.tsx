@@ -73,11 +73,13 @@ export default function Page() {
   return (
     <>
       <div className="min-h-screen bg-background">
-        <div className="container mx-auto py-8">
+        <div className="container mx-auto px-4 py-8 md:px-6 lg:px-8">
           {/* Header */}
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h1 className="text-2xl font-bold">Eptesicus</h1>
+          <header className="flex flex-col items-start justify-between gap-4 border-b pb-6 md:flex-row md:items-center md:gap-0 md:pb-8">
+            <div className="space-y-1">
+              <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+                Eptesicus
+              </h1>
               {user && (
                 <p className="text-sm text-muted-foreground">
                   Hello {user.name} • Press <Kbd>C</Kbd> to create a new issue
@@ -87,21 +89,13 @@ export default function Page() {
             <div className="flex items-center gap-2">
               {user ? (
                 <>
-                  <Link
-                    href="/signin"
-                    className={cn(
-                      buttonVariants({ variant: 'outline', size: 'sm' })
-                    )}
-                  >
-                    Test signin
-                  </Link>
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => signoutMutation.mutate()}
                     disabled={signoutMutation.isPending}
                   >
-                    Sign Out
+                    {signoutMutation.isPending ? 'Signing Out...' : 'Sign Out'}
                   </Button>
                 </>
               ) : (
@@ -115,18 +109,20 @@ export default function Page() {
                 </Link>
               )}
             </div>
-          </div>
+          </header>
 
           {/* Content */}
-          {user ? (
-            <IssueList />
-          ) : (
-            <div className="text-center py-8">
-              <p className="text-muted-foreground">
-                Please sign in to view issues
-              </p>
-            </div>
-          )}
+          <main className="py-8">
+            {user ? (
+              <IssueList />
+            ) : (
+              <div className="flex h-[calc(100vh-200px)] items-center justify-center text-center">
+                <p className="text-lg text-muted-foreground">
+                  Please sign in to view issues
+                </p>
+              </div>
+            )}
+          </main>
         </div>
       </div>
 

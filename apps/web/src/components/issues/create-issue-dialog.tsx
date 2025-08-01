@@ -10,20 +10,47 @@ import {
   FormMessage,
 } from '@workspace/ui/components/form';
 import { Input } from '@workspace/ui/components/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@workspace/ui/components/select';
 import { Switch } from '@workspace/ui/components/switch';
 import { Textarea } from '@workspace/ui/components/textarea';
-import { CircleIcon, MoreHorizontal, Paperclip, Tag, User } from 'lucide-react';
+import { MoreHorizontal, Paperclip, Tag, User } from 'lucide-react';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { useCreateIssue } from '~/hooks/use-issues';
 import { useOrganizations } from '~/hooks/use-organizations';
 import { useUser } from '~/hooks/use-user';
+import {
+  ISSUE_PRIORITY_OPTIONS as PRIORITY_OPTIONS,
+  ISSUE_STATUS_OPTIONS as STATUS_OPTIONS,
+} from '~/lib/constants';
 import { Modal } from '../ui/modal';
 
 const issueFormSchema = z.object({
   title: z.string().min(1, 'Title is required'),
   description: z.string().optional(),
+  todo_status: z.enum([
+    'backlog',
+    'todo',
+    'in_progress',
+    'in_review',
+    'done',
+    'cancelled',
+    'duplicate',
+  ] as const),
+  todo_priority: z.enum([
+    'no_priority',
+    'urgent',
+    'high',
+    'medium',
+    'low',
+  ] as const),
 });
 
 type IssueFormValues = z.infer<typeof issueFormSchema>;
@@ -52,6 +79,8 @@ export function CreateIssueDialog({
     defaultValues: {
       title: '',
       description: '',
+      todo_status: 'todo',
+      todo_priority: 'no_priority',
     },
   });
 
@@ -96,6 +125,8 @@ export function CreateIssueDialog({
       await createIssueMutation.mutateAsync({
         title: values.title.trim(),
         description: values.description?.trim() || undefined,
+        todo_status: values.todo_status,
+        todo_priority: values.todo_priority,
         organization_id: orgId,
       });
 
@@ -190,31 +221,74 @@ export function CreateIssueDialog({
 
               {/* Action Buttons */}
               <div className="flex items-center gap-2 flex-wrap py-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="flex items-center gap-2 text-sm border border-border hover:bg-muted"
-                  disabled={createIssueMutation.isPending}
-                >
-                  <CircleIcon size={14} className="text-muted-foreground" />
-                  <span className="text-foreground">Todo</span>
-                </Button>
+                <FormField
+                  control={form.control}
+                  name="todo_status"
+                  render={({ field }) => (
+                    <Select
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      disabled={createIssueMutation.isPending}
+                    >
+                      <SelectTrigger
+                        size="sm"
+                        className="flex items-center gap-2 text-sm border border-border hover:bg-muted capitalize"
+                      >
+                        <span
+                          className={`w-2.5 h-2.5 rounded-full ${
+                            STATUS_OPTIONS.find((o) => o.value === field.value)
+                              ?.color
+                          }`}
+                        />
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {STATUS_OPTIONS.map((option) => (
+                          <SelectItem
+                            key={option.value}
+                            value={option.value}
+                            className="capitalize flex items-center gap-2"
+                          >
+                            <span
+                              className={`w-2.5 h-2.5 rounded-full ${option.color}`}
+                            />
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
 
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="flex items-center gap-2 text-sm border border-border hover:bg-muted"
-                  disabled={createIssueMutation.isPending}
-                >
-                  <div className="flex gap-1">
-                    <div className="w-1 h-3 rounded-full bg-muted-foreground/60" />
-                    <div className="w-1 h-3 rounded-full bg-muted-foreground/60" />
-                    <div className="w-1 h-3 rounded-full bg-muted-foreground/60" />
-                  </div>
-                  <span className="text-muted-foreground">Priority</span>
-                </Button>
+                <FormField
+                  control={form.control}
+                  name="todo_priority"
+                  render={({ field }) => (
+                    <Select
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      disabled={createIssueMutation.isPending}
+                    >
+                      <SelectTrigger
+                        size="sm"
+                        className="flex items-center gap-2 text-sm border border-border hover:bg-muted capitalize"
+                      >
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {PRIORITY_OPTIONS.map((option) => (
+                          <SelectItem
+                            key={option.value}
+                            value={option.value}
+                            className="capitalize"
+                          >
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
 
                 <Button
                   type="button"
