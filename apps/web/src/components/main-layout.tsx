@@ -15,9 +15,7 @@ export function MainLayout({ children, headersNumber = 2 }: MainLayoutProps) {
     <SidebarProvider>
       <div className="min-h-svh lg:p-2 w-full flex flex-col">
         <div className="lg:border lg:rounded-md flex flex-col items-center justify-start bg-background w-full h-full">
-          <div className="flex justify-end p-4 w-full">
-            <ThemeSwitcher />
-          </div>
+          <ThemeSwitcher className="absolute top-4 right-4" />
           <div className="overflow-auto w-full h-full">{children}</div>
         </div>
       </div>
