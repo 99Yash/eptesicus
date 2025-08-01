@@ -1,5 +1,7 @@
 import { relations } from 'drizzle-orm';
 import { index, pgEnum, pgTable, text, varchar } from 'drizzle-orm/pg-core';
+import { createInsertSchema } from 'drizzle-zod';
+import { z } from 'zod/v4';
 import { createId, lifecycle_dates } from '../helpers/utils';
 
 export const auth_providers = pgEnum('auth_providers', [
@@ -71,3 +73,9 @@ export const users_to_organizations_relations = relations(
     }),
   })
 );
+
+export const organizationInsertSchema = createInsertSchema(organizations, {
+  name: (schema) => schema.max(255),
+});
+
+export type OrganizationInsertType = z.infer<typeof organizationInsertSchema>;

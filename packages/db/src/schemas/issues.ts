@@ -2,7 +2,7 @@ import { pgEnum, pgTable, text, varchar } from 'drizzle-orm/pg-core';
 import { createInsertSchema, createUpdateSchema } from 'drizzle-zod';
 import { z } from 'zod/v4';
 import { createId, lifecycle_dates } from '../helpers/utils';
-import { organizations, users } from './users';
+import { users } from './users';
 
 export const issue_statuses = pgEnum('issue_statuses', [
   'backlog',
@@ -31,9 +31,7 @@ export const issues = pgTable('issues', {
   user_id: varchar('user_id')
     .references(() => users.id)
     .notNull(),
-  organization_id: varchar('organization_id')
-    .references(() => organizations.id)
-    .notNull(),
+  organization_id: varchar('organization_id'),
   assignee_id: varchar('assignee_id').references(() => users.id), // TODO: has to be in the same organization
   todo_status: issue_statuses('todo_status'),
   todo_priority: issue_priorities('todo_priority'),

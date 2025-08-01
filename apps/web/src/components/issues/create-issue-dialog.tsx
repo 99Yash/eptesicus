@@ -8,6 +8,7 @@ import { Switch } from '@workspace/ui/components/switch';
 import { Textarea } from '@workspace/ui/components/textarea';
 import { useState } from 'react';
 import { useCreateIssue } from '~/hooks/use-issues';
+import { useOrganizations } from '~/hooks/use-organizations';
 import { useUser } from '~/hooks/use-user';
 import { Modal } from '../ui/modal';
 
@@ -21,6 +22,8 @@ export function CreateIssueDialog({
   setShowModal,
 }: CreateIssueDialogProps) {
   const { data: user } = useUser();
+  const { data: organizations } = useOrganizations();
+  const orgId = organizations?.[0]?.id;
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -28,8 +31,8 @@ export function CreateIssueDialog({
 
   const createIssueMutation = useCreateIssue();
 
-  if (!user) {
-    return null;
+  if (!user || !orgId) {
+    return null; // Either not logged in or org not ready
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -42,14 +45,14 @@ export function CreateIssueDialog({
     console.log('[CreateIssueDialog] Submitting issue:', {
       title: title.trim(),
       description: description.trim() || undefined,
-      organization_id: 'default',
+      organization_id: orgId,
     });
 
     try {
       await createIssueMutation.mutateAsync({
         title: title.trim(),
         description: description.trim() || undefined,
-        organization_id: 'default', // TODO: Get from user context or organization selector
+        organization_id: orgId,
       });
 
       console.log('[CreateIssueDialog] Issue created successfully');

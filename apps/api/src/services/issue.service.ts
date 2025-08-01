@@ -4,7 +4,7 @@ import {
   IssueUpdateType,
   WithUser,
 } from '@workspace/db/helpers';
-import { issues } from '@workspace/db/schemas';
+import { issues, users_to_organizations } from '@workspace/db/schemas';
 import { AppError } from '../lib/error';
 
 class IssueService {
@@ -24,6 +24,23 @@ class IssueService {
 
     console.log('[IssueService] Creating issue with payload:', args);
 
+    // -------------------- Validation --------------------
+    // 1. Verify that the user actually belongs to the provided organization_id
+    const membership = await db.query.users_to_organizations.findFirst({
+      where: and(
+        eq(users_to_organizations.user_id, user_id),
+        eq(users_to_organizations.organization_id, organization_id as string)
+      ),
+    });
+
+    if (!membership) {
+      throw new AppError({
+        code: 'FORBIDDEN',
+        message: 'You are not a member of the specified organization',
+      });
+    }
+
+    // -------------------- Insert --------------------
     const [issue] = await db
       .insert(issues)
       .values({
