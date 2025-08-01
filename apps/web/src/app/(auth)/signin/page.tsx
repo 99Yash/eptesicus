@@ -73,8 +73,6 @@ export default function AuthenticationPage() {
             </div>
           </>
         )}
-
-        {step === 'verify' && <VerifyEmailForm email={email} />}
       </div>
     </div>
   );
