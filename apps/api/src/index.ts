@@ -14,6 +14,7 @@ import { env } from './env';
 import './lib/passport';
 
 import { auth as authRouter } from './routers/auth.router';
+import { issues as issueRouter } from './routers/issue.router';
 import { users as userRouter } from './routers/user.router';
 
 // NOTE https://github.com/expressjs/express/discussions/5491 - `csurf` package is archived, and has issues.
@@ -40,6 +41,7 @@ async function main() {
 
   app.use('/users', userRouter);
   app.use('/auth', authRouter);
+  app.use('/issues', issueRouter);
 
   app.get('/', (_req, res) => {
     res.send('API is running');

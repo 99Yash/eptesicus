@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import z, { AnyZodObject } from 'zod';
+import z from 'zod/v4';
 import { AppError } from '../lib/error';
 
 type Handler<TReq = any, TRes = any> = (
@@ -8,13 +8,13 @@ type Handler<TReq = any, TRes = any> = (
   next: NextFunction
 ) => TRes | Promise<TRes>;
 
-export type ValidatedRequest<Schema extends z.AnyZodObject> = Request<
+export type ValidatedRequest<Schema extends z.ZodTypeAny> = Request<
   any,
   any,
   z.infer<Schema>
 >;
 
-export function validate<Schema extends AnyZodObject>(
+export function validate<Schema extends z.ZodTypeAny>(
   schema: Schema,
   handler: Handler<Request>
 ) {

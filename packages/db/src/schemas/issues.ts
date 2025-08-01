@@ -1,4 +1,6 @@
 import { pgEnum, pgTable, text, varchar } from 'drizzle-orm/pg-core';
+import { createInsertSchema, createUpdateSchema } from 'drizzle-zod';
+import { z } from 'zod/v4';
 import { createId, lifecycle_dates } from '../helpers/utils';
 import { organizations, users } from './users';
 
@@ -37,3 +39,13 @@ export const issues = pgTable('issues', {
   todo_priority: issue_priorities('todo_priority'),
   ...lifecycle_dates,
 });
+
+// -------------------- Zod schemas generated via drizzle-zod --------------------
+export const issueInsertSchema = createInsertSchema(issues, {
+  title: (schema) => schema.max(255),
+});
+
+export const issueUpdateSchema = createUpdateSchema(issues);
+
+export type IssueInsertType = z.infer<typeof issueInsertSchema>;
+export type IssueUpdateType = z.infer<typeof issueUpdateSchema>;

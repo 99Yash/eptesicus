@@ -1,5 +1,5 @@
 import { InferSelectModel } from 'drizzle-orm';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { issues } from '../schemas';
 import { organizations, users, users_to_organizations } from '../schemas/users';
 
@@ -15,7 +15,7 @@ export const authOptionsSchema = z.enum(['EMAIL', 'GOOGLE', 'GITHUB']);
 export type AuthOptionsType = z.infer<typeof authOptionsSchema>;
 
 export const userInsertSchema = z.object({
-  email: z.string().email().max(255),
+  email: z.email().max(255),
   name: z.string().min(1),
   username: z.string().min(1).optional(),
   image_url: z.string().optional(),
@@ -26,7 +26,7 @@ export const userInsertSchema = z.object({
 export type UserInsertType = z.infer<typeof userInsertSchema>;
 
 export const signupSchema = z.object({
-  email: z.string().email().max(255),
+  email: z.email().max(255),
   name: z.string().min(1).optional(),
   username: z.string().min(1).optional(),
   image_url: z.string().optional(),
@@ -37,8 +37,16 @@ export const signupSchema = z.object({
 export type SignupType = z.infer<typeof signupSchema>;
 
 export const verifyEmailSchema = z.object({
-  email: z.string().email().max(255),
+  email: z.email().max(255),
   code: z.string().min(1),
 });
 
 export type VerifyEmailType = z.infer<typeof verifyEmailSchema>;
+
+// -------------------- Issues --------------------
+import { issueInsertSchema, issueUpdateSchema } from '../schemas/issues';
+
+export { issueInsertSchema, issueUpdateSchema };
+
+export type IssueInsertType = z.infer<typeof issueInsertSchema>;
+export type IssueUpdateType = z.infer<typeof issueUpdateSchema>;

@@ -1,5 +1,5 @@
 import { AxiosError } from 'axios';
-import z from 'zod';
+import z from 'zod/v4';
 import {
   LOCAL_STORAGE_SCHEMAS,
   LocalStorageKey,
@@ -11,7 +11,7 @@ export function getErrorMessage(err: unknown) {
   if (typeof err === 'string') {
     return err;
   } else if (err instanceof z.ZodError) {
-    return err.errors.map((e) => e.message).join(', ') ?? unknownError;
+    return err.issues.map((e) => e.message).join(', ') ?? unknownError;
   } else if (err instanceof AxiosError) {
     return err.response?.data.message ?? unknownError;
   } else if (err instanceof Error) {
@@ -50,7 +50,7 @@ export function setLocalStorageItem<K extends LocalStorageKey>(
         `Value:`,
         value,
         `Errors:`,
-        validationResult.error.errors
+        validationResult.error.issues
       );
       // Depending on strictness, you might throw an error here, or just log and return.
       // For localStorage, it's often better to prevent storing bad data.
@@ -102,7 +102,7 @@ export function getLocalStorageItem<K extends LocalStorageKey>(
             `Default value:`,
             defaultValue,
             `Schema errors:`,
-            defaultValidation.error.errors
+            defaultValidation.error.issues
           );
           // Don't return invalid default value - let it fall through to schema default
         }
@@ -132,7 +132,7 @@ export function getLocalStorageItem<K extends LocalStorageKey>(
         `Stored value:`,
         parsedValue,
         `Errors:`,
-        validationResult.error.errors
+        validationResult.error.issues
       );
 
       // If validation fails, validate and use provided default, then schema default
@@ -147,7 +147,7 @@ export function getLocalStorageItem<K extends LocalStorageKey>(
             `Default value:`,
             defaultValue,
             `Schema errors:`,
-            defaultValidation.error.errors
+            defaultValidation.error.issues
           );
         }
       }
@@ -180,7 +180,7 @@ export function getLocalStorageItem<K extends LocalStorageKey>(
           `Default value:`,
           defaultValue,
           `Schema errors:`,
-          defaultValidation.error.errors
+          defaultValidation.error.issues
         );
       }
     }
