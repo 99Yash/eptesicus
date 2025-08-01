@@ -9,12 +9,16 @@ import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { CreateIssueDialog } from '~/components/issues/create-issue-dialog';
 import { IssueList } from '~/components/issues/issue-list';
+import { CreateOrganizationDialog } from '~/components/organizations/create-organization-dialog';
+import { useOrganizations } from '~/hooks/use-organizations';
 import { useUser } from '~/hooks/use-user';
 import { api } from '~/lib/api';
 
 export default function Page() {
   const { data: user } = useUser();
+  const { data: organizations } = useOrganizations();
   const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [showCreateOrgDialog, setShowCreateOrgDialog] = useState(false);
 
   const queryClient = useQueryClient();
 
@@ -33,6 +37,13 @@ export default function Page() {
       toast.error('Failed to sign out');
     },
   });
+
+  // Show organization dialog if user has none
+  useEffect(() => {
+    if (user && organizations && organizations.length === 0) {
+      setShowCreateOrgDialog(true);
+    }
+  }, [user, organizations]);
 
   // Keyboard shortcut handler
   useEffect(() => {
@@ -122,6 +133,11 @@ export default function Page() {
       <CreateIssueDialog
         showModal={showCreateDialog}
         setShowModal={setShowCreateDialog}
+      />
+
+      <CreateOrganizationDialog
+        showModal={showCreateOrgDialog}
+        setShowModal={setShowCreateOrgDialog}
       />
     </>
   );

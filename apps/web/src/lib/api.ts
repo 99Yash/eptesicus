@@ -2,6 +2,7 @@ import {
   type Issue,
   type IssueCreateType,
   type IssueUpdateType,
+  type Organization,
   type User,
 } from '@workspace/db/helpers';
 import axios from 'axios';
@@ -19,6 +20,22 @@ const _axios = axios.create({
 });
 
 class API {
+  /* -------------------- Organization -------------------- */
+  async listOrganizations() {
+    const response = await _axios.get<Organization[]>('/organizations');
+    return response.data;
+  }
+
+  async createOrganization(data: {
+    name: string;
+    logo_url?: string;
+    bio?: string;
+  }) {
+    const response = await _axios.post<Organization>('/organizations', data);
+    return response.data;
+  }
+
+  /* -------------------- Auth -------------------- */
   async login({
     email,
     name,
