@@ -1,15 +1,33 @@
 'use client';
 
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Badge } from '@workspace/ui/components/badge';
 import { Button } from '@workspace/ui/components/button';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from '@workspace/ui/components/form';
 import { Input } from '@workspace/ui/components/input';
 import { Label } from '@workspace/ui/components/label';
 import { Switch } from '@workspace/ui/components/switch';
 import { Textarea } from '@workspace/ui/components/textarea';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 import { useCreateOrganization } from '~/hooks/use-organizations';
 import { useUser } from '~/hooks/use-user';
 import { Modal } from '../ui/modal';
+
+const organizationFormSchema = z.object({
+  name: z.string().min(1, 'Organization name is required'),
+  bio: z.string().optional(),
+  logoUrl: z.string().optional(),
+});
+
+type OrganizationFormValues = z.infer<typeof organizationFormSchema>;
 
 interface CreateOrganizationDialogProps {
   showModal: boolean;
@@ -22,32 +40,69 @@ export function CreateOrganizationDialog({
 }: CreateOrganizationDialogProps) {
   const { data: user } = useUser();
 
-  const [name, setName] = useState('');
-  const [bio, setBio] = useState('');
-  const [logoUrl, setLogoUrl] = useState('');
   const [createMore, setCreateMore] = useState(false);
 
   const createOrgMutation = useCreateOrganization();
+  const nameInputRef = useRef<HTMLInputElement>(null);
+  const bioTextareaRef = useRef<HTMLTextAreaElement>(null);
+  const logoUrlInputRef = useRef<HTMLInputElement>(null);
+
+  const form = useForm<OrganizationFormValues>({
+    resolver: zodResolver(organizationFormSchema),
+    defaultValues: {
+      name: '',
+      bio: '',
+      logoUrl: '',
+    },
+  });
+
+  // Focus name input when modal opens
+  useEffect(() => {
+    if (showModal && nameInputRef.current) {
+      nameInputRef.current.focus();
+    }
+  }, [showModal]);
 
   if (!user) return null;
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleNameKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && !e.metaKey) {
+      e.preventDefault();
+      bioTextareaRef.current?.focus();
+    } else if (e.key === 'Enter' && e.metaKey) {
+      e.preventDefault();
+      form.handleSubmit(onSubmit)();
+    }
+  };
 
-    if (!name.trim()) return;
+  const handleBioKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.metaKey) {
+      e.preventDefault();
+      logoUrlInputRef.current?.focus();
+    } else if (e.key === 'Enter' && e.metaKey) {
+      e.preventDefault();
+      form.handleSubmit(onSubmit)();
+    }
+  };
 
+  const handleLogoUrlKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && e.metaKey) {
+      e.preventDefault();
+      form.handleSubmit(onSubmit)();
+    }
+  };
+
+  const onSubmit = async (values: OrganizationFormValues) => {
     try {
       await createOrgMutation.mutateAsync({
-        name: name.trim(),
-        bio: bio.trim() || undefined,
-        logo_url: logoUrl.trim() || undefined,
+        name: values.name.trim(),
+        bio: values.bio?.trim() || undefined,
+        logo_url: values.logoUrl?.trim() || undefined,
       });
 
       setShowModal(false);
       if (!createMore) {
-        setName('');
-        setBio('');
-        setLogoUrl('');
+        form.reset();
       }
     } catch (error) {
       // handled in hook
@@ -57,9 +112,7 @@ export function CreateOrganizationDialog({
   const handleClose = () => {
     setShowModal(false);
     if (!createMore) {
-      setName('');
-      setBio('');
-      setLogoUrl('');
+      form.reset();
     }
   };
 
@@ -82,63 +135,122 @@ export function CreateOrganizationDialog({
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-3">
-            <Input
-              placeholder="Organization name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="text-lg font-medium border-0 p-0 focus-visible:ring-0 focus-visible:ring-offset-0"
-              disabled={createOrgMutation.isPending}
-            />
-            <Textarea
-              placeholder="Bio (optional)"
-              value={bio}
-              onChange={(e) => setBio(e.target.value)}
-              className="min-h-[80px] border-0 p-0 focus-visible:ring-0 focus-visible:ring-offset-0 resize-none"
-              disabled={createOrgMutation.isPending}
-            />
-            <Input
-              placeholder="Logo URL (optional)"
-              value={logoUrl}
-              onChange={(e) => setLogoUrl(e.target.value)}
-              className="border-0 p-0 focus-visible:ring-0 focus-visible:ring-offset-0"
-              disabled={createOrgMutation.isPending}
-            />
-          </div>
-
-          {/* Action buttons */}
-          <div className="flex items-center gap-2 flex-wrap">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              className="flex items-center gap-2"
-              disabled={createOrgMutation.isPending}
-              onClick={handleClose}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              size="sm"
-              disabled={createOrgMutation.isPending}
-            >
-              {createOrgMutation.isPending
-                ? 'Creating...'
-                : 'Create Organization'}
-            </Button>
-            {/* Create more toggle */}
-            <div className="ml-auto flex items-center gap-2 text-sm">
-              <Label htmlFor="create-more">Create more</Label>
-              <Switch
-                id="create-more"
-                checked={createMore}
-                onCheckedChange={setCreateMore}
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <div className="space-y-3">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => {
+                  const { ref, ...fieldProps } = field;
+                  return (
+                    <FormItem>
+                      <FormControl>
+                        <Input
+                          autoFocus
+                          placeholder="Organization name"
+                          className="text-lg font-medium border-0 p-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+                          disabled={createOrgMutation.isPending}
+                          onKeyDown={handleNameKeyDown}
+                          ref={(el) => {
+                            nameInputRef.current = el;
+                            ref(el);
+                          }}
+                          {...fieldProps}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  );
+                }}
+              />
+              <FormField
+                control={form.control}
+                name="bio"
+                render={({ field }) => {
+                  const { ref, ...fieldProps } = field;
+                  return (
+                    <FormItem>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Bio (optional)"
+                          className="min-h-[80px] border-0 p-0 focus-visible:ring-0 focus-visible:ring-offset-0 resize-none"
+                          disabled={createOrgMutation.isPending}
+                          onKeyDown={handleBioKeyDown}
+                          ref={(el) => {
+                            bioTextareaRef.current = el;
+                            ref(el);
+                          }}
+                          {...fieldProps}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  );
+                }}
+              />
+              <FormField
+                control={form.control}
+                name="logoUrl"
+                render={({ field }) => {
+                  const { ref, ...fieldProps } = field;
+                  return (
+                    <FormItem>
+                      <FormControl>
+                        <Input
+                          placeholder="Logo URL (optional)"
+                          className="border-0 p-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+                          disabled={createOrgMutation.isPending}
+                          onKeyDown={handleLogoUrlKeyDown}
+                          ref={(el) => {
+                            logoUrlInputRef.current = el;
+                            ref(el);
+                          }}
+                          {...fieldProps}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  );
+                }}
               />
             </div>
-          </div>
-        </form>
+
+            {/* Action buttons */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-2"
+                disabled={createOrgMutation.isPending}
+                onClick={handleClose}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                size="sm"
+                disabled={
+                  createOrgMutation.isPending || !form.watch('name').trim()
+                }
+              >
+                {createOrgMutation.isPending
+                  ? 'Creating...'
+                  : 'Create Organization'}
+              </Button>
+              {/* Create more toggle */}
+              <div className="ml-auto flex items-center gap-2 text-sm">
+                <Label htmlFor="create-more">Create more</Label>
+                <Switch
+                  id="create-more"
+                  checked={createMore}
+                  onCheckedChange={setCreateMore}
+                />
+              </div>
+            </div>
+          </form>
+        </Form>
       </div>
     </Modal>
   );
