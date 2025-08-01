@@ -93,9 +93,9 @@ export function EmailSignIn({ onSuccess }: EmailSignInProps) {
           'Sign In with Email'
         )}
         {lastAuthMethod === 'EMAIL' && (
-          <p className="text-xs absolute right-4 text-muted-foreground text-center">
+          <i className="text-xs absolute right-4 text-muted text-center">
             Last used
-          </p>
+          </i>
         )}
       </Button>
     </form>

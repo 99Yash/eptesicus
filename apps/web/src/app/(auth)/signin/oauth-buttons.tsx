@@ -82,9 +82,9 @@ const OAuthButton: React.FC<OAuthButtonProps> = ({ providerId, className }) => {
         <Spinner className="mr-2 bg-background" />
       ) : (
         lastAuthMethod === (provider.id.toUpperCase() as AuthOptionsType) && (
-          <p className="text-xs absolute right-4 text-muted-foreground text-center">
+          <i className="text-xs absolute right-4 text-muted-foreground text-center">
             Last used
-          </p>
+          </i>
         )
       )}
     </Button>
