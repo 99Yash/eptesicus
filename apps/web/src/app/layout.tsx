@@ -4,8 +4,8 @@ import { Geist_Mono, Inter } from 'next/font/google';
 import '@workspace/ui/globals.css';
 
 import React from 'react';
-import { MainLayout } from '~/components/main-layout';
-import { Providers } from '~/components/providers';
+import { MainLayout } from '~/components/layouts/main-layout';
+import { Providers } from '~/components/layouts/providers';
 import { siteConfig } from '~/lib/site';
 
 const fontSans = Inter({

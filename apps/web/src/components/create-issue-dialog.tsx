@@ -9,7 +9,7 @@ import { Textarea } from '@workspace/ui/components/textarea';
 import { useState } from 'react';
 import { useCreateIssue } from '~/hooks/use-issues';
 import { useUser } from '~/hooks/use-user';
-import { Modal } from './modal';
+import { Modal } from './ui/modal';
 
 interface CreateIssueDialogProps {
   showModal: boolean;
