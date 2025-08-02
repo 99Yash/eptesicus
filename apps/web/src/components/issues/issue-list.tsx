@@ -11,12 +11,20 @@ import {
   CardTitle,
 } from '@workspace/ui/components/card';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@workspace/ui/components/dropdown-menu';
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@workspace/ui/components/command';
 import { Kbd } from '@workspace/ui/components/kbd';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@workspace/ui/components/popover';
+import { cn } from '@workspace/ui/lib/utils';
 import {
   ArrowDown,
   ArrowUp,
@@ -34,13 +42,15 @@ import {
 } from 'lucide-react';
 import { useIssues, useUpdateIssue } from '~/hooks/use-issues';
 import {
+  IssuePriority,
+  IssueStatus,
   ISSUE_PRIORITY_OPTIONS as PRIORITY_OPTIONS,
   ISSUE_STATUS_OPTIONS as STATUS_OPTIONS,
 } from '~/lib/constants';
 
 // -------------------- Icon Mappings --------------------
 const STATUS_ICONS: Record<
-  string,
+  IssueStatus,
   React.ComponentType<{ size?: number; className?: string }>
 > = {
   backlog: CircleDashed,
@@ -53,7 +63,7 @@ const STATUS_ICONS: Record<
 };
 
 const PRIORITY_ICONS: Record<
-  string,
+  IssuePriority,
   React.ComponentType<{ size?: number; className?: string }>
 > = {
   no_priority: Flag,
@@ -66,45 +76,71 @@ const PRIORITY_ICONS: Record<
 function StatusDropdown({ issue }: { issue: Issue }) {
   const updateIssue = useUpdateIssue();
   const CurrentIcon = STATUS_ICONS[issue.todo_status || 'backlog'] || Circle;
+  const [open, setOpen] = React.useState(false);
+
+  const currentStatus = STATUS_OPTIONS.find(
+    (option) => option.value === issue.todo_status
+  );
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
         <Button
           variant="transparent"
           size="icon"
-          aria-label={`Status: ${issue.todo_status}`}
-          title={`Status: ${issue.todo_status}`}
+          role="combobox"
+          aria-expanded={open}
+          className="h-8 w-8"
+          aria-label={`Status: ${currentStatus?.label || 'Select status'}`}
+          title={`Status: ${currentStatus?.label || 'Select status'}`}
         >
           <CurrentIcon size={16} />
         </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent>
-        {STATUS_OPTIONS.map((option) => {
-          const OptionIcon = STATUS_ICONS[option.value] || Circle;
-          return (
-            <DropdownMenuItem
-              key={option.value}
-              onSelect={() => {
-                if (option.value !== issue.todo_status) {
-                  updateIssue.mutate({
-                    id: issue.id,
-                    data: { todo_status: option.value },
-                  });
-                }
-              }}
-              className="capitalize flex items-center gap-2"
-            >
-              <OptionIcon size={16} />
-              {option.label}
-              {option.value === issue.todo_status && (
-                <Check size={16} className="ml-auto" />
-              )}
-            </DropdownMenuItem>
-          );
-        })}
-      </DropdownMenuContent>
-    </DropdownMenu>
+      </PopoverTrigger>
+      <PopoverContent className="w-[140px] p-0" align="start">
+        <Command>
+          <CommandInput placeholder="Search status..." className="h-8" />
+          <CommandList>
+            <CommandEmpty>No status found.</CommandEmpty>
+            <CommandGroup>
+              {STATUS_OPTIONS.map((option) => {
+                const OptionIcon = STATUS_ICONS[option.value] || Circle;
+                return (
+                  <CommandItem
+                    key={option.value}
+                    value={option.value}
+                    onSelect={(currentValue) => {
+                      if (currentValue !== issue.todo_status) {
+                        updateIssue.mutate({
+                          id: issue.id,
+                          data: {
+                            todo_status:
+                              currentValue as typeof issue.todo_status,
+                          },
+                        });
+                      }
+                      setOpen(false);
+                    }}
+                    className="text-xs"
+                  >
+                    <OptionIcon size={14} />
+                    {option.label}
+                    <Check
+                      className={cn(
+                        'ml-auto h-3 w-3',
+                        option.value === issue.todo_status
+                          ? 'opacity-100'
+                          : 'opacity-0'
+                      )}
+                    />
+                  </CommandItem>
+                );
+              })}
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   );
 }
 
@@ -112,45 +148,71 @@ function PriorityDropdown({ issue }: { issue: Issue }) {
   const updateIssue = useUpdateIssue();
   const CurrentIcon =
     PRIORITY_ICONS[issue.todo_priority || 'no_priority'] || Flag;
+  const [open, setOpen] = React.useState(false);
+
+  const currentPriority = PRIORITY_OPTIONS.find(
+    (option) => option.value === issue.todo_priority
+  );
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
         <Button
           variant="transparent"
           size="icon"
-          aria-label={`Priority: ${issue.todo_priority}`}
-          title={`Priority: ${issue.todo_priority}`}
+          role="combobox"
+          aria-expanded={open}
+          className="h-8 w-8"
+          aria-label={`Priority: ${currentPriority?.label || 'Select priority'}`}
+          title={`Priority: ${currentPriority?.label || 'Select priority'}`}
         >
           <CurrentIcon size={16} />
         </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent>
-        {PRIORITY_OPTIONS.map((option) => {
-          const OptionIcon = PRIORITY_ICONS[option.value] || Flag;
-          return (
-            <DropdownMenuItem
-              key={option.value}
-              onSelect={() => {
-                if (option.value !== issue.todo_priority) {
-                  updateIssue.mutate({
-                    id: issue.id,
-                    data: { todo_priority: option.value },
-                  });
-                }
-              }}
-              className="capitalize flex items-center gap-2"
-            >
-              <OptionIcon size={16} />
-              {option.label}
-              {option.value === issue.todo_priority && (
-                <Check size={16} className="ml-auto" />
-              )}
-            </DropdownMenuItem>
-          );
-        })}
-      </DropdownMenuContent>
-    </DropdownMenu>
+      </PopoverTrigger>
+      <PopoverContent className="w-[120px] p-0" align="start">
+        <Command>
+          <CommandInput placeholder="Search priority..." className="h-8" />
+          <CommandList>
+            <CommandEmpty>No priority found.</CommandEmpty>
+            <CommandGroup>
+              {PRIORITY_OPTIONS.map((option) => {
+                const OptionIcon = PRIORITY_ICONS[option.value] || Flag;
+                return (
+                  <CommandItem
+                    key={option.value}
+                    value={option.value}
+                    onSelect={(currentValue) => {
+                      if (currentValue !== issue.todo_priority) {
+                        updateIssue.mutate({
+                          id: issue.id,
+                          data: {
+                            todo_priority:
+                              currentValue as typeof issue.todo_priority,
+                          },
+                        });
+                      }
+                      setOpen(false);
+                    }}
+                    className="text-xs"
+                  >
+                    <OptionIcon size={14} />
+                    {option.label}
+                    <Check
+                      className={cn(
+                        'ml-auto h-3 w-3',
+                        option.value === issue.todo_priority
+                          ? 'opacity-100'
+                          : 'opacity-0'
+                      )}
+                    />
+                  </CommandItem>
+                );
+              })}
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   );
 }
 
@@ -167,10 +229,8 @@ function IssueCard({ issue }: { issue: Issue }) {
       <CardContent className="pt-0">
         <div className="flex items-center justify-between text-xs text-muted-foreground">
           <span>Created {new Date(issue.createdAt).toLocaleDateString()}</span>
-          <div className="flex items-center gap-2">
-            {/* Status icon */}
+          <div className="flex items-center gap-1">
             <StatusDropdown issue={issue} />
-            {/* Priority icon */}
             <PriorityDropdown issue={issue} />
           </div>
         </div>
