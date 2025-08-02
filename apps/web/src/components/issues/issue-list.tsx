@@ -25,6 +25,7 @@ import {
   PopoverTrigger,
 } from '@workspace/ui/components/popover';
 import { cn } from '@workspace/ui/lib/utils';
+import { formatDate } from 'date-fns';
 import {
   ArrowDown,
   ArrowUp,
@@ -97,7 +98,7 @@ function StatusDropdown({ issue }: { issue: Issue }) {
           <CurrentIcon size={16} />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[140px] p-0" align="start">
+      <PopoverContent className="w-[160px] p-0" align="start">
         <Command>
           <CommandInput placeholder="Search status..." className="h-8" />
           <CommandList>
@@ -114,8 +115,7 @@ function StatusDropdown({ issue }: { issue: Issue }) {
                         updateIssue.mutate({
                           id: issue.id,
                           data: {
-                            todo_status:
-                              currentValue as typeof issue.todo_status,
+                            todo_status: currentValue as IssueStatus,
                           },
                         });
                       }
@@ -169,7 +169,7 @@ function PriorityDropdown({ issue }: { issue: Issue }) {
           <CurrentIcon size={16} />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[120px] p-0" align="start">
+      <PopoverContent className="w-[160px] p-0" align="start">
         <Command>
           <CommandInput placeholder="Search priority..." className="h-8" />
           <CommandList>
@@ -186,8 +186,7 @@ function PriorityDropdown({ issue }: { issue: Issue }) {
                         updateIssue.mutate({
                           id: issue.id,
                           data: {
-                            todo_priority:
-                              currentValue as typeof issue.todo_priority,
+                            todo_priority: currentValue as IssuePriority,
                           },
                         });
                       }
@@ -228,7 +227,7 @@ function IssueCard({ issue }: { issue: Issue }) {
       </CardHeader>
       <CardContent className="pt-0">
         <div className="flex items-center justify-between text-xs text-muted-foreground">
-          <span>Created {new Date(issue.createdAt).toLocaleDateString()}</span>
+          <span>Created {formatDate(issue.createdAt, 'MMM d, yyyy')}</span>
           <div className="flex items-center gap-1">
             <StatusDropdown issue={issue} />
             <PriorityDropdown issue={issue} />
