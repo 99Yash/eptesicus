@@ -131,9 +131,17 @@ export function CreateIssueDialog({
       });
 
       console.log('[CreateIssueDialog] Issue created successfully');
-      setShowModal(false);
 
-      if (!createMore) {
+      if (createMore) {
+        // Reset form but keep modal open
+        form.reset();
+        // Focus back to title input for quick creation
+        setTimeout(() => {
+          titleInputRef.current?.focus();
+        }, 0);
+      } else {
+        // Close modal and reset form
+        setShowModal(false);
         form.reset();
       }
     } catch (error) {
