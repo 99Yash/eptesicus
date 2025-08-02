@@ -1,11 +1,7 @@
-import { google } from '@ai-sdk/google';
 import { openai } from '@ai-sdk/openai';
 import { db, eq } from '@workspace/db';
 import { users } from '@workspace/db/schemas';
 import { generateText } from 'ai';
-
-export const openai_4o_mini = openai('gpt-4o-mini');
-export const gemini_1_5_flash = google('gemini-1.5-flash');
 
 export async function generateUniqueUsername(input: string) {
   console.log('[generateUniqueUsername] Generating username for:', input);
@@ -40,9 +36,9 @@ export async function generateUniqueUsername(input: string) {
       );
 
       const { text } = await generateText({
-        model: openai_4o_mini,
+        model: openai('gpt-4o-mini'),
         system: systemPrompt,
-        maxTokens: 9,
+        maxOutputTokens: 9,
         abortSignal: AbortSignal.timeout(10000), // Increased to 10 seconds for username generation
         messages: [
           {
