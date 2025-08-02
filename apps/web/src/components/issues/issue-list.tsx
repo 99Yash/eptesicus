@@ -2,9 +2,8 @@
 
 import React from 'react';
 
-import { type Issue } from '@workspace/db/helpers';
+import { type IssueWithOrganization } from '@workspace/db/helpers';
 import { Button } from '@workspace/ui/components/button';
-// Removed Card components - using clean rows instead
 import {
   Command,
   CommandEmpty,
@@ -95,13 +94,14 @@ const getPriorityColorClass = (priority: IssuePriority): string => {
   return colorMap[priority] || 'text-priority-none';
 };
 
-function StatusDropdown({ issue }: { issue: Issue }) {
+function StatusDropdown({ issue }: { issue: IssueWithOrganization }) {
   const updateIssue = useUpdateIssue();
-  const CurrentIcon = STATUS_ICONS[issue.todo_status || 'backlog'] || Circle;
+  const CurrentIcon =
+    STATUS_ICONS[(issue.todo_status as IssueStatus) || 'backlog'] || Circle;
   const [open, setOpen] = React.useState(false);
 
   const currentStatus = STATUS_OPTIONS.find(
-    (option) => option.value === issue.todo_status
+    (option) => option.value === (issue.todo_status as IssueStatus)
   );
 
   return (
@@ -135,7 +135,7 @@ function StatusDropdown({ issue }: { issue: Issue }) {
                     key={option.value}
                     value={option.value}
                     onSelect={(currentValue) => {
-                      if (currentValue !== issue.todo_status) {
+                      if (currentValue !== (issue.todo_status as IssueStatus)) {
                         updateIssue.mutate({
                           id: issue.id,
                           data: {
@@ -155,7 +155,7 @@ function StatusDropdown({ issue }: { issue: Issue }) {
                     <Check
                       className={cn(
                         'ml-auto h-3 w-3',
-                        option.value === issue.todo_status
+                        option.value === (issue.todo_status as IssueStatus)
                           ? 'opacity-100'
                           : 'opacity-0'
                       )}
@@ -171,7 +171,7 @@ function StatusDropdown({ issue }: { issue: Issue }) {
   );
 }
 
-function PriorityDropdown({ issue }: { issue: Issue }) {
+function PriorityDropdown({ issue }: { issue: IssueWithOrganization }) {
   const updateIssue = useUpdateIssue();
   const CurrentIcon =
     PRIORITY_ICONS[issue.todo_priority || 'no_priority'] || Flag;
@@ -250,12 +250,14 @@ function PriorityDropdown({ issue }: { issue: Issue }) {
   );
 }
 
-function IssueRow({ issue }: { issue: Issue }) {
+function IssueRow({ issue }: { issue: IssueWithOrganization }) {
   const PriorityIcon =
     PRIORITY_ICONS[issue.todo_priority || 'no_priority'] || Flag;
 
-  // Generate a readable issue ID from the database ID
-  const issueId = `LAB-${issue.id.slice(-2)}`;
+  // Generate a readable issue ID from the database ID and organization name
+  const orgPrefix =
+    issue.organization?.name?.slice(0, 3).toUpperCase() || 'ISSUE';
+  const issueId = `${orgPrefix}-${issue.id.slice(-2)}`;
 
   return (
     <div className="group flex items-center gap-3 py-1.5 px-2 hover:bg-muted/30 rounded-sm transition-colors">
@@ -299,7 +301,7 @@ function StatusGroup({
   onAddIssue,
 }: {
   status: (typeof STATUS_OPTIONS)[number];
-  issues: Issue[];
+  issues: IssueWithOrganization[];
   onAddIssue?: () => void;
 }) {
   const StatusIcon = STATUS_ICONS[status.value] || Circle;
@@ -404,11 +406,11 @@ export function IssueList() {
   const groupedIssues = STATUS_OPTIONS.reduce(
     (acc, status) => {
       acc[status.value] = issues.filter(
-        (issue) => issue.todo_status === status.value
+        (issue) => (issue.todo_status as IssueStatus) === status.value
       );
       return acc;
     },
-    {} as Record<IssueStatus, Issue[]>
+    {} as Record<IssueStatus, IssueWithOrganization[]>
   );
 
   return (

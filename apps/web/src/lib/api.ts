@@ -1,7 +1,7 @@
 import {
-  type Issue,
   type IssueCreateType,
   type IssueUpdateType,
+  type IssueWithOrganization,
   type Organization,
   type User,
 } from '@workspace/db/helpers';
@@ -92,28 +92,33 @@ class API {
   // Issue-related methods
   async createIssue(data: CreateIssueData) {
     console.log('[api.createIssue] Sending request:', data);
-    const response = await _axios.post<Issue>('/issues', data);
+    const response = await _axios.post<IssueWithOrganization>('/issues', data);
     console.log('[api.createIssue] Response:', response.data);
     return response.data;
   }
 
   async getIssue(id: string) {
     console.log('[api.getIssue] Fetching issue:', id);
-    const response = await _axios.get<Issue>(`/issues/${id}`);
+    const response = await _axios.get<IssueWithOrganization>(`/issues/${id}`);
     console.log('[api.getIssue] Response:', response.data);
     return response.data;
   }
 
   async listIssues(params?: { organization_id?: string }) {
     console.log('[api.listIssues] Fetching issues with params:', params);
-    const response = await _axios.get<Issue[]>('/issues', { params });
+    const response = await _axios.get<IssueWithOrganization[]>('/issues', {
+      params,
+    });
     console.log('[api.listIssues] Response:', response.data);
     return response.data;
   }
 
   async updateIssue(id: string, data: IssueUpdateType) {
     console.log('[api.updateIssue] Updating issue:', id, data);
-    const response = await _axios.put<Issue>(`/issues/${id}`, data);
+    const response = await _axios.put<IssueWithOrganization>(
+      `/issues/${id}`,
+      data
+    );
     console.log('[api.updateIssue] Response:', response.data);
     return response.data;
   }

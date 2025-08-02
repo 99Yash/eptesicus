@@ -61,7 +61,15 @@ class IssueService {
       });
     }
 
-    return issue;
+    // Fetch the issue with organization data
+    const issueWithOrg = await db.query.issues.findFirst({
+      where: eq(issues.id, issue.id),
+      with: {
+        organization: true,
+      },
+    });
+
+    return issueWithOrg || issue;
   }
 
   /*
@@ -70,6 +78,9 @@ class IssueService {
   async getIssue(id: string) {
     const issue = await db.query.issues.findFirst({
       where: eq(issues.id, id),
+      with: {
+        organization: true,
+      },
     });
 
     if (!issue) {
@@ -106,6 +117,9 @@ class IssueService {
     const result = await db.query.issues.findMany({
       where: whereExpr,
       orderBy: (issues, { desc }) => desc(issues.createdAt),
+      with: {
+        organization: true,
+      },
     });
 
     return result;
@@ -140,7 +154,15 @@ class IssueService {
       });
     }
 
-    return issue;
+    // Fetch the issue with organization data
+    const issueWithOrg = await db.query.issues.findFirst({
+      where: eq(issues.id, id),
+      with: {
+        organization: true,
+      },
+    });
+
+    return issueWithOrg || issue;
   }
 
   /*
