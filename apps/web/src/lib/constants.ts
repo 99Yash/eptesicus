@@ -6,13 +6,17 @@ export const LOCAL_STORAGE_SCHEMAS = {
 } as const;
 
 export const ISSUE_STATUS_OPTIONS = [
-  { value: 'backlog', label: 'Backlog', color: 'bg-muted-foreground/60' },
-  { value: 'todo', label: 'Todo', color: 'bg-primary' },
-  { value: 'in_progress', label: 'In Progress', color: 'bg-blue-500' },
-  { value: 'in_review', label: 'In Review', color: 'bg-purple-500' },
-  { value: 'done', label: 'Done', color: 'bg-green-600' },
-  { value: 'cancelled', label: 'Cancelled', color: 'bg-destructive' },
-  { value: 'duplicate', label: 'Duplicate', color: 'bg-yellow-500' },
+  { value: 'backlog', label: 'Backlog', color: 'bg-status-backlog' },
+  { value: 'todo', label: 'Todo', color: 'bg-status-todo' },
+  {
+    value: 'in_progress',
+    label: 'In Progress',
+    color: 'bg-status-in-progress',
+  },
+  { value: 'in_review', label: 'In Review', color: 'bg-status-in-review' },
+  { value: 'done', label: 'Done', color: 'bg-status-done' },
+  { value: 'cancelled', label: 'Cancelled', color: 'bg-status-cancelled' },
+  { value: 'duplicate', label: 'Duplicate', color: 'bg-status-duplicate' },
 ] as const;
 
 export const ISSUE_PRIORITY_OPTIONS = [

@@ -4,12 +4,7 @@ import React from 'react';
 
 import { type Issue } from '@workspace/db/helpers';
 import { Button } from '@workspace/ui/components/button';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@workspace/ui/components/card';
+// Removed Card components - using clean rows instead
 import {
   Command,
   CommandEmpty,
@@ -39,6 +34,7 @@ import {
   Flag,
   Flame,
   Minus,
+  Plus,
   XCircle,
 } from 'lucide-react';
 import { useIssues, useUpdateIssue } from '~/hooks/use-issues';
@@ -74,6 +70,31 @@ const PRIORITY_ICONS: Record<
   low: ArrowDown,
 };
 
+// -------------------- Color Mappings --------------------
+const getStatusColorClass = (status: IssueStatus): string => {
+  const colorMap: Record<IssueStatus, string> = {
+    backlog: 'text-status-backlog',
+    todo: 'text-status-todo',
+    in_progress: 'text-status-in-progress',
+    in_review: 'text-status-in-review',
+    done: 'text-status-done',
+    cancelled: 'text-status-cancelled',
+    duplicate: 'text-status-duplicate',
+  };
+  return colorMap[status] || 'text-muted-foreground';
+};
+
+const getPriorityColorClass = (priority: IssuePriority): string => {
+  const colorMap: Record<IssuePriority, string> = {
+    no_priority: 'text-priority-none',
+    urgent: 'text-priority-urgent',
+    high: 'text-priority-high',
+    medium: 'text-priority-medium',
+    low: 'text-priority-low',
+  };
+  return colorMap[priority] || 'text-priority-none';
+};
+
 function StatusDropdown({ issue }: { issue: Issue }) {
   const updateIssue = useUpdateIssue();
   const CurrentIcon = STATUS_ICONS[issue.todo_status || 'backlog'] || Circle;
@@ -95,7 +116,10 @@ function StatusDropdown({ issue }: { issue: Issue }) {
           aria-label={`Status: ${currentStatus?.label || 'Select status'}`}
           title={`Status: ${currentStatus?.label || 'Select status'}`}
         >
-          <CurrentIcon size={16} />
+          <CurrentIcon
+            size={16}
+            className={getStatusColorClass(issue.todo_status || 'backlog')}
+          />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[160px] p-0" align="start">
@@ -123,7 +147,10 @@ function StatusDropdown({ issue }: { issue: Issue }) {
                     }}
                     className="text-xs"
                   >
-                    <OptionIcon size={14} />
+                    <OptionIcon
+                      size={14}
+                      className={getStatusColorClass(option.value)}
+                    />
                     {option.label}
                     <Check
                       className={cn(
@@ -166,7 +193,12 @@ function PriorityDropdown({ issue }: { issue: Issue }) {
           aria-label={`Priority: ${currentPriority?.label || 'Select priority'}`}
           title={`Priority: ${currentPriority?.label || 'Select priority'}`}
         >
-          <CurrentIcon size={16} />
+          <CurrentIcon
+            size={16}
+            className={getPriorityColorClass(
+              issue.todo_priority || 'no_priority'
+            )}
+          />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[160px] p-0" align="start">
@@ -194,7 +226,10 @@ function PriorityDropdown({ issue }: { issue: Issue }) {
                     }}
                     className="text-xs"
                   >
-                    <OptionIcon size={14} />
+                    <OptionIcon
+                      size={14}
+                      className={getPriorityColorClass(option.value)}
+                    />
                     {option.label}
                     <Check
                       className={cn(
@@ -215,26 +250,90 @@ function PriorityDropdown({ issue }: { issue: Issue }) {
   );
 }
 
-function IssueCard({ issue }: { issue: Issue }) {
+function IssueRow({ issue }: { issue: Issue }) {
+  const PriorityIcon =
+    PRIORITY_ICONS[issue.todo_priority || 'no_priority'] || Flag;
+
+  // Generate a readable issue ID from the database ID
+  const issueId = `LAB-${issue.id.slice(-2)}`;
+
   return (
-    <Card className="hover:shadow-md transition-shadow">
-      <CardHeader className="pb-2">
-        <div className="flex items-start justify-between">
-          <CardTitle className="text-base font-medium truncate">
-            {issue.title}
-          </CardTitle>
+    <div className="group flex items-center gap-3 py-1.5 px-2 hover:bg-muted/30 rounded-sm transition-colors">
+      {/* Priority Icon */}
+      <div className="flex items-center min-w-fit">
+        <PriorityIcon
+          size={14}
+          className={getPriorityColorClass(
+            issue.todo_priority || 'no_priority'
+          )}
+        />
+      </div>
+
+      {/* Issue ID */}
+      <span className="text-xs text-muted-foreground font-mono font-medium min-w-fit">
+        {issueId}
+      </span>
+
+      {/* Issue Title */}
+      <span className="text-sm text-foreground truncate flex-1">
+        {issue.title}
+      </span>
+
+      {/* Date */}
+      <span className="text-xs text-muted-foreground min-w-fit">
+        {formatDate(issue.createdAt, 'MMM d')}
+      </span>
+
+      {/* Dropdowns on hover */}
+      <div className="flex items-center gap-1">
+        <StatusDropdown issue={issue} />
+        <PriorityDropdown issue={issue} />
+      </div>
+    </div>
+  );
+}
+
+function StatusGroup({
+  status,
+  issues,
+  onAddIssue,
+}: {
+  status: (typeof STATUS_OPTIONS)[number];
+  issues: Issue[];
+  onAddIssue?: () => void;
+}) {
+  const StatusIcon = STATUS_ICONS[status.value] || Circle;
+
+  return (
+    <div className="space-y-1">
+      {/* Status Header */}
+      <div className="flex items-center gap-2 py-1.5 px-2 text-sm group/header">
+        <div className="flex items-center gap-2 flex-1">
+          <StatusIcon size={16} className={getStatusColorClass(status.value)} />
+          <span className="font-medium text-foreground">{status.label}</span>
+          <span className="text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full">
+            {issues.length}
+          </span>
         </div>
-      </CardHeader>
-      <CardContent className="pt-0">
-        <div className="flex items-center justify-between text-xs text-muted-foreground">
-          <span>Created {formatDate(issue.createdAt, 'MMM d, yyyy')}</span>
-          <div className="flex items-center gap-1">
-            <StatusDropdown issue={issue} />
-            <PriorityDropdown issue={issue} />
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+        {onAddIssue && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-6 w-6 opacity-0 group-hover/header:opacity-100 transition-opacity"
+            onClick={onAddIssue}
+          >
+            <Plus size={12} />
+          </Button>
+        )}
+      </div>
+
+      {/* Issues */}
+      <div className="space-y-0">
+        {issues.map((issue) => (
+          <IssueRow key={issue.id} issue={issue} />
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -243,17 +342,30 @@ export function IssueList() {
 
   if (isLoading) {
     return (
-      <div className="space-y-4">
-        {Array.from({ length: 3 }).map((_, i) => (
-          <Card key={i} className="animate-pulse">
-            <CardHeader className="pb-2">
-              <div className="h-4 bg-muted rounded w-3/4" />
-            </CardHeader>
-            <CardContent className="pt-0">
-              <div className="h-3 bg-muted rounded w-1/2 mb-3" />
-              <div className="h-3 bg-muted rounded w-1/4" />
-            </CardContent>
-          </Card>
+      <div className="space-y-6">
+        {STATUS_OPTIONS.slice(0, 3).map((status) => (
+          <div key={status.value} className="space-y-1">
+            {/* Status header skeleton */}
+            <div className="flex items-center gap-2 py-1.5 px-2">
+              <div className="h-4 w-4 bg-muted rounded" />
+              <div className="h-4 bg-muted rounded w-16" />
+              <div className="h-4 bg-muted rounded-full w-6" />
+            </div>
+            {/* Issue rows skeleton */}
+            {Array.from({ length: Math.floor(Math.random() * 3) + 1 }).map(
+              (_, i) => (
+                <div
+                  key={i}
+                  className="flex items-center gap-3 py-1.5 px-2 animate-pulse"
+                >
+                  <div className="h-3 w-3 bg-muted rounded" />
+                  <div className="h-3 bg-muted rounded w-12" />
+                  <div className="h-3 bg-muted rounded flex-1" />
+                  <div className="h-3 bg-muted rounded w-10" />
+                </div>
+              )
+            )}
+          </div>
         ))}
       </div>
     );
@@ -288,11 +400,37 @@ export function IssueList() {
     );
   }
 
+  // Group issues by status
+  const groupedIssues = STATUS_OPTIONS.reduce(
+    (acc, status) => {
+      acc[status.value] = issues.filter(
+        (issue) => issue.todo_status === status.value
+      );
+      return acc;
+    },
+    {} as Record<IssueStatus, Issue[]>
+  );
+
   return (
-    <div className="space-y-4">
-      {issues.map((issue) => (
-        <IssueCard key={issue.id} issue={issue} />
-      ))}
+    <div className="space-y-6">
+      {STATUS_OPTIONS.map((status) => {
+        const statusIssues = groupedIssues[status.value] || [];
+
+        // Only show status groups that have issues
+        if (statusIssues.length === 0) return null;
+
+        return (
+          <StatusGroup
+            key={status.value}
+            status={status}
+            issues={statusIssues}
+            onAddIssue={() => {
+              // TODO: Implement add issue functionality
+              console.log(`Add issue to ${status.label}`);
+            }}
+          />
+        );
+      })}
     </div>
   );
 }
