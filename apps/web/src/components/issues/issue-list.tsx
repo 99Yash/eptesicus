@@ -35,7 +35,7 @@ import {
 
 function StatusDropdown({ issue }: { issue: IssueWithOrganization }) {
   const updateIssue = useUpdateIssue();
-  const CurrentIcon = getStatusIcon(issue.todo_status || 'backlog');
+  const CurrentIcon = getStatusIcon(issue.todo_status);
   const [open, setOpen] = React.useState(false);
 
   const currentStatus = STATUS_OPTIONS.find(
@@ -56,7 +56,7 @@ function StatusDropdown({ issue }: { issue: IssueWithOrganization }) {
         >
           <CurrentIcon
             size={16}
-            className={getStatusTextColor(issue.todo_status || 'backlog')}
+            className={getStatusTextColor(issue.todo_status)}
           />
         </Button>
       </PopoverTrigger>
@@ -111,7 +111,7 @@ function StatusDropdown({ issue }: { issue: IssueWithOrganization }) {
 
 function PriorityDropdown({ issue }: { issue: IssueWithOrganization }) {
   const updateIssue = useUpdateIssue();
-  const CurrentIcon = getPriorityIcon(issue.todo_priority || 'no_priority');
+  const CurrentIcon = getPriorityIcon(issue.todo_priority);
   const [open, setOpen] = React.useState(false);
 
   const currentPriority = PRIORITY_OPTIONS.find(
@@ -132,9 +132,7 @@ function PriorityDropdown({ issue }: { issue: IssueWithOrganization }) {
         >
           <CurrentIcon
             size={16}
-            className={getPriorityTextColor(
-              issue.todo_priority || 'no_priority'
-            )}
+            className={getPriorityTextColor(issue.todo_priority)}
           />
         </Button>
       </PopoverTrigger>
@@ -188,7 +186,7 @@ function PriorityDropdown({ issue }: { issue: IssueWithOrganization }) {
 }
 
 function IssueRow({ issue }: { issue: IssueWithOrganization }) {
-  const PriorityIcon = getPriorityIcon(issue.todo_priority || 'no_priority');
+  const PriorityIcon = getPriorityIcon(issue.todo_priority);
 
   // Generate a readable issue ID from the database ID and organization name
   const orgPrefix =
@@ -201,7 +199,7 @@ function IssueRow({ issue }: { issue: IssueWithOrganization }) {
       <div className="flex items-center min-w-fit">
         <PriorityIcon
           size={14}
-          className={getPriorityTextColor(issue.todo_priority || 'no_priority')}
+          className={getPriorityTextColor(issue.todo_priority)}
         />
       </div>
 
