@@ -20,88 +20,26 @@ import {
 } from '@workspace/ui/components/popover';
 import { cn } from '@workspace/ui/lib/utils';
 import { formatDate } from 'date-fns';
-import {
-  ArrowDown,
-  ArrowUp,
-  Check,
-  CheckCircle2,
-  Circle,
-  CircleDashed,
-  CircleDot,
-  Clock,
-  Copy as CopyIcon,
-  Flag,
-  Flame,
-  Minus,
-  Plus,
-  XCircle,
-} from 'lucide-react';
+import { Check, Plus } from 'lucide-react';
 import { useIssues, useUpdateIssue } from '~/hooks/use-issues';
 import {
   IssuePriority,
   IssueStatus,
   ISSUE_PRIORITY_OPTIONS as PRIORITY_OPTIONS,
   ISSUE_STATUS_OPTIONS as STATUS_OPTIONS,
+  getPriorityIcon,
+  getPriorityTextColor,
+  getStatusIcon,
+  getStatusTextColor,
 } from '~/lib/constants';
-
-// -------------------- Icon Mappings --------------------
-const STATUS_ICONS: Record<
-  IssueStatus,
-  React.ComponentType<{ size?: number; className?: string }>
-> = {
-  backlog: CircleDashed,
-  todo: Circle,
-  in_progress: Clock,
-  in_review: CircleDot,
-  done: CheckCircle2,
-  cancelled: XCircle,
-  duplicate: CopyIcon,
-};
-
-const PRIORITY_ICONS: Record<
-  IssuePriority,
-  React.ComponentType<{ size?: number; className?: string }>
-> = {
-  no_priority: Flag,
-  urgent: Flame,
-  high: ArrowUp,
-  medium: Minus,
-  low: ArrowDown,
-};
-
-// -------------------- Color Mappings --------------------
-const getStatusColorClass = (status: IssueStatus): string => {
-  const colorMap: Record<IssueStatus, string> = {
-    backlog: 'text-status-backlog',
-    todo: 'text-status-todo',
-    in_progress: 'text-status-in-progress',
-    in_review: 'text-status-in-review',
-    done: 'text-status-done',
-    cancelled: 'text-status-cancelled',
-    duplicate: 'text-status-duplicate',
-  };
-  return colorMap[status] || 'text-muted-foreground';
-};
-
-const getPriorityColorClass = (priority: IssuePriority): string => {
-  const colorMap: Record<IssuePriority, string> = {
-    no_priority: 'text-priority-none',
-    urgent: 'text-priority-urgent',
-    high: 'text-priority-high',
-    medium: 'text-priority-medium',
-    low: 'text-priority-low',
-  };
-  return colorMap[priority] || 'text-priority-none';
-};
 
 function StatusDropdown({ issue }: { issue: IssueWithOrganization }) {
   const updateIssue = useUpdateIssue();
-  const CurrentIcon =
-    STATUS_ICONS[(issue.todo_status as IssueStatus) || 'backlog'] || Circle;
+  const CurrentIcon = getStatusIcon(issue.todo_status || 'backlog');
   const [open, setOpen] = React.useState(false);
 
   const currentStatus = STATUS_OPTIONS.find(
-    (option) => option.value === (issue.todo_status as IssueStatus)
+    (option) => option.value === issue.todo_status
   );
 
   return (
@@ -118,7 +56,7 @@ function StatusDropdown({ issue }: { issue: IssueWithOrganization }) {
         >
           <CurrentIcon
             size={16}
-            className={getStatusColorClass(issue.todo_status || 'backlog')}
+            className={getStatusTextColor(issue.todo_status || 'backlog')}
           />
         </Button>
       </PopoverTrigger>
@@ -129,13 +67,13 @@ function StatusDropdown({ issue }: { issue: IssueWithOrganization }) {
             <CommandEmpty>No status found.</CommandEmpty>
             <CommandGroup>
               {STATUS_OPTIONS.map((option) => {
-                const OptionIcon = STATUS_ICONS[option.value] || Circle;
+                const OptionIcon = getStatusIcon(option.value);
                 return (
                   <CommandItem
                     key={option.value}
                     value={option.value}
                     onSelect={(currentValue) => {
-                      if (currentValue !== (issue.todo_status as IssueStatus)) {
+                      if (currentValue !== issue.todo_status) {
                         updateIssue.mutate({
                           id: issue.id,
                           data: {
@@ -149,13 +87,13 @@ function StatusDropdown({ issue }: { issue: IssueWithOrganization }) {
                   >
                     <OptionIcon
                       size={14}
-                      className={getStatusColorClass(option.value)}
+                      className={getStatusTextColor(option.value)}
                     />
                     {option.label}
                     <Check
                       className={cn(
                         'ml-auto h-3 w-3',
-                        option.value === (issue.todo_status as IssueStatus)
+                        option.value === issue.todo_status
                           ? 'opacity-100'
                           : 'opacity-0'
                       )}
@@ -173,8 +111,7 @@ function StatusDropdown({ issue }: { issue: IssueWithOrganization }) {
 
 function PriorityDropdown({ issue }: { issue: IssueWithOrganization }) {
   const updateIssue = useUpdateIssue();
-  const CurrentIcon =
-    PRIORITY_ICONS[issue.todo_priority || 'no_priority'] || Flag;
+  const CurrentIcon = getPriorityIcon(issue.todo_priority || 'no_priority');
   const [open, setOpen] = React.useState(false);
 
   const currentPriority = PRIORITY_OPTIONS.find(
@@ -195,7 +132,7 @@ function PriorityDropdown({ issue }: { issue: IssueWithOrganization }) {
         >
           <CurrentIcon
             size={16}
-            className={getPriorityColorClass(
+            className={getPriorityTextColor(
               issue.todo_priority || 'no_priority'
             )}
           />
@@ -208,7 +145,7 @@ function PriorityDropdown({ issue }: { issue: IssueWithOrganization }) {
             <CommandEmpty>No priority found.</CommandEmpty>
             <CommandGroup>
               {PRIORITY_OPTIONS.map((option) => {
-                const OptionIcon = PRIORITY_ICONS[option.value] || Flag;
+                const OptionIcon = getPriorityIcon(option.value);
                 return (
                   <CommandItem
                     key={option.value}
@@ -228,7 +165,7 @@ function PriorityDropdown({ issue }: { issue: IssueWithOrganization }) {
                   >
                     <OptionIcon
                       size={14}
-                      className={getPriorityColorClass(option.value)}
+                      className={getPriorityTextColor(option.value)}
                     />
                     {option.label}
                     <Check
@@ -251,8 +188,7 @@ function PriorityDropdown({ issue }: { issue: IssueWithOrganization }) {
 }
 
 function IssueRow({ issue }: { issue: IssueWithOrganization }) {
-  const PriorityIcon =
-    PRIORITY_ICONS[issue.todo_priority || 'no_priority'] || Flag;
+  const PriorityIcon = getPriorityIcon(issue.todo_priority || 'no_priority');
 
   // Generate a readable issue ID from the database ID and organization name
   const orgPrefix =
@@ -265,9 +201,7 @@ function IssueRow({ issue }: { issue: IssueWithOrganization }) {
       <div className="flex items-center min-w-fit">
         <PriorityIcon
           size={14}
-          className={getPriorityColorClass(
-            issue.todo_priority || 'no_priority'
-          )}
+          className={getPriorityTextColor(issue.todo_priority || 'no_priority')}
         />
       </div>
 
@@ -304,14 +238,14 @@ function StatusGroup({
   issues: IssueWithOrganization[];
   onAddIssue?: () => void;
 }) {
-  const StatusIcon = STATUS_ICONS[status.value] || Circle;
+  const StatusIcon = getStatusIcon(status.value);
 
   return (
     <div className="space-y-1">
       {/* Status Header */}
       <div className="flex items-center gap-2 py-1.5 px-2 text-sm group/header">
         <div className="flex items-center gap-2 flex-1">
-          <StatusIcon size={16} className={getStatusColorClass(status.value)} />
+          <StatusIcon size={16} className={getStatusTextColor(status.value)} />
           <span className="font-medium text-foreground">{status.label}</span>
           <span className="text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full">
             {issues.length}
@@ -406,7 +340,7 @@ export function IssueList() {
   const groupedIssues = STATUS_OPTIONS.reduce(
     (acc, status) => {
       acc[status.value] = issues.filter(
-        (issue) => (issue.todo_status as IssueStatus) === status.value
+        (issue) => issue.todo_status === status.value
       );
       return acc;
     },
