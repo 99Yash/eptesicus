@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { api } from '~/lib/api';
+import { getErrorMessage } from '~/lib/utils';
 
 export function useOrganizations() {
   return useQuery({
@@ -22,11 +23,9 @@ export function useCreateOrganization() {
       toast.success(`Organization "${org.name}" created`);
       queryClient.invalidateQueries({ queryKey: ['organizations'] });
     },
-    onError: (error: any) => {
+    onError: (error) => {
       toast.dismiss();
-      toast.error(
-        error?.response?.data?.message || 'Failed to create organization'
-      );
+      toast.error(getErrorMessage(error));
     },
   });
 }

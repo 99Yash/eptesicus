@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { type IssueUpdateType } from '@workspace/db/helpers';
 import { toast } from 'sonner';
 import { api, type CreateIssueData } from '~/lib/api';
+import { getErrorMessage } from '~/lib/utils';
 
 export function useIssues(params?: { organization_id?: string }) {
   return useQuery({
@@ -43,11 +44,10 @@ export function useUpdateIssue() {
     onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: ['issues'] });
       queryClient.invalidateQueries({ queryKey: ['issues', id] });
-      toast.success('Issue updated successfully');
     },
     onError: (error) => {
       console.error('[useUpdateIssue] error:', error);
-      toast.error('Failed to update issue');
+      toast.error(getErrorMessage(error));
     },
   });
 }

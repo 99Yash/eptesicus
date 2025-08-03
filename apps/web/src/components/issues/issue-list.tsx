@@ -19,7 +19,6 @@ import {
   PopoverTrigger,
 } from '@workspace/ui/components/popover';
 import { cn } from '@workspace/ui/lib/utils';
-import { formatDate } from 'date-fns';
 import { Check, Plus } from 'lucide-react';
 import { useIssues, useUpdateIssue } from '~/hooks/use-issues';
 import {
@@ -186,21 +185,15 @@ function PriorityDropdown({ issue }: { issue: IssueWithOrganization }) {
 }
 
 function IssueRow({ issue }: { issue: IssueWithOrganization }) {
-  const PriorityIcon = getPriorityIcon(issue.todo_priority);
-
-  // Generate a readable issue ID from the database ID and organization name
   const orgPrefix =
     issue.organization?.name?.slice(0, 3).toUpperCase() || 'ISSUE';
   const issueId = `${orgPrefix}-${issue.id.slice(-2)}`;
 
   return (
-    <div className="group flex items-center gap-3 py-1.5 px-2 hover:bg-muted/30 rounded-sm transition-colors">
-      {/* Priority Icon */}
+    <div className="group flex items-center gap-1.5 py-1.5 px-2 hover:bg-muted/30 rounded-sm transition-colors">
+      {/* Interactive Priority Icon */}
       <div className="flex items-center min-w-fit">
-        <PriorityIcon
-          size={14}
-          className={getPriorityTextColor(issue.todo_priority)}
-        />
+        <PriorityDropdown issue={issue} />
       </div>
 
       {/* Issue ID */}
@@ -208,21 +201,15 @@ function IssueRow({ issue }: { issue: IssueWithOrganization }) {
         {issueId}
       </span>
 
+      {/* Interactive Status Icon */}
+      <div className="flex items-center min-w-fit">
+        <StatusDropdown issue={issue} />
+      </div>
+
       {/* Issue Title */}
       <span className="text-sm text-foreground truncate flex-1">
         {issue.title}
       </span>
-
-      {/* Date */}
-      <span className="text-xs text-muted-foreground min-w-fit">
-        {formatDate(issue.createdAt, 'MMM d')}
-      </span>
-
-      {/* Dropdowns on hover */}
-      <div className="flex items-center gap-1">
-        <StatusDropdown issue={issue} />
-        <PriorityDropdown issue={issue} />
-      </div>
     </div>
   );
 }
