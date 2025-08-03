@@ -3,6 +3,7 @@
 import { sql } from 'drizzle-orm';
 import { timestamp } from 'drizzle-orm/pg-core';
 import { customAlphabet } from 'nanoid';
+import z from 'zod';
 
 export const lifecycle_dates = {
   createdAt: timestamp('created_at').defaultNow().notNull(),
@@ -22,3 +23,12 @@ export function createId(
 export function generateRandomCode(length: number = 8) {
   return customAlphabet('123456789', length)();
 }
+
+export const storedFileSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  url: z.string(),
+  alt: z.string().optional(),
+});
+
+export type StoredFile = z.infer<typeof storedFileSchema>;

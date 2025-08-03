@@ -1,0 +1,1 @@
+ALTER TABLE "issues" ADD COLUMN "files" jsonb;

@@ -1,8 +1,8 @@
 import { relations } from 'drizzle-orm';
-import { pgEnum, pgTable, text, varchar } from 'drizzle-orm/pg-core';
+import { jsonb, pgEnum, pgTable, text, varchar } from 'drizzle-orm/pg-core';
 import { createInsertSchema, createUpdateSchema } from 'drizzle-zod';
 import { z } from 'zod/v4';
-import { createId, lifecycle_dates } from '../helpers/utils';
+import { createId, lifecycle_dates, StoredFile } from '../helpers/utils';
 import { organizations, users } from './users';
 
 export const issue_statuses = pgEnum('issue_statuses', [
@@ -42,6 +42,7 @@ export const issues = pgTable('issues', {
   todo_priority: issue_priorities('todo_priority')
     .$defaultFn(() => 'no_priority')
     .notNull(),
+  files: jsonb('files').$type<StoredFile[]>(),
   ...lifecycle_dates,
 });
 
