@@ -1,6 +1,8 @@
 'use client';
 
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import React from 'react';
+import { toast } from 'sonner';
 
 import { type IssueWithOrganization } from '@workspace/db/helpers';
 import { Button } from '@workspace/ui/components/button';
@@ -20,7 +22,7 @@ import {
 } from '@workspace/ui/components/popover';
 import { cn } from '@workspace/ui/lib/utils';
 import { Check, Plus } from 'lucide-react';
-import { useIssues, useUpdateIssue } from '~/hooks/use-issues';
+import { api } from '~/lib/api';
 import {
   IssuePriority,
   IssueStatus,
@@ -31,9 +33,23 @@ import {
   getStatusIcon,
   getStatusTextColor,
 } from '~/lib/constants';
+import { getErrorMessage } from '~/lib/utils';
 
 function StatusDropdown({ issue }: { issue: IssueWithOrganization }) {
-  const updateIssue = useUpdateIssue();
+  const queryClient = useQueryClient();
+
+  const updateIssue = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: any }) =>
+      api.updateIssue(id, data),
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ['issues'] });
+      queryClient.invalidateQueries({ queryKey: ['issues', id] });
+    },
+    onError: (error) => {
+      console.error('[useUpdateIssue] error:', error);
+      toast.error(getErrorMessage(error));
+    },
+  });
   const CurrentIcon = getStatusIcon(issue.todo_status);
   const [open, setOpen] = React.useState(false);
 
@@ -109,7 +125,20 @@ function StatusDropdown({ issue }: { issue: IssueWithOrganization }) {
 }
 
 function PriorityDropdown({ issue }: { issue: IssueWithOrganization }) {
-  const updateIssue = useUpdateIssue();
+  const queryClient = useQueryClient();
+
+  const updateIssue = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: any }) =>
+      api.updateIssue(id, data),
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ['issues'] });
+      queryClient.invalidateQueries({ queryKey: ['issues', id] });
+    },
+    onError: (error) => {
+      console.error('[useUpdateIssue] error:', error);
+      toast.error(getErrorMessage(error));
+    },
+  });
   const CurrentIcon = getPriorityIcon(issue.todo_priority);
   const [open, setOpen] = React.useState(false);
 
@@ -259,7 +288,15 @@ function StatusGroup({
 }
 
 export function IssueList() {
-  const { data: issues, isLoading, error } = useIssues();
+  const queryClient = useQueryClient();
+  const {
+    data: issues,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ['issues'],
+    queryFn: () => api.listIssues(),
+  });
 
   if (isLoading) {
     return (
@@ -325,7 +362,7 @@ export function IssueList() {
   const groupedIssues = STATUS_OPTIONS.reduce(
     (acc, status) => {
       acc[status.value] = issues.filter(
-        (issue) => issue.todo_status === status.value
+        (issue: IssueWithOrganization) => issue.todo_status === status.value
       );
       return acc;
     },

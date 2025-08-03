@@ -1,6 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@workspace/ui/components/button';
 import {
   Form,
@@ -22,10 +23,10 @@ import { Textarea } from '@workspace/ui/components/textarea';
 import { MoreHorizontal, Paperclip, Tag, User } from 'lucide-react';
 import React from 'react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import { z } from 'zod';
-import { useCreateIssue } from '~/hooks/use-issues';
-import { useOrganizations } from '~/hooks/use-organizations';
 import { useUser } from '~/hooks/use-user';
+import { api, type CreateIssueData } from '~/lib/api';
 import {
   ISSUE_PRIORITY_OPTIONS as PRIORITY_OPTIONS,
   ISSUE_STATUS_OPTIONS as STATUS_OPTIONS,
@@ -65,12 +66,28 @@ export function CreateIssueDialog({
   setShowModal,
 }: CreateIssueDialogProps) {
   const { data: user } = useUser();
-  const { data: organizations } = useOrganizations();
+  const { data: organizations } = useQuery({
+    queryKey: ['organizations'],
+    queryFn: api.listOrganizations,
+  });
   const orgId = organizations?.[0]?.id;
 
   const [createMore, setCreateMore] = React.useState(false);
 
-  const createIssueMutation = useCreateIssue();
+  const queryClient = useQueryClient();
+
+  const createIssueMutation = useMutation({
+    mutationFn: (data: CreateIssueData) => api.createIssue(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['issues'] });
+      toast.success('Issue created successfully');
+    },
+    onError: (error) => {
+      console.error('[useCreateIssue] error:', error);
+      toast.error('Failed to create issue');
+    },
+  });
+
   const titleInputRef = React.useRef<HTMLInputElement>(null);
   const descriptionTextareaRef = React.useRef<HTMLTextAreaElement>(null);
 

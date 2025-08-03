@@ -1,6 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Badge } from '@workspace/ui/components/badge';
 import { Button } from '@workspace/ui/components/button';
 import {
@@ -16,9 +17,11 @@ import { Switch } from '@workspace/ui/components/switch';
 import { Textarea } from '@workspace/ui/components/textarea';
 import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import { z } from 'zod';
-import { useCreateOrganization } from '~/hooks/use-organizations';
 import { useUser } from '~/hooks/use-user';
+import { api } from '~/lib/api';
+import { getErrorMessage } from '~/lib/utils';
 import { Modal } from '../ui/modal';
 
 const organizationFormSchema = z.object({
@@ -42,7 +45,23 @@ export function CreateOrganizationDialog({
 
   const [createMore, setCreateMore] = useState(false);
 
-  const createOrgMutation = useCreateOrganization();
+  const queryClient = useQueryClient();
+
+  const createOrgMutation = useMutation({
+    mutationFn: api.createOrganization,
+    onMutate: () => {
+      toast.loading('Creating organization...');
+    },
+    onSuccess: (org) => {
+      toast.dismiss();
+      toast.success(`Organization "${org.name}" created`);
+      queryClient.invalidateQueries({ queryKey: ['organizations'] });
+    },
+    onError: (error) => {
+      toast.dismiss();
+      toast.error(getErrorMessage(error));
+    },
+  });
   const nameInputRef = useRef<HTMLInputElement>(null);
   const bioTextareaRef = useRef<HTMLTextAreaElement>(null);
   const logoUrlInputRef = useRef<HTMLInputElement>(null);

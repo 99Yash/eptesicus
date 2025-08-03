@@ -1,6 +1,6 @@
 'use client';
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button, buttonVariants } from '@workspace/ui/components/button';
 import { Kbd } from '@workspace/ui/components/kbd';
 import { cn } from '@workspace/ui/lib/utils';
@@ -10,13 +10,15 @@ import { toast } from 'sonner';
 import { CreateIssueDialog } from '~/components/issues/create-issue-dialog';
 import { IssueList } from '~/components/issues/issue-list';
 import { CreateOrganizationDialog } from '~/components/organizations/create-organization-dialog';
-import { useOrganizations } from '~/hooks/use-organizations';
 import { useUser } from '~/hooks/use-user';
 import { api } from '~/lib/api';
 
 export default function Page() {
   const { data: user } = useUser();
-  const { data: organizations } = useOrganizations();
+  const { data: organizations } = useQuery({
+    queryKey: ['organizations'],
+    queryFn: api.listOrganizations,
+  });
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [showCreateOrgDialog, setShowCreateOrgDialog] = useState(false);
 
