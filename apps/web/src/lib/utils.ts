@@ -85,108 +85,70 @@ export function getLocalStorageItem<K extends LocalStorageKey>(
   key: K,
   defaultValue?: LocalStorageValue<K>
 ): LocalStorageValue<K> | undefined {
-  try {
-    const serializedValue = localStorage.getItem(key);
-    const schema = LOCAL_STORAGE_SCHEMAS[key]; // Retrieve schema based on the key
+  const schema = LOCAL_STORAGE_SCHEMAS[key];
 
-    if (serializedValue === null) {
-      // Validate the provided default value against the schema
-      if (defaultValue !== undefined) {
-        const defaultValidation = schema.safeParse(defaultValue);
+  // Try to get the stored value
+  const serializedValue = localStorage.getItem(key);
 
-        if (defaultValidation.success) {
-          return defaultValidation.data;
-        } else {
-          console.error(
-            `[LocalStorageError] Provided default value for key "${key}" does not conform to schema.`,
-            `Default value:`,
-            defaultValue,
-            `Schema errors:`,
-            defaultValidation.error.issues
-          );
-          // Don't return invalid default value - let it fall through to schema default
-        }
+  // If no stored value, try to use default or schema default
+  if (serializedValue === null) {
+    // Validate provided default against schema
+    if (defaultValue !== undefined) {
+      const defaultResult = schema.safeParse(defaultValue);
+      if (defaultResult.success) {
+        return defaultResult.data;
       }
-
-      // Try to get schema default if no valid provided default
-      try {
-        const schemaDefault = schema.parse(undefined);
-        return schemaDefault;
-      } catch (schemaError) {
-        return undefined;
-      }
-    }
-
-    const parsedValue: unknown = JSON.parse(serializedValue);
-
-    // --- Core Protection: Zod Validation ---
-    const validationResult = schema.safeParse(parsedValue);
-
-    if (validationResult.success) {
-      return validationResult.data as LocalStorageValue<K>; // Data is valid and precisely typed
-    } else {
-      // Log the validation error for debugging purposes
-      console.warn(
-        `[LocalStorageValidation] Stored data for key "${key}" is invalid. ` +
-          `Attempting to use default value.`,
-        `Stored value:`,
-        parsedValue,
-        `Errors:`,
-        validationResult.error.issues
+      console.error(
+        `[LocalStorageError] Default value for key "${key}" does not conform to schema:`,
+        defaultResult.error.issues
       );
-
-      // If validation fails, validate and use provided default, then schema default
-      if (defaultValue !== undefined) {
-        const defaultValidation = schema.safeParse(defaultValue);
-
-        if (defaultValidation.success) {
-          return defaultValidation.data;
-        } else {
-          console.error(
-            `[LocalStorageError] Provided default value for key "${key}" does not conform to schema after stored value validation failed.`,
-            `Default value:`,
-            defaultValue,
-            `Schema errors:`,
-            defaultValidation.error.issues
-          );
-        }
-      }
-
-      // Try schema default as last resort
-      try {
-        const schemaDefault = schema.parse(undefined);
-        return schemaDefault;
-      } catch (schemaError) {
-        return undefined;
-      }
     }
+
+    // Try schema default as fallback
+    const schemaDefaultResult = schema.safeParse(undefined);
+    return schemaDefaultResult.success ? schemaDefaultResult.data : undefined;
+  }
+
+  // Parse the stored value
+  let parsedValue: unknown;
+  try {
+    parsedValue = JSON.parse(serializedValue);
   } catch (error) {
-    // This catch block handles JSON.parse errors or other unexpected issues
     console.error(
-      `[LocalStorageError] Failed to get or parse item for key "${key}":`,
+      `[LocalStorageError] Failed to parse stored value for key "${key}":`,
       error
     );
-
-    // Even on error, validate the default value if provided
-    if (defaultValue !== undefined) {
-      const schema = LOCAL_STORAGE_SCHEMAS[key];
-      const defaultValidation = schema.safeParse(defaultValue);
-
-      if (defaultValidation.success) {
-        return defaultValidation.data;
-      } else {
-        console.error(
-          `[LocalStorageError] Provided default value for key "${key}" does not conform to schema after error.`,
-          `Default value:`,
-          defaultValue,
-          `Schema errors:`,
-          defaultValidation.error.issues
-        );
-      }
-    }
-
-    return undefined;
+    return getLocalStorageItem(key, defaultValue); // Recursively try with default
   }
+
+  // Validate the parsed value against schema
+  const validationResult = schema.safeParse(parsedValue);
+
+  if (validationResult.success) {
+    return validationResult.data;
+  }
+
+  // Validation failed, log warning and try fallbacks
+  console.warn(
+    `[LocalStorageValidation] Stored data for key "${key}" is invalid:`,
+    validationResult.error.issues
+  );
+
+  // Try provided default
+  if (defaultValue !== undefined) {
+    const defaultResult = schema.safeParse(defaultValue);
+    if (defaultResult.success) {
+      return defaultResult.data;
+    }
+    console.error(
+      `[LocalStorageError] Default value for key "${key}" does not conform to schema:`,
+      defaultResult.error.issues
+    );
+  }
+
+  // Try schema default as last resort
+  const schemaDefaultResult = schema.safeParse(undefined);
+  return schemaDefaultResult.success ? schemaDefaultResult.data : undefined;
 }
 
 /**
