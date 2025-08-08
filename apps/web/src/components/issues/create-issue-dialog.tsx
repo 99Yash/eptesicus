@@ -11,6 +11,7 @@ import {
   FormMessage,
 } from '@workspace/ui/components/form';
 import { Input } from '@workspace/ui/components/input';
+import { Kbd } from '@workspace/ui/components/kbd';
 import {
   Select,
   SelectContent,
@@ -179,8 +180,12 @@ export function CreateIssueDialog({
             <div className="w-6 h-6 rounded flex items-center justify-center bg-primary/10">
               <div className="w-3 h-3 rounded-sm bg-primary" />
             </div>
-            <span className="">LAB</span>
-            <span className="text-muted">›</span>
+            <span className="text-muted-foreground uppercase">
+              {orgId.slice(0, 4)}
+            </span>
+            <span className="text-muted-foreground">
+              <Kbd>/</Kbd>
+            </span>
             <span>New issue</span>
           </div>
         </div>
