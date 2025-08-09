@@ -3,12 +3,12 @@ import { Router } from 'express';
 import z from 'zod/v4';
 import { issueController } from '../controllers/issue.controller';
 import { authenticate } from '../middlewares/authenticate';
-import { validate, validateParams } from '../middlewares/validate';
+import { validate } from '../middlewares/validate';
 
 export const issues: Router = Router({ mergeParams: true });
 
 const issueParamsSchema = z.object({
-  id: z.string().uuid(),
+  id: z.uuid(),
 });
 
 // Create
@@ -21,13 +21,16 @@ issues.post(
 issues.get('/', authenticate(issueController.listIssues));
 
 // Read
-issues.get('/:id', authenticate(issueController.getIssue));
+issues.get(
+  '/:id',
+  authenticate(validate(issueParamsSchema)(issueController.getIssue))
+);
 
 // Update
 issues.put(
   '/:id',
   authenticate(
-    validateParams(issueParamsSchema)(
+    validate(issueParamsSchema)(
       validate(issueUpdateSchema)(issueController.updateIssue)
     )
   )

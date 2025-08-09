@@ -109,9 +109,21 @@ class UserService {
 
     const wasCreated = !existingUser;
 
-    const [user] = existingUser
-      ? [existingUser]
-      : await db.insert(users).values(userToInsert).returning();
+    let user = existingUser as typeof existingUser | undefined;
+    if (!user) {
+      try {
+        [user] = await db.insert(users).values(userToInsert).returning();
+      } catch (e) {
+        if (isUniqueConstraintError(e)) {
+          // Could be username or email; adjust message if you inspect constraint name
+          throw new AppError({
+            code: 'BAD_REQUEST',
+            message: 'Username or email already taken',
+          });
+        }
+        throw e;
+      }
+    }
 
     if (!user) {
       throw new AppError({
@@ -282,12 +294,27 @@ class UserService {
     return user;
   }
 
-  async checkUsernameAvailability(username: string) {
+  async checkUsernameAvailability(username: string, currentUserId?: string) {
     if (!username || username.trim().length === 0) {
       return { available: false, message: 'Username cannot be empty' };
     }
 
     const trimmedUsername = username.trim().toLowerCase();
+
+    // If current user context is provided and username is unchanged, short-circuit as available
+    if (currentUserId) {
+      try {
+        const currentUser = await this.getUserById(currentUserId);
+        if (currentUser.username === trimmedUsername) {
+          console.log(
+            '[UserService] Availability short-circuit: same as current username'
+          );
+          return { available: true, message: 'You already have this username' };
+        }
+      } catch (_err) {
+        // If fetching current user fails, proceed with generic checks
+      }
+    }
 
     // Basic validation
     if (trimmedUsername.length < 3) {
@@ -337,6 +364,13 @@ class UserService {
     });
 
     if (existingUser) {
+      // If the only match is the same authenticated user, treat as available
+      if (currentUserId && existingUser.id === currentUserId) {
+        console.log(
+          '[UserService] Availability: username exists but belongs to current user'
+        );
+        return { available: true, message: 'You already have this username' };
+      }
       return { available: false, message: 'Username already taken' };
     }
 
@@ -344,8 +378,20 @@ class UserService {
   }
 
   async updateUsername(userId: string, newUsername: string) {
-    // Reuse validation rules
-    const availability = await this.checkUsernameAvailability(newUsername);
+    const normalized = newUsername.trim().toLowerCase();
+
+    // Short-circuit if unchanged
+    const currentUser = await this.getUserById(userId);
+    if (currentUser.username === normalized) {
+      console.log('[UserService] updateUsername short-circuit: unchanged');
+      return currentUser;
+    }
+
+    // Reuse validation rules with context of current user
+    const availability = await this.checkUsernameAvailability(
+      normalized,
+      userId
+    );
     if (!availability.available) {
       throw new AppError({
         code: 'BAD_REQUEST',
@@ -355,7 +401,6 @@ class UserService {
 
     // Update username for the authenticated user
     try {
-      const normalized = newUsername.trim().toLowerCase();
       const [updated] = await db
         .update(users)
         .set({ username: normalized })

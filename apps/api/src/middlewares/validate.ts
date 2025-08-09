@@ -96,19 +96,33 @@ export function validateParams<
   TReq extends Request = Request,
 >(
   schema: Schema,
-  handler: Handler<TReq>
-): (req: TReq, res: Response, next: NextFunction) => Promise<void>;
+  handler: Handler<TReq & ValidatedParamsRequest<Schema>>
+): (
+  req: TReq & ValidatedParamsRequest<Schema>,
+  res: Response,
+  next: NextFunction
+) => Promise<void>;
 export function validateParams<Schema extends z.ZodTypeAny>(
   schema: Schema
 ): <TReq extends Request>(
-  handler: Handler<TReq>
-) => (req: TReq, res: Response, next: NextFunction) => Promise<void>;
+  handler: Handler<TReq & ValidatedParamsRequest<Schema>>
+) => (
+  req: TReq & ValidatedParamsRequest<Schema>,
+  res: Response,
+  next: NextFunction
+) => Promise<void>;
 export function validateParams<Schema extends z.ZodTypeAny>(
   schema: Schema,
   handler?: Handler<any>
 ) {
-  const build = <TReq extends Request>(innerHandler: Handler<TReq>) => {
-    return async (req: TReq, res: Response, next: NextFunction) => {
+  const build = <TReq extends Request>(
+    innerHandler: Handler<TReq & ValidatedParamsRequest<Schema>>
+  ) => {
+    return async (
+      req: TReq & ValidatedParamsRequest<Schema>,
+      res: Response,
+      next: NextFunction
+    ) => {
       try {
         console.log('[validateParams] Validating request params');
         const result = schema.safeParse(req.params);
@@ -130,11 +144,13 @@ export function validateParams<Schema extends z.ZodTypeAny>(
 
         console.log('[validateParams] Request params validated');
 
-        (req as unknown as Request).params = result.data as any;
+        const typedReq = req as unknown as TReq &
+          ValidatedParamsRequest<Schema>;
+        typedReq.params = result.data as any;
 
         console.log('[validateParams] Calling handler');
 
-        await innerHandler(req, res, next);
+        await innerHandler(typedReq, res, next);
       } catch (error) {
         next(error);
       }
@@ -145,5 +161,7 @@ export function validateParams<Schema extends z.ZodTypeAny>(
     return build(handler);
   }
 
-  return <TReq extends Request>(inner: Handler<TReq>) => build(inner);
+  return <TReq extends Request>(
+    inner: Handler<TReq & ValidatedParamsRequest<Schema>>
+  ) => build(inner);
 }

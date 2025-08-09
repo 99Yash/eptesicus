@@ -6,7 +6,7 @@ import {
 import { NextFunction, Response } from 'express';
 import z from 'zod';
 import { AppError } from '../lib/error';
-import { generateEncryptedToken } from '../lib/jwt';
+import { generateEncryptedToken, verifyToken } from '../lib/jwt';
 import { AuthenticatedRequest } from '../middlewares/authenticate';
 import { ValidatedRequest } from '../middlewares/validate';
 import { cookieService } from '../services/cookie.service';
@@ -104,7 +104,30 @@ class UserController {
 
       console.log('[UserController] Checking username availability:', username);
 
-      const result = await userService.checkUsernameAvailability(username);
+      // Try to infer current user id if token cookie is present; ignore failures
+      let currentUserId: string | undefined;
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const anyReq = req as any;
+        const token = cookieService.getTokenCookie({ req: anyReq });
+        if (typeof token === 'string' && token.length > 0) {
+          const decoded = await verifyToken(token);
+          if (!decoded.is_expired) {
+            currentUserId = decoded.userId;
+            console.log(
+              '[UserController] checkUsernameAvailability inferred currentUserId:',
+              currentUserId
+            );
+          }
+        }
+      } catch (_err) {
+        // no-op
+      }
+
+      const result = await userService.checkUsernameAvailability(
+        username,
+        currentUserId
+      );
 
       res.status(200).json(result);
     } catch (error) {
