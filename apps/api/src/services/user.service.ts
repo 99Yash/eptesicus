@@ -52,8 +52,9 @@ class UserService {
     } else {
       // For new users, handle username generation/validation
       if (username && username.trim().length > 0) {
+        const normalized = username.trim().toLowerCase();
         const existingUsernameUser = await db.query.users.findFirst({
-          where: eq(users.username, username.trim()),
+          where: eq(users.username, normalized),
         });
 
         if (existingUsernameUser) {
@@ -62,14 +63,14 @@ class UserService {
             message: 'Username already taken',
           });
         }
-        finalUsername = username.trim();
+        finalUsername = normalized;
       } else {
         // Generate unique username using AI
         finalUsername = await generateUniqueUsername(name || email);
 
         // Double-check the generated username is still available (race condition protection)
         const existingUsernameUser = await db.query.users.findFirst({
-          where: eq(users.username, finalUsername),
+          where: eq(users.username, finalUsername.toLowerCase()),
         });
 
         if (existingUsernameUser) {
@@ -95,7 +96,7 @@ class UserService {
     const userToInsert = {
       email,
       name: finalName,
-      username: finalUsername,
+      username: finalUsername.toLowerCase(),
       image_url,
       bio,
       auth_provider,
@@ -286,7 +287,7 @@ class UserService {
       return { available: false, message: 'Username cannot be empty' };
     }
 
-    const trimmedUsername = username.trim();
+    const trimmedUsername = username.trim().toLowerCase();
 
     // Basic validation
     if (trimmedUsername.length < 3) {
@@ -326,7 +327,7 @@ class UserService {
       'root',
       'system',
     ];
-    if (reservedUsernames.includes(trimmedUsername.toLowerCase())) {
+    if (reservedUsernames.includes(trimmedUsername)) {
       return { available: false, message: 'This username is reserved' };
     }
 
@@ -354,9 +355,10 @@ class UserService {
 
     // Update username for the authenticated user
     try {
+      const normalized = newUsername.trim().toLowerCase();
       const [updated] = await db
         .update(users)
-        .set({ username: newUsername.trim() })
+        .set({ username: normalized })
         .where(eq(users.id, userId))
         .returning();
 

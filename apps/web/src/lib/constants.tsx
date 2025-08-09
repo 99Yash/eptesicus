@@ -20,7 +20,7 @@ export const LOCAL_STORAGE_SCHEMAS = {
 } as const;
 
 export const SESSION_STORAGE_SCHEMAS = {
-  SHOW_USERNAME_MODAL: z.boolean(),
+  SHOW_USERNAME_MODAL: z.boolean().default(false),
 } as const;
 
 export const ISSUE_STATUS_OPTIONS = [

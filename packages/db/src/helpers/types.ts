@@ -73,13 +73,19 @@ const RESERVED_USERNAMES = new Set([
 export const updateUsernameSchema = z.object({
   username: z
     .string()
-    .regex(/^[a-z0-9_]{3,30}$/i, {
-      message:
-        'Username must be 3-30 characters and contain only letters, numbers, or underscores',
-    })
-    .refine((value) => !RESERVED_USERNAMES.has(value.toLowerCase()), {
-      message: 'This username is reserved',
-    }),
+    .trim()
+    .transform((value) => value.toLowerCase())
+    .pipe(
+      z
+        .string()
+        .regex(/^[a-z0-9_]{3,30}$/u, {
+          message:
+            'Username must be 3-30 characters and contain only letters, numbers, or underscores',
+        })
+        .refine((value) => !RESERVED_USERNAMES.has(value.toLowerCase()), {
+          message: 'This username is reserved',
+        })
+    ),
 });
 
 export type UpdateUsernameType = z.infer<typeof updateUsernameSchema>;

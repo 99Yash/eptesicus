@@ -1,10 +1,15 @@
 import { issueCreateSchema, issueUpdateSchema } from '@workspace/db/helpers';
 import { Router } from 'express';
+import z from 'zod/v4';
 import { issueController } from '../controllers/issue.controller';
 import { authenticate } from '../middlewares/authenticate';
-import { validate } from '../middlewares/validate';
+import { validate, validateParams } from '../middlewares/validate';
 
 export const issues: Router = Router({ mergeParams: true });
+
+const issueParamsSchema = z.object({
+  id: z.string().uuid(),
+});
 
 // Create
 issues.post(
@@ -21,7 +26,11 @@ issues.get('/:id', authenticate(issueController.getIssue));
 // Update
 issues.put(
   '/:id',
-  authenticate(validate(issueUpdateSchema)(issueController.updateIssue))
+  authenticate(
+    validateParams(issueParamsSchema)(
+      validate(issueUpdateSchema)(issueController.updateIssue)
+    )
+  )
 );
 
 // Delete

@@ -39,19 +39,21 @@ const OAuthButton: React.FC<OAuthButtonProps> = ({ providerId, className }) => {
     }
   }, []);
 
-  if (!provider) {
-    return null;
-  }
-
   const oauthMutation = useMutation<Awaited<ReturnType<typeof oauthPopup>>>({
-    mutationFn: () => oauthPopup(provider),
+    mutationFn: () => {
+      const p = getProviderById(providerId);
+      if (!p) {
+        throw new Error('Provider not found');
+      }
+      return oauthPopup(p);
+    },
     onError(error: unknown) {
       toast.error(getErrorMessage(error));
     },
     onSuccess(result: Awaited<ReturnType<typeof oauthPopup>>) {
       setLocalStorageItem(
         'LAST_AUTH_METHOD',
-        provider.id.toUpperCase() as AuthOptionsType
+        providerId.toUpperCase() as AuthOptionsType
       );
       // Store a hint in sessionStorage to trigger username modal post-redirect
       if (result.wasCreated) {
@@ -61,6 +63,10 @@ const OAuthButton: React.FC<OAuthButtonProps> = ({ providerId, className }) => {
       router.push('/');
     },
   });
+
+  if (!provider) {
+    return null;
+  }
 
   const renderIcon = () => {
     if (provider.icon) {

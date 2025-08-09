@@ -178,6 +178,11 @@ export function setSessionStorageItem<K extends SessionStorageKey>(
   value: SessionStorageValue<K>
 ): void {
   try {
+    // SSR/edge-safe guard
+    if (typeof window === 'undefined' || !('sessionStorage' in window)) {
+      return;
+    }
+
     const schema = SESSION_STORAGE_SCHEMAS[key];
     const validationResult = schema.safeParse(value);
     if (!validationResult.success) {
@@ -204,8 +209,26 @@ export function getSessionStorageItem<K extends SessionStorageKey>(
   key: K,
   defaultValue?: SessionStorageValue<K>
 ): SessionStorageValue<K> | undefined {
+  // SSR/edge-safe guard
+  if (typeof window === 'undefined' || !('sessionStorage' in window)) {
+    const schema = SESSION_STORAGE_SCHEMAS[key];
+    const schemaDefaultResult = schema.safeParse(
+      defaultValue === undefined ? undefined : defaultValue
+    );
+    return schemaDefaultResult.success ? schemaDefaultResult.data : undefined;
+  }
+
   const schema = SESSION_STORAGE_SCHEMAS[key];
-  const serializedValue = sessionStorage.getItem(key);
+  let serializedValue: string | null = null;
+  try {
+    serializedValue = sessionStorage.getItem(key);
+  } catch (error) {
+    console.debug(
+      `[SessionStorageError] Failed to read item for key "${key}":`,
+      error
+    );
+  }
+
   if (serializedValue === null) {
     if (defaultValue !== undefined) {
       const defaultResult = schema.safeParse(defaultValue);
