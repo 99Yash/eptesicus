@@ -17,6 +17,7 @@ import {
   getErrorMessage,
   getLocalStorageItem,
   setLocalStorageItem,
+  setSessionStorageItem,
 } from '~/lib/utils';
 
 interface OAuthButtonProps {
@@ -42,24 +43,22 @@ const OAuthButton: React.FC<OAuthButtonProps> = ({ providerId, className }) => {
     return null;
   }
 
-  const oauthMutation = useMutation({
+  const oauthMutation = useMutation<Awaited<ReturnType<typeof oauthPopup>>>({
     mutationFn: () => oauthPopup(provider),
-    onError(error) {
+    onError(error: unknown) {
       toast.error(getErrorMessage(error));
     },
-    async onSuccess(result) {
+    onSuccess(result: Awaited<ReturnType<typeof oauthPopup>>) {
       setLocalStorageItem(
         'LAST_AUTH_METHOD',
         provider.id.toUpperCase() as AuthOptionsType
       );
+      // Store a hint in sessionStorage to trigger username modal post-redirect
+      if (result.wasCreated) {
+        setSessionStorageItem('SHOW_USERNAME_MODAL', true);
+      }
       // If first-time, home page will open the username modal; push regardless
       router.push('/');
-      // Store a hint in sessionStorage to trigger username modal post-redirect
-      if (result?.wasCreated) {
-        try {
-          sessionStorage.setItem('SHOW_USERNAME_MODAL', '1');
-        } catch {}
-      }
     },
   });
 

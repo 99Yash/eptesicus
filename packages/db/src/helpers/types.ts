@@ -46,6 +46,44 @@ export const verifyEmailSchema = z.object({
 
 export type VerifyEmailType = z.infer<typeof verifyEmailSchema>;
 
+// Reserved usernames that cannot be claimed by users
+const RESERVED_USERNAMES = new Set([
+  'admin',
+  'root',
+  'support',
+  'help',
+  'api',
+  'auth',
+  'login',
+  'logout',
+  'signup',
+  'user',
+  'users',
+  'me',
+  'settings',
+  'about',
+  'contact',
+  'privacy',
+  'terms',
+  'status',
+  'dashboard',
+]);
+
+// Schema for updating the username with strict constraints to prevent XSS and invalid names
+export const updateUsernameSchema = z.object({
+  username: z
+    .string()
+    .regex(/^[a-z0-9_]{3,30}$/i, {
+      message:
+        'Username must be 3-30 characters and contain only letters, numbers, or underscores',
+    })
+    .refine((value) => !RESERVED_USERNAMES.has(value.toLowerCase()), {
+      message: 'This username is reserved',
+    }),
+});
+
+export type UpdateUsernameType = z.infer<typeof updateUsernameSchema>;
+
 // -------------------- Schema Helpers --------------------
 
 /**

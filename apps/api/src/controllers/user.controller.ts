@@ -1,4 +1,8 @@
-import { userInsertSchema, verifyEmailSchema } from '@workspace/db/helpers';
+import {
+  updateUsernameSchema,
+  userInsertSchema,
+  verifyEmailSchema,
+} from '@workspace/db/helpers';
 import { NextFunction, Response } from 'express';
 import z from 'zod';
 import { AppError } from '../lib/error';
@@ -113,23 +117,24 @@ class UserController {
   }
 
   async updateUsername(
-    req: AuthenticatedRequest,
+    req: AuthenticatedRequest & ValidatedRequest<typeof updateUsernameSchema>,
     res: Response,
     next: NextFunction
   ): Promise<void> {
     try {
-      const parsed = z.object({ username: z.string() }).safeParse(req.body);
-
-      if (!parsed.success) {
-        throw new AppError({
-          code: 'BAD_REQUEST',
-          message: 'Invalid username',
-        });
+      if (!req.userId) {
+        throw new AppError({ code: 'UNAUTHORIZED', message: 'Unauthorized' });
       }
+
+      const { username } = req.body;
+      console.log('[UserController] updateUsername', {
+        userId: req.userId,
+        username,
+      });
 
       const updatedUser = await userService.updateUsername(
         req.userId,
-        parsed.data.username
+        username
       );
 
       res.status(200).json(updatedUser);

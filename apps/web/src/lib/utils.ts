@@ -4,6 +4,9 @@ import {
   LOCAL_STORAGE_SCHEMAS,
   LocalStorageKey,
   LocalStorageValue,
+  SESSION_STORAGE_SCHEMAS,
+  SessionStorageKey,
+  SessionStorageValue,
 } from './constants';
 
 export const unknownError = 'Something went wrong. Please try again.';
@@ -162,6 +165,101 @@ export function removeLocalStorageItem(key: LocalStorageKey): void {
   } catch (error) {
     console.error(
       `[LocalStorageError] Failed to remove item for key "${key}":`,
+      error
+    );
+  }
+}
+
+/**
+ * Sets an item in sessionStorage with schema validation, mirroring localStorage helpers.
+ */
+export function setSessionStorageItem<K extends SessionStorageKey>(
+  key: K,
+  value: SessionStorageValue<K>
+): void {
+  try {
+    const schema = SESSION_STORAGE_SCHEMAS[key];
+    const validationResult = schema.safeParse(value);
+    if (!validationResult.success) {
+      console.error(
+        `[SessionStorageError] Type mismatch or invalid value for key "${key}":`,
+        validationResult.error.issues
+      );
+      return;
+    }
+    const serializedValue = JSON.stringify(validationResult.data);
+    sessionStorage.setItem(key, serializedValue);
+  } catch (error) {
+    console.debug(
+      `[SessionStorageError] Failed to set item for key "${key}":`,
+      error
+    );
+  }
+}
+
+/**
+ * Retrieves a sessionStorage value with runtime validation, mirroring localStorage helpers.
+ */
+export function getSessionStorageItem<K extends SessionStorageKey>(
+  key: K,
+  defaultValue?: SessionStorageValue<K>
+): SessionStorageValue<K> | undefined {
+  const schema = SESSION_STORAGE_SCHEMAS[key];
+  const serializedValue = sessionStorage.getItem(key);
+  if (serializedValue === null) {
+    if (defaultValue !== undefined) {
+      const defaultResult = schema.safeParse(defaultValue);
+      if (defaultResult.success) return defaultResult.data;
+      console.error(
+        `[SessionStorageError] Default value for key "${key}" does not conform to schema:`,
+        defaultResult.error.issues
+      );
+    }
+    const schemaDefaultResult = schema.safeParse(undefined);
+    return schemaDefaultResult.success ? schemaDefaultResult.data : undefined;
+  }
+
+  let parsedValue: unknown;
+  try {
+    parsedValue = JSON.parse(serializedValue);
+  } catch (error) {
+    console.debug(
+      `[SessionStorageError] Failed to parse stored value for key "${key}":`,
+      error
+    );
+    return getSessionStorageItem(key, defaultValue);
+  }
+
+  const validationResult = schema.safeParse(parsedValue);
+  if (validationResult.success) return validationResult.data;
+
+  console.warn(
+    `[SessionStorageValidation] Stored data for key "${key}" is invalid:`,
+    validationResult.error.issues
+  );
+
+  if (defaultValue !== undefined) {
+    const defaultResult = schema.safeParse(defaultValue);
+    if (defaultResult.success) return defaultResult.data;
+    console.error(
+      `[SessionStorageError] Default value for key "${key}" does not conform to schema:`,
+      defaultResult.error.issues
+    );
+  }
+
+  const schemaDefaultResult = schema.safeParse(undefined);
+  return schemaDefaultResult.success ? schemaDefaultResult.data : undefined;
+}
+
+/**
+ * Removes an item from sessionStorage under the given key.
+ */
+export function removeSessionStorageItem(key: SessionStorageKey): void {
+  try {
+    sessionStorage.removeItem(key);
+  } catch (error) {
+    console.debug(
+      `[SessionStorageError] Failed to remove item for key "${key}":`,
       error
     );
   }

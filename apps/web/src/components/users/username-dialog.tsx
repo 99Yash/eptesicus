@@ -17,7 +17,7 @@ import { toast } from 'sonner';
 import { z } from 'zod';
 import { useUser } from '~/hooks/use-user';
 import { api } from '~/lib/api';
-import { getErrorMessage } from '~/lib/utils';
+import { getErrorMessage, removeSessionStorageItem } from '~/lib/utils';
 import { Modal } from '../ui/modal';
 
 const usernameSchema = z
@@ -37,7 +37,7 @@ export function UsernameDialog({
   setShowModal,
 }: {
   showModal: boolean;
-  setShowModal: (open: boolean) => void;
+  setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const { data: user } = useUser();
   const queryClient = useQueryClient();
@@ -83,9 +83,7 @@ export function UsernameDialog({
     onSuccess: () => {
       toast.dismiss();
       toast.success('Username updated');
-      try {
-        sessionStorage.removeItem('SHOW_USERNAME_MODAL');
-      } catch {}
+      removeSessionStorageItem('SHOW_USERNAME_MODAL');
       queryClient.invalidateQueries({ queryKey: ['user'] });
       setShowModal(false);
     },

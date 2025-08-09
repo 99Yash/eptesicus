@@ -47,7 +47,8 @@ export default function Page() {
     if (user && organizations && organizations.length === 0) {
       let wantsUsername = false;
       try {
-        wantsUsername = sessionStorage.getItem('SHOW_USERNAME_MODAL') === '1';
+        const flag = sessionStorage.getItem('SHOW_USERNAME_MODAL');
+        wantsUsername = flag ? JSON.parse(flag) === true : false;
       } catch {}
       if (!wantsUsername && !showUsernameDialog) {
         setShowCreateOrgDialog(true);
@@ -60,7 +61,7 @@ export default function Page() {
     if (!user) return;
     try {
       const flag = sessionStorage.getItem('SHOW_USERNAME_MODAL');
-      if (flag === '1') {
+      if (flag ? JSON.parse(flag) === true : false) {
         setShowUsernameDialog(true);
       }
     } catch {}

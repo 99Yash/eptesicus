@@ -55,13 +55,13 @@ class API {
   }
 
   async verifyEmail({ email, code }: { email: string; code: string }) {
-    const response = await _axios.post<{ user: User; token: string }>(
-      '/auth/verify-email',
-      {
-        email,
-        code,
-      }
-    );
+    const response = await _axios.post<{
+      user: User & { __wasCreated?: boolean };
+      token: string;
+    }>('/auth/verify-email', {
+      email,
+      code,
+    });
     return response.data;
   }
 

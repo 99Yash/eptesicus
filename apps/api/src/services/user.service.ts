@@ -9,6 +9,14 @@ import { sendEmail } from '../lib/email';
 import { AppError } from '../lib/error';
 import { generateUniqueUsername } from './ai.service';
 
+function isUniqueConstraintError(error: unknown): boolean {
+  // Postgres unique_violation: 23505
+  return (
+    typeof (error as { code?: string } | null | undefined)?.code === 'string' &&
+    (error as { code?: string }).code === '23505'
+  );
+}
+
 class UserService {
   async upsertUser(
     args: UserInsertType & {
@@ -92,7 +100,11 @@ class UserService {
       bio,
       auth_provider,
     };
-    console.log('[UserService] Inserting user:', userToInsert);
+    console.log('[UserService] upsertUser start', {
+      email,
+      hasExistingUser: !!existingUser,
+      auth_provider,
+    });
 
     const wasCreated = !existingUser;
 
@@ -109,6 +121,10 @@ class UserService {
 
     // Skip email verification flow when not required (e.g., social login)
     if (!sendVerificationEmail) {
+      console.log('[UserService] Skipping email verification send', {
+        email,
+        reason: 'sendVerificationEmail=false',
+      });
       return { user, wasCreated };
     }
 
@@ -177,6 +193,7 @@ class UserService {
       `,
     });
 
+    console.log('[UserService] Verification email sent', { email });
     return { user, wasCreated };
   }
 
@@ -197,7 +214,7 @@ class UserService {
 
   async verifyEmail(args: VerifyEmailType) {
     const { email, code } = args;
-    console.log('[UserService] Verifying email:', email, 'with code:', code);
+    console.log('[UserService] Verifying email attempt', { email });
 
     const verification_code = await db.query.email_verification_codes.findFirst(
       {
@@ -209,7 +226,7 @@ class UserService {
     );
 
     if (!verification_code) {
-      console.log('[UserService] Invalid verification code for:', email);
+      console.warn('[UserService] Invalid verification code', { email });
       throw new AppError({
         code: 'NOT_FOUND',
         message: 'Invalid verification code',
@@ -217,14 +234,14 @@ class UserService {
     }
 
     if (verification_code.expires_at < new Date()) {
-      console.log('[UserService] Expired verification code for:', email);
+      console.warn('[UserService] Expired verification code', { email });
       throw new AppError({
         code: 'BAD_REQUEST',
         message: 'Verification code expired',
       });
     }
 
-    console.log('[UserService] Verification successful for:', email);
+    console.log('[UserService] Verification successful', { email });
     // Delete the verification code after successful verification
     await db
       .delete(email_verification_codes)
@@ -336,20 +353,31 @@ class UserService {
     }
 
     // Update username for the authenticated user
-    const [updated] = await db
-      .update(users)
-      .set({ username: newUsername.trim() })
-      .where(eq(users.id, userId))
-      .returning();
+    try {
+      const [updated] = await db
+        .update(users)
+        .set({ username: newUsername.trim() })
+        .where(eq(users.id, userId))
+        .returning();
 
-    if (!updated) {
-      throw new AppError({
-        code: 'INTERNAL_SERVER_ERROR',
-        message: 'Failed to update username',
-      });
+      if (!updated) {
+        throw new AppError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to update username',
+        });
+      }
+
+      return updated;
+    } catch (error) {
+      if (isUniqueConstraintError(error)) {
+        // Another concurrent request claimed this username between availability check and update
+        throw new AppError({
+          code: 'BAD_REQUEST',
+          message: 'Username already taken',
+        });
+      }
+      throw error;
     }
-
-    return updated;
   }
 }
 
