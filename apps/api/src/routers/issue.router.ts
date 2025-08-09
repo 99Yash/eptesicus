@@ -9,7 +9,7 @@ export const issues: Router = Router({ mergeParams: true });
 // Create
 issues.post(
   '/',
-  validate(issueCreateSchema, authenticate(issueController.createIssue))
+  authenticate(validate(issueCreateSchema)(issueController.createIssue))
 );
 
 // List
@@ -21,7 +21,7 @@ issues.get('/:id', authenticate(issueController.getIssue));
 // Update
 issues.put(
   '/:id',
-  validate(issueUpdateSchema, authenticate(issueController.updateIssue))
+  authenticate(validate(issueUpdateSchema)(issueController.updateIssue))
 );
 
 // Delete

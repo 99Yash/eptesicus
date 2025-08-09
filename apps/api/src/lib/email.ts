@@ -25,22 +25,14 @@ export async function sendEmail({
       console.error('[email] Failed to send email', { to, subject, error });
       throw new AppError({
         code: 'INTERNAL_SERVER_ERROR',
-        message: `Failed to send email to ${to}`,
+        message: `Failed to send email`,
         cause: error,
       });
     }
-
-    // Log the successful send for observability
-    console.log('[email] Email dispatched', {
-      to,
-      subject,
-      id: (data as any)?.id,
-    });
   } catch (error) {
-    console.error('[email] Error while sending email', { to, subject, error });
     throw new AppError({
       code: 'INTERNAL_SERVER_ERROR',
-      message: `Failed to send email to ${to}`,
+      message: `Failed to send email`,
       cause: error,
     });
   }

@@ -15,5 +15,5 @@ users.get(
 
 users.put(
   '/username',
-  validate(updateUsernameSchema, authenticate(userController.updateUsername))
+  authenticate(validate(updateUsernameSchema)(userController.updateUsername))
 );
