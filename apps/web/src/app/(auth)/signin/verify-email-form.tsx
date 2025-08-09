@@ -11,7 +11,7 @@ import React from 'react';
 import { toast } from 'sonner';
 import z from 'zod';
 import { api } from '~/lib/api';
-import { getErrorMessage } from '~/lib/utils';
+import { getErrorMessage, setSessionStorageItem } from '~/lib/utils';
 
 const verifyEmailSchema = z.object({
   code: z.string().min(8, 'Code must be 8 digits'),
@@ -31,8 +31,12 @@ export function VerifyEmailForm({ email }: VerifyEmailFormProps) {
     onError(error) {
       toast.error(getErrorMessage(error));
     },
-    onSuccess() {
+    onSuccess(data) {
       toast.success('Email verified');
+      // If this verification just created the user (first time), mark to show username modal
+      if (data?.user.__wasCreated) {
+        setSessionStorageItem('SHOW_USERNAME_MODAL', true);
+      }
       router.push('/');
     },
   });
