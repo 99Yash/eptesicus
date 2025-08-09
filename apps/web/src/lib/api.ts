@@ -51,7 +51,7 @@ class API {
       username,
     });
 
-    return response.data;
+    return { ...response.data, wasCreated: response.status === 201 };
   }
 
   async verifyEmail({ email, code }: { email: string; code: string }) {
@@ -86,6 +86,11 @@ class API {
       available: boolean;
       message: string;
     }>(`/users/check-username/${username}`);
+    return response.data;
+  }
+
+  async updateUsername(username: string) {
+    const response = await _axios.put<User>('/users/username', { username });
     return response.data;
   }
 

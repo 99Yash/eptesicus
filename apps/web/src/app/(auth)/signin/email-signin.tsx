@@ -39,10 +39,16 @@ export function EmailSignIn({ onSuccess }: EmailSignInProps) {
     onError(error) {
       toast.error(getErrorMessage(error));
     },
-    onSuccess(_data, variables) {
+    onSuccess(data, variables) {
       // Persist last used auth method
       if (typeof window !== 'undefined') {
         setLocalStorageItem('LAST_AUTH_METHOD', 'EMAIL');
+        // If first-time signup (201), set flag to show username modal after verification
+        try {
+          if ((data as any)?.wasCreated) {
+            sessionStorage.setItem('SHOW_USERNAME_MODAL', '1');
+          }
+        } catch {}
       }
       onSuccess(variables.email);
       toast.info(`Please check your inbox for further instructions.`);

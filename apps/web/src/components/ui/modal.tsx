@@ -27,6 +27,7 @@ export function Modal({
   onClose,
   desktopOnly,
   preventDefaultClose,
+  persistent,
 }: {
   children: React.ReactNode;
   className?: string;
@@ -35,11 +36,12 @@ export function Modal({
   onClose?: () => void;
   desktopOnly?: boolean;
   preventDefaultClose?: boolean;
+  persistent?: boolean;
 }) {
   const router = useRouter();
 
   const closeModal = ({ dragged }: { dragged?: boolean } = {}) => {
-    if (preventDefaultClose && !dragged) {
+    if (persistent || preventDefaultClose) {
       return;
     }
     // fire onClose event if provided

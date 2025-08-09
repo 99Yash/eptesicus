@@ -32,7 +32,7 @@ passport.use(
           // Fallback to the local-part of the email (before the @) when username is absent.
           profile.username ?? profile.emails[0].value.split('@')[0];
 
-        const user = await userService.upsertUser({
+        const result = await userService.upsertUser({
           email: profile.emails[0].value,
           name: profile.displayName,
           username,
@@ -41,8 +41,8 @@ passport.use(
           auth_provider: 'GOOGLE',
         });
 
-        // Complete the Passport flow. We don’t use sessions, so the user is just attached to req.user
-        return done(null, user);
+        // Complete the Passport flow. Attach marker for first-time creation.
+        return done(null, { ...result.user, __wasCreated: result.wasCreated });
       } catch (error) {
         // Forward any errors (e.g., email exists with different provider) to Passport
         return done(error as Error, undefined);
@@ -82,7 +82,7 @@ passport.use(
 
         const username = profile.username ?? email.split('@')[0];
 
-        const user = await userService.upsertUser({
+        const result = await userService.upsertUser({
           email,
           name: profile.displayName ?? username,
           username,
@@ -91,7 +91,7 @@ passport.use(
           auth_provider: 'GITHUB',
         });
 
-        return done(null, user);
+        return done(null, { ...result.user, __wasCreated: result.wasCreated });
       } catch (error) {
         return done(error as Error, undefined);
       }

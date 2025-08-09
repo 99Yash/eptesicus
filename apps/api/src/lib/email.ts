@@ -24,14 +24,14 @@ export async function sendEmail({
     if (error) {
       throw new AppError({
         code: 'INTERNAL_SERVER_ERROR',
-        message: `Failed to send email to ${to}: Subject: ${subject}`,
+        message: `Failed to send email to ${to}`,
         cause: error,
       });
     }
   } catch (error) {
     throw new AppError({
       code: 'INTERNAL_SERVER_ERROR',
-      message: `Failed to send email to ${to}: Subject: ${subject}`,
+      message: `Failed to send email to ${to}`,
       cause: error,
     });
   }

@@ -77,6 +77,7 @@ auth.get('/google/callback', (req, res, next) => {
     const { success, data } = z
       .object({
         id: z.string(),
+        __wasCreated: z.boolean().optional(),
       })
       .safeParse(user);
 
@@ -102,8 +103,10 @@ auth.get('/google/callback', (req, res, next) => {
     cookieService.setTokenCookie({ res, token });
     console.log('[auth.router] Token cookie set');
 
-    // Send success payload via postMessage HTML
-    return res.status(200).send(buildHtml({ ok: true }));
+    // Send success payload via postMessage HTML, include first-time marker
+    return res
+      .status(200)
+      .send(buildHtml({ ok: true, wasCreated: !!data.__wasCreated }));
   })(req, res, next);
 });
 
@@ -159,6 +162,7 @@ auth.get('/github/callback', (req, res, next) => {
       const { success, data } = z
         .object({
           id: z.string(),
+          __wasCreated: z.boolean().optional(),
         })
         .safeParse(user);
 
@@ -186,7 +190,9 @@ auth.get('/github/callback', (req, res, next) => {
       console.log('[auth.router] Token cookie set');
 
       // Send success payload via postMessage HTML
-      return res.status(200).send(buildHtml({ ok: true }));
+      return res
+        .status(200)
+        .send(buildHtml({ ok: true, wasCreated: !!data.__wasCreated }));
     }
   )(req, res, next);
 });

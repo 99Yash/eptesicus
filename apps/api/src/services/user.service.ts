@@ -94,6 +94,8 @@ class UserService {
     };
     console.log('[UserService] Inserting user:', userToInsert);
 
+    const wasCreated = !existingUser;
+
     const [user] = existingUser
       ? [existingUser]
       : await db.insert(users).values(userToInsert).returning();
@@ -107,7 +109,7 @@ class UserService {
 
     // Skip email verification flow when not required (e.g., social login)
     if (!sendVerificationEmail) {
-      return user;
+      return { user, wasCreated };
     }
 
     // Check if there's an existing verification code and if it's expired
@@ -175,7 +177,7 @@ class UserService {
       `,
     });
 
-    return user;
+    return { user, wasCreated };
   }
 
   async getUser(id: string) {
@@ -321,6 +323,33 @@ class UserService {
     }
 
     return { available: true, message: 'Username is available' };
+  }
+
+  async updateUsername(userId: string, newUsername: string) {
+    // Reuse validation rules
+    const availability = await this.checkUsernameAvailability(newUsername);
+    if (!availability.available) {
+      throw new AppError({
+        code: 'BAD_REQUEST',
+        message: availability.message,
+      });
+    }
+
+    // Update username for the authenticated user
+    const [updated] = await db
+      .update(users)
+      .set({ username: newUsername.trim() })
+      .where(eq(users.id, userId))
+      .returning();
+
+    if (!updated) {
+      throw new AppError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Failed to update username',
+      });
+    }
+
+    return updated;
   }
 }
 

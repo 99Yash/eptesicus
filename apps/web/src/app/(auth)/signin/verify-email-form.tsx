@@ -31,8 +31,14 @@ export function VerifyEmailForm({ email }: VerifyEmailFormProps) {
     onError(error) {
       toast.error(getErrorMessage(error));
     },
-    onSuccess() {
+    onSuccess(data) {
       toast.success('Email verified');
+      // If this verification just created the user (first time), mark to show username modal
+      try {
+        if ((data as any)?.wasCreated) {
+          sessionStorage.setItem('SHOW_USERNAME_MODAL', '1');
+        }
+      } catch {}
       router.push('/');
     },
   });

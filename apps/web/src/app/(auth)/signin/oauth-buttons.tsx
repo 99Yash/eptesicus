@@ -47,12 +47,19 @@ const OAuthButton: React.FC<OAuthButtonProps> = ({ providerId, className }) => {
     onError(error) {
       toast.error(getErrorMessage(error));
     },
-    async onSuccess() {
+    async onSuccess(result) {
       setLocalStorageItem(
         'LAST_AUTH_METHOD',
         provider.id.toUpperCase() as AuthOptionsType
       );
+      // If first-time, home page will open the username modal; push regardless
       router.push('/');
+      // Store a hint in sessionStorage to trigger username modal post-redirect
+      if (result?.wasCreated) {
+        try {
+          sessionStorage.setItem('SHOW_USERNAME_MODAL', '1');
+        } catch {}
+      }
     },
   });
 

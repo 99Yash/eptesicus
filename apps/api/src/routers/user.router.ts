@@ -10,3 +10,5 @@ users.get(
   '/check-username/:username',
   userController.checkUsernameAvailability
 );
+
+users.put('/username', authenticate(userController.updateUsername));

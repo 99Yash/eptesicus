@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { CreateIssueDialog } from '~/components/issues/create-issue-dialog';
 import { IssueList } from '~/components/issues/issue-list';
 import { CreateOrganizationDialog } from '~/components/organizations/create-organization-dialog';
+import { UsernameDialog } from '~/components/users/username-dialog';
 import { useUser } from '~/hooks/use-user';
 import { api } from '~/lib/api';
 
@@ -21,6 +22,7 @@ export default function Page() {
   });
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [showCreateOrgDialog, setShowCreateOrgDialog] = useState(false);
+  const [showUsernameDialog, setShowUsernameDialog] = useState(false);
 
   const queryClient = useQueryClient();
 
@@ -43,9 +45,26 @@ export default function Page() {
   // Show organization dialog if user has none
   useEffect(() => {
     if (user && organizations && organizations.length === 0) {
-      setShowCreateOrgDialog(true);
+      let wantsUsername = false;
+      try {
+        wantsUsername = sessionStorage.getItem('SHOW_USERNAME_MODAL') === '1';
+      } catch {}
+      if (!wantsUsername && !showUsernameDialog) {
+        setShowCreateOrgDialog(true);
+      }
     }
-  }, [user, organizations]);
+  }, [user, organizations, showUsernameDialog]);
+
+  // Show username dialog on first sign-in (flag set by auth flows)
+  useEffect(() => {
+    if (!user) return;
+    try {
+      const flag = sessionStorage.getItem('SHOW_USERNAME_MODAL');
+      if (flag === '1') {
+        setShowUsernameDialog(true);
+      }
+    } catch {}
+  }, [user]);
 
   // Keyboard shortcut handler
   useEffect(() => {
@@ -136,6 +155,11 @@ export default function Page() {
       <CreateOrganizationDialog
         showModal={showCreateOrgDialog}
         setShowModal={setShowCreateOrgDialog}
+      />
+
+      <UsernameDialog
+        showModal={showUsernameDialog}
+        setShowModal={setShowUsernameDialog}
       />
     </>
   );

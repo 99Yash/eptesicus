@@ -111,6 +111,32 @@ class UserController {
       next(error);
     }
   }
+
+  async updateUsername(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const parsed = z.object({ username: z.string() }).safeParse(req.body);
+
+      if (!parsed.success) {
+        throw new AppError({
+          code: 'BAD_REQUEST',
+          message: 'Invalid username',
+        });
+      }
+
+      const updatedUser = await userService.updateUsername(
+        req.userId,
+        parsed.data.username
+      );
+
+      res.status(200).json(updatedUser);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export const userController = new UserController();
