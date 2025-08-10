@@ -12,10 +12,8 @@ import {
   FormMessage,
 } from '@workspace/ui/components/form';
 import { Input } from '@workspace/ui/components/input';
-import { Label } from '@workspace/ui/components/label';
-import { Switch } from '@workspace/ui/components/switch';
 import { Textarea } from '@workspace/ui/components/textarea';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
@@ -42,8 +40,6 @@ export function CreateOrganizationDialog({
   setShowModal,
 }: CreateOrganizationDialogProps) {
   const { data: user } = useUser();
-
-  const [createMore, setCreateMore] = useState(false);
 
   const queryClient = useQueryClient();
 
@@ -120,9 +116,7 @@ export function CreateOrganizationDialog({
       });
 
       setShowModal(false);
-      if (!createMore) {
-        form.reset();
-      }
+      form.reset();
     } catch (error) {
       // handled in hook
     }
@@ -130,9 +124,7 @@ export function CreateOrganizationDialog({
 
   const handleClose = () => {
     setShowModal(false);
-    if (!createMore) {
-      form.reset();
-    }
+    form.reset();
   };
 
   return (
@@ -258,15 +250,6 @@ export function CreateOrganizationDialog({
                   ? 'Creating...'
                   : 'Create Organization'}
               </Button>
-              {/* Create more toggle */}
-              <div className="ml-auto flex items-center gap-2 text-sm">
-                <Label htmlFor="create-more">Create more</Label>
-                <Switch
-                  id="create-more"
-                  checked={createMore}
-                  onCheckedChange={setCreateMore}
-                />
-              </div>
             </div>
           </form>
         </Form>
