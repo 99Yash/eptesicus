@@ -13,7 +13,7 @@ import {
 } from '@workspace/ui/components/form';
 import { Input } from '@workspace/ui/components/input';
 import { Textarea } from '@workspace/ui/components/textarea';
-import { useEffect, useRef } from 'react';
+import React from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
@@ -60,9 +60,9 @@ export function CreateOrganizationDialog({
     },
   });
 
-  const nameInputRef = useRef<HTMLInputElement>(null);
-  const bioTextareaRef = useRef<HTMLTextAreaElement>(null);
-  const logoUrlInputRef = useRef<HTMLInputElement>(null);
+  const nameInputRef = React.useRef<HTMLInputElement>(null);
+  const bioTextareaRef = React.useRef<HTMLTextAreaElement>(null);
+  const logoUrlInputRef = React.useRef<HTMLInputElement>(null);
 
   const form = useForm<OrganizationFormValues>({
     resolver: zodResolver(organizationFormSchema),
@@ -74,7 +74,7 @@ export function CreateOrganizationDialog({
   });
 
   // Focus name input when modal opens
-  useEffect(() => {
+  React.useEffect(() => {
     if (showModal && nameInputRef.current) {
       nameInputRef.current.focus();
     }
