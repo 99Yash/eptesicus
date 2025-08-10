@@ -88,7 +88,9 @@ export function validate<Schema extends z.ZodTypeAny>(
     return build(handler);
   }
 
-  return <TReq extends Request>(inner: Handler<TReq>) => build(inner);
+  return <TReq extends Request>(
+    inner: Handler<TReq & ValidatedRequest<Schema>>
+  ) => build(inner);
 }
 
 export function validateParams<
