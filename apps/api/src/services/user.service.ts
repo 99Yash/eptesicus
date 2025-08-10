@@ -9,6 +9,14 @@ import { sendEmail } from '../lib/email';
 import { AppError } from '../lib/error';
 import { generateUniqueUsername } from './ai.service';
 
+function isUniqueConstraintError(error: unknown): boolean {
+  // Postgres unique_violation: 23505
+  return (
+    typeof (error as { code?: string } | null | undefined)?.code === 'string' &&
+    (error as { code?: string }).code === '23505'
+  );
+}
+
 class UserService {
   async upsertUser(
     args: UserInsertType & {
@@ -44,8 +52,9 @@ class UserService {
     } else {
       // For new users, handle username generation/validation
       if (username && username.trim().length > 0) {
+        const normalized = username.trim().toLowerCase();
         const existingUsernameUser = await db.query.users.findFirst({
-          where: eq(users.username, username.trim()),
+          where: eq(users.username, normalized),
         });
 
         if (existingUsernameUser) {
@@ -54,14 +63,14 @@ class UserService {
             message: 'Username already taken',
           });
         }
-        finalUsername = username.trim();
+        finalUsername = normalized;
       } else {
         // Generate unique username using AI
         finalUsername = await generateUniqueUsername(name || email);
 
         // Double-check the generated username is still available (race condition protection)
         const existingUsernameUser = await db.query.users.findFirst({
-          where: eq(users.username, finalUsername),
+          where: eq(users.username, finalUsername.toLowerCase()),
         });
 
         if (existingUsernameUser) {
@@ -87,16 +96,34 @@ class UserService {
     const userToInsert = {
       email,
       name: finalName,
-      username: finalUsername,
+      username: finalUsername.toLowerCase(),
       image_url,
       bio,
       auth_provider,
     };
-    console.log('[UserService] Inserting user:', userToInsert);
+    console.log('[UserService] upsertUser start', {
+      email,
+      hasExistingUser: !!existingUser,
+      auth_provider,
+    });
 
-    const [user] = existingUser
-      ? [existingUser]
-      : await db.insert(users).values(userToInsert).returning();
+    const wasCreated = !existingUser;
+
+    let user = existingUser as typeof existingUser | undefined;
+    if (!user) {
+      try {
+        [user] = await db.insert(users).values(userToInsert).returning();
+      } catch (e) {
+        if (isUniqueConstraintError(e)) {
+          // Could be username or email; adjust message if you inspect constraint name
+          throw new AppError({
+            code: 'BAD_REQUEST',
+            message: 'Username or email already taken',
+          });
+        }
+        throw e;
+      }
+    }
 
     if (!user) {
       throw new AppError({
@@ -107,7 +134,11 @@ class UserService {
 
     // Skip email verification flow when not required (e.g., social login)
     if (!sendVerificationEmail) {
-      return user;
+      console.log('[UserService] Skipping email verification send', {
+        email,
+        reason: 'sendVerificationEmail=false',
+      });
+      return { user, wasCreated };
     }
 
     // Check if there's an existing verification code and if it's expired
@@ -175,7 +206,8 @@ class UserService {
       `,
     });
 
-    return user;
+    console.log('[UserService] Verification email sent', { email });
+    return { user, wasCreated };
   }
 
   async getUser(id: string) {
@@ -195,7 +227,7 @@ class UserService {
 
   async verifyEmail(args: VerifyEmailType) {
     const { email, code } = args;
-    console.log('[UserService] Verifying email:', email, 'with code:', code);
+    console.log('[UserService] Verifying email attempt', { email });
 
     const verification_code = await db.query.email_verification_codes.findFirst(
       {
@@ -207,7 +239,7 @@ class UserService {
     );
 
     if (!verification_code) {
-      console.log('[UserService] Invalid verification code for:', email);
+      console.warn('[UserService] Invalid verification code', { email });
       throw new AppError({
         code: 'NOT_FOUND',
         message: 'Invalid verification code',
@@ -215,14 +247,14 @@ class UserService {
     }
 
     if (verification_code.expires_at < new Date()) {
-      console.log('[UserService] Expired verification code for:', email);
+      console.warn('[UserService] Expired verification code', { email });
       throw new AppError({
         code: 'BAD_REQUEST',
         message: 'Verification code expired',
       });
     }
 
-    console.log('[UserService] Verification successful for:', email);
+    console.log('[UserService] Verification successful', { email });
     // Delete the verification code after successful verification
     await db
       .delete(email_verification_codes)
@@ -262,12 +294,27 @@ class UserService {
     return user;
   }
 
-  async checkUsernameAvailability(username: string) {
+  async checkUsernameAvailability(username: string, currentUserId?: string) {
     if (!username || username.trim().length === 0) {
       return { available: false, message: 'Username cannot be empty' };
     }
 
-    const trimmedUsername = username.trim();
+    const trimmedUsername = username.trim().toLowerCase();
+
+    // If current user context is provided and username is unchanged, short-circuit as available
+    if (currentUserId) {
+      try {
+        const currentUser = await this.getUserById(currentUserId);
+        if (currentUser.username === trimmedUsername) {
+          console.log(
+            '[UserService] Availability short-circuit: same as current username'
+          );
+          return { available: true, message: 'You already have this username' };
+        }
+      } catch (_err) {
+        // If fetching current user fails, proceed with generic checks
+      }
+    }
 
     // Basic validation
     if (trimmedUsername.length < 3) {
@@ -307,7 +354,7 @@ class UserService {
       'root',
       'system',
     ];
-    if (reservedUsernames.includes(trimmedUsername.toLowerCase())) {
+    if (reservedUsernames.includes(trimmedUsername)) {
       return { available: false, message: 'This username is reserved' };
     }
 
@@ -317,10 +364,67 @@ class UserService {
     });
 
     if (existingUser) {
+      // If the only match is the same authenticated user, treat as available
+      if (currentUserId && existingUser.id === currentUserId) {
+        console.log(
+          '[UserService] Availability: username exists but belongs to current user'
+        );
+        return { available: true, message: 'You already have this username' };
+      }
       return { available: false, message: 'Username already taken' };
     }
 
     return { available: true, message: 'Username is available' };
+  }
+
+  async updateUsername(userId: string, newUsername: string) {
+    const normalized = newUsername.trim().toLowerCase();
+
+    // Short-circuit if unchanged
+    const currentUser = await this.getUserById(userId);
+    if (currentUser.username === normalized) {
+      console.log('[UserService] updateUsername short-circuit: unchanged');
+      return currentUser;
+    }
+
+    // Reuse validation rules with context of current user
+    const availability = await this.checkUsernameAvailability(
+      normalized,
+      userId
+    );
+    if (!availability.available) {
+      throw new AppError({
+        code: 'BAD_REQUEST',
+        message: availability.message,
+      });
+    }
+
+    // Update username for the authenticated user
+    try {
+      const [updated] = await db
+        .update(users)
+        .set({ username: normalized })
+        .where(eq(users.id, userId))
+        .returning();
+
+      if (!updated) {
+        throw new AppError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to update username',
+        });
+      }
+
+      return updated;
+    } catch (error) {
+      if (isUniqueConstraintError(error)) {
+        // Another concurrent request claimed this username between availability check and update
+        throw new AppError({
+          code: 'BAD_REQUEST',
+          message: 'Username already taken',
+        });
+      }
+      throw error;
+    }
   }
 }
 

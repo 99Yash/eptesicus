@@ -12,8 +12,9 @@ organizations.get('/', authenticate(organizationController.listOrganizations));
 // Create organization
 organizations.post(
   '/',
-  validate(
-    organizationInsertSchema,
-    authenticate(organizationController.createOrganization)
+  authenticate(
+    validate(organizationInsertSchema)(
+      organizationController.createOrganization
+    )
   )
 );

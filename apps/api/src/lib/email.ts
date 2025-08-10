@@ -22,16 +22,17 @@ export async function sendEmail({
     });
 
     if (error) {
+      console.error('[email] Failed to send email', { to, subject, error });
       throw new AppError({
         code: 'INTERNAL_SERVER_ERROR',
-        message: `Failed to send email to ${to}: Subject: ${subject}`,
+        message: `Failed to send email`,
         cause: error,
       });
     }
   } catch (error) {
     throw new AppError({
       code: 'INTERNAL_SERVER_ERROR',
-      message: `Failed to send email to ${to}: Subject: ${subject}`,
+      message: `Failed to send email`,
       cause: error,
     });
   }

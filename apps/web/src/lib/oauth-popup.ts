@@ -20,7 +20,9 @@ function validateOrigin(origin: string, expectedApiUrl: string): boolean {
   }
 }
 
-export async function oauthPopup(provider: OAuthProvider): Promise<void> {
+export async function oauthPopup(
+  provider: OAuthProvider
+): Promise<{ wasCreated?: boolean }> {
   if (typeof window === 'undefined') {
     throw new Error(
       'Window is undefined. This function must run in a browser context.'
@@ -62,7 +64,7 @@ export async function oauthPopup(provider: OAuthProvider): Promise<void> {
         return;
       }
 
-      const { type, error, message } = event.data || {};
+      const { type, error, message, wasCreated } = event.data || {};
       if (type !== `${provider.id}-oauth`) return;
 
       window.removeEventListener('message', handleMessage);
@@ -72,7 +74,7 @@ export async function oauthPopup(provider: OAuthProvider): Promise<void> {
       if (error) {
         reject(new Error(message || 'Authentication failed'));
       } else {
-        resolve();
+        resolve({ wasCreated });
       }
     }
 

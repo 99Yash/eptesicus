@@ -12,10 +12,8 @@ import {
   FormMessage,
 } from '@workspace/ui/components/form';
 import { Input } from '@workspace/ui/components/input';
-import { Label } from '@workspace/ui/components/label';
-import { Switch } from '@workspace/ui/components/switch';
 import { Textarea } from '@workspace/ui/components/textarea';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
@@ -43,25 +41,25 @@ export function CreateOrganizationDialog({
 }: CreateOrganizationDialogProps) {
   const { data: user } = useUser();
 
-  const [createMore, setCreateMore] = useState(false);
-
   const queryClient = useQueryClient();
 
+  let toastId: string | number | undefined;
   const createOrgMutation = useMutation({
     mutationFn: api.createOrganization,
     onMutate: () => {
-      toast.loading('Creating organization...');
+      toastId = toast.loading('Creating organization...');
     },
     onSuccess: (org) => {
-      toast.dismiss();
+      if (toastId !== undefined) toast.dismiss(toastId);
       toast.success(`Organization "${org.name}" created`);
       queryClient.invalidateQueries({ queryKey: ['organizations'] });
     },
     onError: (error) => {
-      toast.dismiss();
+      if (toastId !== undefined) toast.dismiss(toastId);
       toast.error(getErrorMessage(error));
     },
   });
+
   const nameInputRef = useRef<HTMLInputElement>(null);
   const bioTextareaRef = useRef<HTMLTextAreaElement>(null);
   const logoUrlInputRef = useRef<HTMLInputElement>(null);
@@ -112,27 +110,21 @@ export function CreateOrganizationDialog({
   };
 
   const onSubmit = async (values: OrganizationFormValues) => {
-    try {
-      await createOrgMutation.mutateAsync({
-        name: values.name.trim(),
-        bio: values.bio?.trim() || undefined,
-        logo_url: values.logoUrl?.trim() || undefined,
-      });
+    if (createOrgMutation.isPending) return; // prevent duplicate submissions
 
-      setShowModal(false);
-      if (!createMore) {
-        form.reset();
-      }
-    } catch (error) {
-      // handled in hook
-    }
+    await createOrgMutation.mutateAsync({
+      name: values.name.trim(),
+      bio: values.bio?.trim() || undefined,
+      logo_url: values.logoUrl?.trim() || undefined,
+    });
+
+    setShowModal(false);
+    form.reset();
   };
 
   const handleClose = () => {
     setShowModal(false);
-    if (!createMore) {
-      form.reset();
-    }
+    form.reset();
   };
 
   return (
@@ -258,15 +250,6 @@ export function CreateOrganizationDialog({
                   ? 'Creating...'
                   : 'Create Organization'}
               </Button>
-              {/* Create more toggle */}
-              <div className="ml-auto flex items-center gap-2 text-sm">
-                <Label htmlFor="create-more">Create more</Label>
-                <Switch
-                  id="create-more"
-                  checked={createMore}
-                  onCheckedChange={setCreateMore}
-                />
-              </div>
             </div>
           </form>
         </Form>

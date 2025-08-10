@@ -38,8 +38,8 @@ export function Modal({
 }) {
   const router = useRouter();
 
-  const closeModal = ({ dragged }: { dragged?: boolean } = {}) => {
-    if (preventDefaultClose && !dragged) {
+  const closeModal = () => {
+    if (preventDefaultClose) {
       return;
     }
     // fire onClose event if provided
@@ -61,7 +61,7 @@ export function Modal({
         open={setShowModal ? showModal : true}
         onOpenChange={(open) => {
           if (!open) {
-            closeModal({ dragged: true });
+            closeModal();
           }
         }}
       >

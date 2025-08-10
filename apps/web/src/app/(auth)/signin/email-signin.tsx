@@ -13,6 +13,7 @@ import {
   getErrorMessage,
   getLocalStorageItem,
   setLocalStorageItem,
+  setSessionStorageItem,
 } from '~/lib/utils';
 
 const schema = z.object({
@@ -39,10 +40,14 @@ export function EmailSignIn({ onSuccess }: EmailSignInProps) {
     onError(error) {
       toast.error(getErrorMessage(error));
     },
-    onSuccess(_data, variables) {
+    onSuccess(data, variables) {
       // Persist last used auth method
       if (typeof window !== 'undefined') {
         setLocalStorageItem('LAST_AUTH_METHOD', 'EMAIL');
+        // If first-time signup (201), set flag to show username modal after verification
+        if ((data as any)?.wasCreated) {
+          setSessionStorageItem('SHOW_USERNAME_MODAL', true);
+        }
       }
       onSuccess(variables.email);
       toast.info(`Please check your inbox for further instructions.`);
