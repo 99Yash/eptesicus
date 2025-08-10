@@ -43,21 +43,23 @@ export function CreateOrganizationDialog({
 
   const queryClient = useQueryClient();
 
+  let toastId: string | number | undefined;
   const createOrgMutation = useMutation({
     mutationFn: api.createOrganization,
     onMutate: () => {
-      toast.loading('Creating organization...');
+      toastId = toast.loading('Creating organization...');
     },
     onSuccess: (org) => {
-      toast.dismiss();
+      if (toastId !== undefined) toast.dismiss(toastId);
       toast.success(`Organization "${org.name}" created`);
       queryClient.invalidateQueries({ queryKey: ['organizations'] });
     },
     onError: (error) => {
-      toast.dismiss();
+      if (toastId !== undefined) toast.dismiss(toastId);
       toast.error(getErrorMessage(error));
     },
   });
+
   const nameInputRef = useRef<HTMLInputElement>(null);
   const bioTextareaRef = useRef<HTMLTextAreaElement>(null);
   const logoUrlInputRef = useRef<HTMLInputElement>(null);
@@ -108,18 +110,16 @@ export function CreateOrganizationDialog({
   };
 
   const onSubmit = async (values: OrganizationFormValues) => {
-    try {
-      await createOrgMutation.mutateAsync({
-        name: values.name.trim(),
-        bio: values.bio?.trim() || undefined,
-        logo_url: values.logoUrl?.trim() || undefined,
-      });
+    if (createOrgMutation.isPending) return; // prevent duplicate submissions
 
-      setShowModal(false);
-      form.reset();
-    } catch (error) {
-      // handled in hook
-    }
+    await createOrgMutation.mutateAsync({
+      name: values.name.trim(),
+      bio: values.bio?.trim() || undefined,
+      logo_url: values.logoUrl?.trim() || undefined,
+    });
+
+    setShowModal(false);
+    form.reset();
   };
 
   const handleClose = () => {
