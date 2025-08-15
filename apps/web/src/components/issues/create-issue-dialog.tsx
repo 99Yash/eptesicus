@@ -1,7 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@workspace/ui/components/button';
 import {
   Form,
@@ -26,6 +26,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
+import { useOrganization } from '~/components/layouts/organization-provider';
 import { useUser } from '~/hooks/use-user';
 import { api, type CreateIssueData } from '~/lib/api';
 import {
@@ -67,11 +68,8 @@ export function CreateIssueDialog({
   setShowModal,
 }: CreateIssueDialogProps) {
   const { data: user } = useUser();
-  const { data: organizations } = useQuery({
-    queryKey: ['organizations'],
-    queryFn: api.listOrganizations,
-  });
-  const orgId = organizations?.[0]?.id;
+  const { currentOrganization } = useOrganization();
+  const orgId = currentOrganization?.id;
 
   const [createMore, setCreateMore] = React.useState(false);
 
@@ -202,7 +200,7 @@ export function CreateIssueDialog({
               <div className="w-3 h-3 rounded-sm bg-primary" />
             </div>
             <span className="text-muted-foreground uppercase">
-              {orgId.slice(0, 4)}
+              {currentOrganization?.name || 'ORG'}
             </span>
             <span className="text-muted-foreground">
               <Kbd>/</Kbd>

@@ -13,10 +13,10 @@ export function MainLayout({ children, headersNumber = 2 }: MainLayoutProps) {
   // };
   return (
     <SidebarProvider>
-      <div className="min-h-svh lg:p-2 w-full flex flex-col">
-        <div className="lg:border lg:rounded-md flex flex-col items-center justify-start bg-background w-full h-full">
-          <ThemeSwitcher className="absolute top-4 right-4" />
-          <div className="overflow-auto w-full h-full">{children}</div>
+      <div className="h-svh lg:p-2 w-full flex flex-col">
+        <div className="lg:border lg:rounded-md flex flex-col bg-background w-full h-full">
+          <ThemeSwitcher className="absolute top-4 left-4" />
+          <div className="flex-1 overflow-auto">{children}</div>
         </div>
       </div>
     </SidebarProvider>

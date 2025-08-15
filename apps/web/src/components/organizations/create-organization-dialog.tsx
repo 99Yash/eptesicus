@@ -43,19 +43,18 @@ export function CreateOrganizationDialog({
 
   const queryClient = useQueryClient();
 
-  let toastId: string | number | undefined;
   const createOrgMutation = useMutation({
     mutationFn: api.createOrganization,
     onMutate: () => {
-      toastId = toast.loading('Creating organization...');
+      toast.loading('Creating organization...');
     },
     onSuccess: (org) => {
-      if (toastId !== undefined) toast.dismiss(toastId);
+      toast.dismiss();
       toast.success(`Organization "${org.name}" created`);
       queryClient.invalidateQueries({ queryKey: ['organizations'] });
     },
     onError: (error) => {
-      if (toastId !== undefined) toast.dismiss(toastId);
+      toast.dismiss();
       toast.error(getErrorMessage(error));
     },
   });
