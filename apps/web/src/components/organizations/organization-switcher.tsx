@@ -82,7 +82,15 @@ export function OrganizationSwitcher({
           aria-haspopup="true"
           aria-expanded={isOpen}
         >
-          <Building2 className="size-4" />
+          {currentOrganization.logo_url ? (
+            <img
+              src={currentOrganization.logo_url}
+              alt={currentOrganization.name}
+              className="rounded self-center border border-main-muted size-6"
+            />
+          ) : (
+            <Building2 className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+          )}
           <span className="max-w-[120px] truncate text-sm">
             {currentOrganization.name}
           </span>

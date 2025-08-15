@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button, buttonVariants } from '@workspace/ui/components/button';
 import { Kbd } from '@workspace/ui/components/kbd';
 import { cn } from '@workspace/ui/lib/utils';
-import { LogOutIcon } from 'lucide-react';
+import { LogInIcon, LogOutIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
@@ -23,7 +23,9 @@ export default function Page() {
   const { data: organizations, isLoading: organizationsLoading } = useQuery({
     queryKey: ['organizations'],
     queryFn: api.listOrganizations,
+    enabled: !!user, // Only fetch organizations when user is authenticated
   });
+
   const [showCreateIssueDialog, setShowCreateIssueDialog] = useState(false);
   const [showCreateOrgDialog, setShowCreateOrgDialog] = useState(false);
   const [showUsernameDialog, setShowUsernameDialog] = useState(false);
@@ -96,7 +98,7 @@ export default function Page() {
   }, [user]);
 
   // Don't render anything until we have the user and organizations data
-  if (!user || organizationsLoading) {
+  if (user && organizationsLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
@@ -107,7 +109,7 @@ export default function Page() {
     );
   }
 
-  if (!organizations) {
+  if (user && !organizations) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
@@ -125,8 +127,11 @@ export default function Page() {
     );
   }
 
+  // Ensure organizations is always defined when we reach this point
+  const safeOrganizations = organizations || [];
+
   return (
-    <OrganizationProvider organizations={organizations}>
+    <OrganizationProvider organizations={safeOrganizations}>
       <div className="h-full">
         <div className="container mx-auto px-4 py-8 md:px-6 lg:px-8">
           {/* Header */}
@@ -145,7 +150,7 @@ export default function Page() {
               {user ? (
                 <>
                   <OrganizationSwitcher
-                    organizations={organizations}
+                    organizations={safeOrganizations}
                     onCreateOrganization={() => setShowCreateOrgDialog(true)}
                   />
                   <Button
@@ -165,6 +170,7 @@ export default function Page() {
                     buttonVariants({ variant: 'outline', size: 'sm' })
                   )}
                 >
+                  <LogInIcon className="size-4" />
                   Sign In
                 </Link>
               )}
