@@ -20,7 +20,7 @@ export default function Page() {
     queryKey: ['organizations'],
     queryFn: api.listOrganizations,
   });
-  const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [showCreateIssueDialog, setShowCreateIssueDialog] = useState(false);
   const [showCreateOrgDialog, setShowCreateOrgDialog] = useState(false);
   const [showUsernameDialog, setShowUsernameDialog] = useState(false);
 
@@ -84,7 +84,7 @@ export default function Page() {
         !event.altKey
       ) {
         event.preventDefault();
-        setShowCreateDialog(true);
+        setShowCreateIssueDialog(true);
       }
     };
 
@@ -149,8 +149,8 @@ export default function Page() {
       </div>
 
       <CreateIssueDialog
-        showModal={showCreateDialog}
-        setShowModal={setShowCreateDialog}
+        showModal={showCreateIssueDialog}
+        setShowModal={setShowCreateIssueDialog}
       />
 
       <CreateOrganizationDialog

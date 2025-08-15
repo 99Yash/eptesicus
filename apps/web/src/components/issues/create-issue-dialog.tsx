@@ -91,6 +91,32 @@ export function CreateIssueDialog({
 
   const titleInputRef = React.useRef<HTMLInputElement>(null);
   const descriptionTextareaRef = React.useRef<HTMLTextAreaElement>(null);
+  const hasFocusedTitleInputRef = React.useRef<boolean>(false);
+
+  const setTitleInputRef = React.useCallback(
+    (node: HTMLInputElement | null) => {
+      // Track attachment/detachment and focus once on attach
+      console.debug('[CreateIssueDialog] title input node set', {
+        attached: Boolean(node),
+      });
+
+      titleInputRef.current = node;
+
+      if (node === null) {
+        hasFocusedTitleInputRef.current = false; // reset when unmounted/closed
+        return;
+      }
+
+      if (!hasFocusedTitleInputRef.current) {
+        console.debug(
+          '[CreateIssueDialog] focusing title input via callback ref'
+        );
+        node.focus();
+        hasFocusedTitleInputRef.current = true;
+      }
+    },
+    []
+  );
 
   const form = useForm<IssueFormValues>({
     resolver: zodResolver(issueFormSchema),
@@ -102,12 +128,7 @@ export function CreateIssueDialog({
     },
   });
 
-  // Focus title input when modal opens
-  React.useEffect(() => {
-    if (showModal && titleInputRef.current) {
-      titleInputRef.current.focus();
-    }
-  }, [showModal]);
+  // Focus is handled via callback ref above per https://tkdodo.eu/blog/avoiding-use-effect-with-callback-refs
 
   if (!user || !orgId) {
     return null; // Either not logged in or org not ready
@@ -210,7 +231,7 @@ export function CreateIssueDialog({
                           disabled={createIssueMutation.isPending}
                           onKeyDown={handleTitleKeyDown}
                           ref={(el) => {
-                            titleInputRef.current = el;
+                            setTitleInputRef(el);
                             ref(el);
                           }}
                           {...fieldProps}

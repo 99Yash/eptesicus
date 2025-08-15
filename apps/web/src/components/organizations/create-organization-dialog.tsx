@@ -63,6 +63,28 @@ export function CreateOrganizationDialog({
   const nameInputRef = React.useRef<HTMLInputElement>(null);
   const bioTextareaRef = React.useRef<HTMLTextAreaElement>(null);
   const logoUrlInputRef = React.useRef<HTMLInputElement>(null);
+  const hasFocusedNameInputRef = React.useRef<boolean>(false);
+
+  const setNameInputRef = React.useCallback((node: HTMLInputElement | null) => {
+    console.debug('[CreateOrganizationDialog] name input node set', {
+      attached: Boolean(node),
+    });
+
+    nameInputRef.current = node;
+
+    if (node === null) {
+      hasFocusedNameInputRef.current = false; // reset when unmounted/closed
+      return;
+    }
+
+    if (!hasFocusedNameInputRef.current) {
+      console.debug(
+        '[CreateOrganizationDialog] focusing name input via callback ref'
+      );
+      node.focus();
+      hasFocusedNameInputRef.current = true;
+    }
+  }, []);
 
   const form = useForm<OrganizationFormValues>({
     resolver: zodResolver(organizationFormSchema),
@@ -73,12 +95,7 @@ export function CreateOrganizationDialog({
     },
   });
 
-  // Focus name input when modal opens
-  React.useEffect(() => {
-    if (showModal && nameInputRef.current) {
-      nameInputRef.current.focus();
-    }
-  }, [showModal]);
+  // Focus is handled via callback ref above per https://tkdodo.eu/blog/avoiding-use-effect-with-callback-refs
 
   if (!user) return null;
 
@@ -164,7 +181,7 @@ export function CreateOrganizationDialog({
                           disabled={createOrgMutation.isPending}
                           onKeyDown={handleNameKeyDown}
                           ref={(el) => {
-                            nameInputRef.current = el;
+                            setNameInputRef(el);
                             ref(el);
                           }}
                           {...fieldProps}
