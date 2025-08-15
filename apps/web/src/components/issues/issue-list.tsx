@@ -22,6 +22,7 @@ import {
 } from '@workspace/ui/components/popover';
 import { cn } from '@workspace/ui/lib/utils';
 import { Check, Plus } from 'lucide-react';
+import { useOrganization } from '~/components/layouts/organization-provider';
 import { api } from '~/lib/api';
 import {
   IssuePriority,
@@ -289,14 +290,30 @@ function StatusGroup({
 
 export function IssueList() {
   const queryClient = useQueryClient();
+  const { currentOrganization } = useOrganization();
+
   const {
     data: issues,
     isLoading,
     error,
   } = useQuery({
-    queryKey: ['issues'],
-    queryFn: () => api.listIssues(),
+    queryKey: ['issues', currentOrganization?.id],
+    queryFn: () =>
+      api.listIssues({
+        organization_id: currentOrganization?.id,
+      }),
+    enabled: !!currentOrganization?.id,
   });
+
+  if (!currentOrganization) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-muted-foreground">
+          Please select an organization to view issues
+        </p>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (

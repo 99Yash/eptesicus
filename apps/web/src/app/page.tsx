@@ -4,12 +4,15 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button, buttonVariants } from '@workspace/ui/components/button';
 import { Kbd } from '@workspace/ui/components/kbd';
 import { cn } from '@workspace/ui/lib/utils';
+import { LogOutIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { CreateIssueDialog } from '~/components/issues/create-issue-dialog';
 import { IssueList } from '~/components/issues/issue-list';
+import { OrganizationProvider } from '~/components/layouts/organization-provider';
 import { CreateOrganizationDialog } from '~/components/organizations/create-organization-dialog';
+import { OrganizationSwitcher } from '~/components/organizations/organization-switcher';
 import { UsernameDialog } from '~/components/users/username-dialog';
 import { useUser } from '~/hooks/use-user';
 import { api } from '~/lib/api';
@@ -17,7 +20,7 @@ import { getSessionStorageItem } from '~/lib/utils';
 
 export default function Page() {
   const { data: user } = useUser();
-  const { data: organizations } = useQuery({
+  const { data: organizations, isLoading: organizationsLoading } = useQuery({
     queryKey: ['organizations'],
     queryFn: api.listOrganizations,
   });
@@ -76,7 +79,7 @@ export default function Page() {
       const target = event.target as HTMLElement;
       if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return;
 
-      // Check if 'C' is pressed (case insensitive)
+      // Check if 'C' is pressed (case insensitive) for creating issues
       if (
         event.key.toLowerCase() === 'c' &&
         !event.ctrlKey &&
@@ -92,8 +95,38 @@ export default function Page() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [user]);
 
+  // Don't render anything until we have the user and organizations data
+  if (!user || organizationsLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!organizations) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-muted-foreground">Failed to load organizations</p>
+          <Button
+            variant="outline"
+            size="sm"
+            className="mt-2"
+            onClick={() => window.location.reload()}
+          >
+            Try again
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <>
+    <OrganizationProvider organizations={organizations}>
       <div className="min-h-screen bg-background">
         <div className="container mx-auto px-4 py-8 md:px-6 lg:px-8">
           {/* Header */}
@@ -111,12 +144,17 @@ export default function Page() {
             <div className="flex items-center gap-2">
               {user ? (
                 <>
+                  <OrganizationSwitcher
+                    organizations={organizations}
+                    onCreateOrganization={() => setShowCreateOrgDialog(true)}
+                  />
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => signoutMutation.mutate()}
                     disabled={signoutMutation.isPending}
                   >
+                    <LogOutIcon className="size-4" />
                     {signoutMutation.isPending ? 'Signing Out...' : 'Sign Out'}
                   </Button>
                 </>
@@ -162,6 +200,6 @@ export default function Page() {
         showModal={showUsernameDialog}
         setShowModal={setShowUsernameDialog}
       />
-    </>
+    </OrganizationProvider>
   );
 }
