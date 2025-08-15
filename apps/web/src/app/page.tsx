@@ -127,7 +127,7 @@ export default function Page() {
 
   return (
     <OrganizationProvider organizations={organizations}>
-      <div className="min-h-screen bg-background">
+      <div className="h-full">
         <div className="container mx-auto px-4 py-8 md:px-6 lg:px-8">
           {/* Header */}
           <header className="flex flex-col items-start justify-between gap-4 border-b pb-6 md:flex-row md:items-center md:gap-0 md:pb-8">

@@ -5,6 +5,7 @@ import React from 'react';
 import { toast } from 'sonner';
 
 import { type IssueWithOrganization } from '@workspace/db/helpers';
+import { IssueUpdateType } from '@workspace/db/schemas';
 import { Button } from '@workspace/ui/components/button';
 import {
   Command,
@@ -129,7 +130,7 @@ function PriorityDropdown({ issue }: { issue: IssueWithOrganization }) {
   const queryClient = useQueryClient();
 
   const updateIssue = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: any }) =>
+    mutationFn: ({ id, data }: { id: string; data: IssueUpdateType }) =>
       api.updateIssue(id, data),
     onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: ['issues'] });
