@@ -13,6 +13,7 @@ import { CreateOrganizationDialog } from '~/components/organizations/create-orga
 import { UsernameDialog } from '~/components/users/username-dialog';
 import { useUser } from '~/hooks/use-user';
 import { api } from '~/lib/api';
+import { getSessionStorageItem } from '~/lib/utils';
 
 export default function Page() {
   const { data: user } = useUser();
@@ -60,14 +61,13 @@ export default function Page() {
   useEffect(() => {
     if (!user) return;
     try {
-      const flag = sessionStorage.getItem('SHOW_USERNAME_MODAL');
+      const flag = getSessionStorageItem('SHOW_USERNAME_MODAL');
       if (flag ? JSON.parse(flag) === true : false) {
         setShowUsernameDialog(true);
       }
     } catch {}
   }, [user]);
 
-  // Keyboard shortcut handler
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       // Only trigger if user is logged in and not typing in an input/textarea
