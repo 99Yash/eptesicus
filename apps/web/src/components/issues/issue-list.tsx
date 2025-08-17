@@ -22,7 +22,7 @@ import {
   PopoverTrigger,
 } from '@workspace/ui/components/popover';
 import { cn } from '@workspace/ui/lib/utils';
-import { Check, Plus } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { useOrganization } from '~/components/layouts/organization-provider';
 import { api } from '~/lib/api';
 import {
@@ -248,11 +248,9 @@ function IssueRow({ issue }: { issue: IssueWithOrganization }) {
 function StatusGroup({
   status,
   issues,
-  onAddIssue,
 }: {
   status: (typeof STATUS_OPTIONS)[number];
   issues: IssueWithOrganization[];
-  onAddIssue?: () => void;
 }) {
   const StatusIcon = getStatusIcon(status.value);
 
@@ -267,16 +265,6 @@ function StatusGroup({
             {issues.length}
           </span>
         </div>
-        {onAddIssue && (
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-6 w-6 opacity-0 group-hover/header:opacity-100 transition-opacity"
-            onClick={onAddIssue}
-          >
-            <Plus size={12} />
-          </Button>
-        )}
       </div>
 
       {/* Issues */}
@@ -399,10 +387,6 @@ export function IssueList() {
             key={status.value}
             status={status}
             issues={statusIssues}
-            onAddIssue={() => {
-              // TODO: Implement add issue functionality
-              console.log(`Add issue to ${status.label}`);
-            }}
           />
         );
       })}
