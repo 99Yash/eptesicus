@@ -65,10 +65,6 @@ export function CreateOrganizationDialog({
   const hasFocusedNameInputRef = React.useRef<boolean>(false);
 
   const setNameInputRef = React.useCallback((node: HTMLInputElement | null) => {
-    console.debug('[CreateOrganizationDialog] name input node set', {
-      attached: Boolean(node),
-    });
-
     nameInputRef.current = node;
 
     if (node === null) {
@@ -77,9 +73,6 @@ export function CreateOrganizationDialog({
     }
 
     if (!hasFocusedNameInputRef.current) {
-      console.debug(
-        '[CreateOrganizationDialog] focusing name input via callback ref'
-      );
       node.focus();
       hasFocusedNameInputRef.current = true;
     }
@@ -93,8 +86,6 @@ export function CreateOrganizationDialog({
       logoUrl: '',
     },
   });
-
-  // Focus is handled via callback ref above per https://tkdodo.eu/blog/avoiding-use-effect-with-callback-refs
 
   if (!user) return null;
 

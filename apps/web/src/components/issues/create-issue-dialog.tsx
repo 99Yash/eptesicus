@@ -93,11 +93,6 @@ export function CreateIssueDialog({
 
   const setTitleInputRef = React.useCallback(
     (node: HTMLInputElement | null) => {
-      // Track attachment/detachment and focus once on attach
-      console.debug('[CreateIssueDialog] title input node set', {
-        attached: Boolean(node),
-      });
-
       titleInputRef.current = node;
 
       if (node === null) {
@@ -106,9 +101,6 @@ export function CreateIssueDialog({
       }
 
       if (!hasFocusedTitleInputRef.current) {
-        console.debug(
-          '[CreateIssueDialog] focusing title input via callback ref'
-        );
         node.focus();
         hasFocusedTitleInputRef.current = true;
       }
@@ -152,12 +144,6 @@ export function CreateIssueDialog({
   };
 
   const onSubmit = async (values: IssueFormValues) => {
-    console.log('[CreateIssueDialog] Submitting issue:', {
-      title: values.title.trim(),
-      description: values.description?.trim() || undefined,
-      organization_id: orgId,
-    });
-
     try {
       await createIssueMutation.mutateAsync({
         title: values.title.trim(),
@@ -166,8 +152,6 @@ export function CreateIssueDialog({
         todo_priority: values.todo_priority,
         organization_id: orgId,
       });
-
-      console.log('[CreateIssueDialog] Issue created successfully');
 
       if (createMore) {
         // Reset form but keep modal open
@@ -182,8 +166,7 @@ export function CreateIssueDialog({
         form.reset();
       }
     } catch (error) {
-      // Error is handled by the mutation hook
-      console.error('[CreateIssueDialog] Failed to create issue:', error);
+      toast.error('Failed to create issue');
     }
   };
 
