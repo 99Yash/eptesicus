@@ -61,3 +61,28 @@ export const issue_relations = relations(issues, ({ one }) => ({
     references: [organizations.id],
   }),
 }));
+
+export const comments = pgTable('comments', {
+  id: varchar('id')
+    .$defaultFn(() => createId())
+    .primaryKey(),
+  issue_id: varchar('issue_id')
+    .references(() => issues.id)
+    .notNull(),
+  user_id: varchar('user_id')
+    .references(() => users.id)
+    .notNull(),
+  content: text('content').notNull(),
+  ...lifecycle_dates,
+});
+
+export const comment_relations = relations(comments, ({ one }) => ({
+  issue: one(issues, {
+    fields: [comments.issue_id],
+    references: [issues.id],
+  }),
+  user: one(users, {
+    fields: [comments.user_id],
+    references: [users.id],
+  }),
+}));
