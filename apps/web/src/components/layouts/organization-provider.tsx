@@ -6,7 +6,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 interface OrganizationContextType {
   currentOrganization: Organization | null;
   setCurrentOrganization: (org: Organization | null) => void;
-  switchOrganization: (orgId: string) => void;
+  switchOrganization: (orgId: Organization['id']) => void;
 }
 
 const OrganizationContext = createContext<OrganizationContextType | null>(null);

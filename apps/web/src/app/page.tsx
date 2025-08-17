@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button, buttonVariants } from '@workspace/ui/components/button';
 import { Kbd } from '@workspace/ui/components/kbd';
 import { cn } from '@workspace/ui/lib/utils';
-import { LogInIcon, LogOutIcon } from 'lucide-react';
+import { LogIn, LogOut } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
@@ -159,7 +159,7 @@ export default function Page() {
                     onClick={() => signoutMutation.mutate()}
                     disabled={signoutMutation.isPending}
                   >
-                    <LogOutIcon className="size-4" />
+                    <LogOut className="size-4" />
                     {signoutMutation.isPending ? 'Signing Out...' : 'Sign Out'}
                   </Button>
                 </>
@@ -170,7 +170,7 @@ export default function Page() {
                     buttonVariants({ variant: 'outline', size: 'sm' })
                   )}
                 >
-                  <LogInIcon className="size-4" />
+                  <LogIn className="size-4" />
                   Sign In
                 </Link>
               )}
