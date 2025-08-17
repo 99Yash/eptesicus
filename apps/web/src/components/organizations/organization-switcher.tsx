@@ -11,7 +11,6 @@ import {
 } from '@workspace/ui/components/dropdown-menu';
 import { cn } from '@workspace/ui/lib/utils';
 import { Building2, Check, ChevronsUpDownIcon, Plus } from 'lucide-react';
-import Image from 'next/image';
 import { useState } from 'react';
 import { useOrganization } from '~/components/layouts/organization-provider';
 
@@ -106,12 +105,10 @@ export function OrganizationSwitcher({
           >
             <div className="flex flex-1 items-start gap-2">
               {org.logo_url ? (
-                <Image
+                <img
                   src={org.logo_url}
                   alt={org.name}
                   className="rounded self-center border border-main-muted size-6"
-                  width={24}
-                  height={24}
                 />
               ) : (
                 <Building2 className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
