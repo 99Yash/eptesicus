@@ -283,12 +283,6 @@ export function CreateIssueDialog({
                         size="sm"
                         className="flex items-center gap-2 text-sm border border-border hover:bg-muted capitalize"
                       >
-                        <span
-                          className={`w-2.5 h-2.5 rounded-full ${
-                            STATUS_OPTIONS.find((o) => o.value === field.value)
-                              ?.color
-                          }`}
-                        />
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
