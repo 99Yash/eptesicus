@@ -222,23 +222,19 @@ function IssueRow({ issue }: { issue: IssueWithOrganization }) {
 
   return (
     <div className="group flex items-center gap-1.5 py-1.5 px-2 hover:bg-muted/30 rounded-sm transition-colors">
-      {/* Interactive Priority Icon */}
       <div className="flex items-center min-w-fit">
         <PriorityDropdown issue={issue} />
       </div>
 
-      {/* Issue ID */}
       <span className="text-xs text-muted-foreground font-mono font-medium min-w-fit">
         {issueId}
       </span>
 
-      {/* Interactive Status Icon */}
       <div className="flex items-center min-w-fit">
         <StatusDropdown issue={issue} />
       </div>
 
-      {/* Issue Title */}
-      <span className="text-sm text-foreground truncate flex-1">
+      <span className="text-sm text-foreground line-clamp-1 font-medium flex-1">
         {issue.title}
       </span>
     </div>
