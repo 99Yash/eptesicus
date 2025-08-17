@@ -216,9 +216,8 @@ function PriorityDropdown({ issue }: { issue: IssueWithOrganization }) {
 }
 
 function IssueRow({ issue }: { issue: IssueWithOrganization }) {
-  const orgPrefix =
-    issue.organization?.name?.slice(0, 3).toUpperCase() || 'ISSUE';
-  const issueId = `${orgPrefix}-${issue.id.slice(-2)}`;
+  const orgPrefix = issue.organization?.name?.slice(0, 3) || 'ISSUE';
+  const issueId = `${orgPrefix}-${issue.id.slice(-2)}`.toUpperCase();
 
   return (
     <div className="group flex items-center gap-1.5 py-1.5 px-2 hover:bg-muted/30 rounded-sm transition-colors">
