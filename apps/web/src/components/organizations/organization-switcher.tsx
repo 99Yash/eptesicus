@@ -1,6 +1,5 @@
 'use client';
 
-import { useQueryClient } from '@tanstack/react-query';
 import { Organization } from '@workspace/db/helpers';
 import { Button } from '@workspace/ui/components/button';
 import {
@@ -27,10 +26,8 @@ export function OrganizationSwitcher({
   onCreateOrganization,
 }: OrganizationSwitcherProps) {
   const { currentOrganization, switchOrganization } = useOrganization();
-  const queryClient = useQueryClient();
   const [isOpen, setIsOpen] = useState(false);
 
-  // Don't render if no organizations
   if (!organizations || organizations.length === 0) {
     return (
       <Button
@@ -62,9 +59,6 @@ export function OrganizationSwitcher({
   const handleOrganizationSwitch = (orgId: string) => {
     console.log('[OrganizationSwitcher] Switching to organization:', orgId);
     switchOrganization(orgId);
-
-    // Invalidate issues query to refetch with new organization
-    queryClient.invalidateQueries({ queryKey: ['issues'] });
 
     // Close the dropdown after selection
     setIsOpen(false);
