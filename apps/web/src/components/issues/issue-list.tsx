@@ -178,9 +178,9 @@ function PriorityDropdown({ issue }: { issue: IssueWithOrganization }) {
                   <CommandItem
                     key={option.value}
                     value={option.value}
-                    onSelect={(currentValue) => {
+                    onSelect={async (currentValue) => {
                       if (currentValue !== issue.todo_priority) {
-                        updateIssue.mutate({
+                        await updateIssue.mutateAsync({
                           id: issue.id,
                           data: {
                             todo_priority: currentValue as IssuePriority,
@@ -290,7 +290,6 @@ function StatusGroup({
 }
 
 export function IssueList() {
-  const queryClient = useQueryClient();
   const { currentOrganization } = useOrganization();
 
   const {

@@ -53,7 +53,7 @@ export const issueInsertSchema = createInsertSchema(issues, {
 export const issueUpdateSchema = createUpdateSchema(issues);
 
 export type IssueInsertType = z.infer<typeof issueInsertSchema>;
-export type IssueUpdateType = z.infer<typeof issueUpdateSchema>;
+export type IssueUpdateType = Partial<z.infer<typeof issueUpdateSchema>>;
 
 export const issue_relations = relations(issues, ({ one }) => ({
   organization: one(organizations, {

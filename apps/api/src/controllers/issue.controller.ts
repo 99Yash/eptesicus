@@ -8,6 +8,7 @@ import { NextFunction, Response } from 'express';
 import { AppError } from '../lib/error';
 import { AuthenticatedRequest } from '../middlewares/authenticate';
 import { ValidatedRequest } from '../middlewares/validate';
+import { issueParamsSchema } from '../routers/issue.router';
 import { issueService } from '../services/issue.service';
 
 class IssueController {
@@ -82,7 +83,7 @@ class IssueController {
     try {
       const { id } = req.params;
 
-      if (!id) {
+      if (!id || !issueParamsSchema.safeParse(req.params).success) {
         throw new AppError({
           code: 'BAD_REQUEST',
           message: 'Issue id is required',

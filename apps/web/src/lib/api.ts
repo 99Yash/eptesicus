@@ -120,7 +120,7 @@ class API {
 
   async updateIssue(id: string, data: IssueUpdateType) {
     console.log('[api.updateIssue] Updating issue:', id, data);
-    const response = await _axios.put<IssueWithOrganization>(
+    const response = await _axios.patch<IssueWithOrganization>(
       `/issues/${id}`,
       data
     );

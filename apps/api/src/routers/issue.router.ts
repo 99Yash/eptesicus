@@ -7,8 +7,8 @@ import { validate } from '../middlewares/validate';
 
 export const issues: Router = Router({ mergeParams: true });
 
-const issueParamsSchema = z.object({
-  id: z.uuid(),
+export const issueParamsSchema = z.object({
+  id: z.string(),
 });
 
 // Create
@@ -27,13 +27,9 @@ issues.get(
 );
 
 // Update
-issues.put(
+issues.patch(
   '/:id',
-  authenticate(
-    validate(issueParamsSchema)(
-      validate(issueUpdateSchema)(issueController.updateIssue)
-    )
-  )
+  authenticate(validate(issueUpdateSchema)(issueController.updateIssue))
 );
 
 // Delete

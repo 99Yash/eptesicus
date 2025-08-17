@@ -43,7 +43,7 @@ class UserController {
     req: ValidatedRequest<typeof verifyEmailSchema>,
     res: Response,
     next: NextFunction
-  ): Promise<void> {
+  ) {
     try {
       const { email, code } = req.body;
       const user = await userService.verifyEmail({ email, code });
@@ -61,14 +61,14 @@ class UserController {
     req: AuthenticatedRequest,
     res: Response,
     next: NextFunction
-  ): Promise<void> {
+  ) {
     try {
       console.log(
         '[UserController] getCurrentUser called with userId:',
         req.userId
       );
       const user = await userService.getUser(req.userId);
-      console.log('[UserController] getCurrentUser found user:', user);
+
       res.status(200).json(user);
     } catch (error) {
       next(error);
