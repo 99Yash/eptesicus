@@ -6,7 +6,7 @@ import { Kbd } from '@workspace/ui/components/kbd';
 import { cn } from '@workspace/ui/lib/utils';
 import { LogIn, LogOut } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import React from 'react';
 import { toast } from 'sonner';
 import { CreateIssueDialog } from '~/components/issues/create-issue-dialog';
 import { IssueList } from '~/components/issues/issue-list';
@@ -26,9 +26,10 @@ export default function Page() {
     enabled: !!user, // Only fetch organizations when user is authenticated
   });
 
-  const [showCreateIssueDialog, setShowCreateIssueDialog] = useState(false);
-  const [showCreateOrgDialog, setShowCreateOrgDialog] = useState(false);
-  const [showUsernameDialog, setShowUsernameDialog] = useState(false);
+  const [showCreateIssueDialog, setShowCreateIssueDialog] =
+    React.useState(false);
+  const [showCreateOrgDialog, setShowCreateOrgDialog] = React.useState(false);
+  const [showUsernameDialog, setShowUsernameDialog] = React.useState(false);
 
   const queryClient = useQueryClient();
 
@@ -49,7 +50,7 @@ export default function Page() {
   });
 
   // Show organization dialog if user has none
-  useEffect(() => {
+  React.useEffect(() => {
     if (user && organizations && organizations.length === 0) {
       let wantsUsername = false;
       try {
@@ -63,7 +64,7 @@ export default function Page() {
   }, [user, organizations, showUsernameDialog]);
 
   // Show username dialog on first sign-in (flag set by auth flows)
-  useEffect(() => {
+  React.useEffect(() => {
     if (!user) return;
     try {
       const flag = getSessionStorageItem('SHOW_USERNAME_MODAL');
@@ -73,7 +74,7 @@ export default function Page() {
     } catch {}
   }, [user]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       // Only trigger if user is logged in and not typing in an input/textarea
       if (!user) return;
