@@ -129,13 +129,14 @@ export function CreateOrganizationDialog({
     form.reset();
   };
 
-  const handleClose = () => {
-    setShowModal(false);
-    form.reset();
-  };
-
   return (
-    <Modal showModal={showModal} setShowModal={handleClose}>
+    <Modal
+      showModal={showModal}
+      setShowModal={(show) => {
+        setShowModal(false);
+        form.reset();
+      }}
+    >
       <div className="w-full max-w-[600px] mx-auto p-6 space-y-4">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -242,7 +243,7 @@ export function CreateOrganizationDialog({
                 size="sm"
                 className="flex items-center gap-2"
                 disabled={createOrgMutation.isPending}
-                onClick={handleClose}
+                onClick={() => setShowModal(false)}
               >
                 Cancel
               </Button>
